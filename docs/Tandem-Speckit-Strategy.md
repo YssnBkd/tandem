@@ -129,7 +129,7 @@ Create the constitution for Tandem, a weekly productivity app for couples.
 
 ### Code Quality
 - Kotlin-first idioms (sealed classes, data classes, extension functions)
-- Null safety enforced (no `!!` operators)
+- Null safety enforced (no \`!!\` operators)
 - All public functions documented with KDoc
 - Unit tests for all use cases and ViewModels
 - UI tests for critical flows
