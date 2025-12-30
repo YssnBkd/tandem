@@ -11,27 +11,51 @@
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: Kotlin 2.1+ (Kotlin Multiplatform)
+**Primary Dependencies**: Compose Multiplatform, Koin, SQLDelight, DataStore, WorkManager
+**Storage**: SQLDelight (local), DataStore (preferences), offline-first with sync queue
+**Testing**: Kotlin Test (unit), Android Instrumented Tests (UI)
+**Target Platform**: Android 8.0+ (SDK 26), iOS preparation (future)
+**Project Type**: Mobile (Kotlin Multiplatform)
+**Performance Goals**: 60 fps UI, <100ms UI response, efficient battery usage
+**Constraints**: Offline-first (core features work without network), Material Design 3 compliance
+**Scale/Scope**: 2-person teams (couples), weekly task volumes (~10-50 tasks/week/person)
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+### Core Principles Compliance
+
+- [ ] **Relationship-First Design**: Does this feature strengthen relationships without enabling surveillance/nagging/control?
+- [ ] **Weekly Rhythm**: Is the feature centered on the weekly planning → execution → review cycle?
+- [ ] **Autonomous Partnership**: Does the feature respect partner autonomy and require acceptance for requests?
+- [ ] **Celebration Over Judgment**: Does the UI use positive framing (Tried/Skipped vs Failed/Abandoned)?
+- [ ] **Intentional Simplicity**: Does the feature avoid due dates, priority levels, subtasks, and categories?
+
+### Decision Framework
+
+1. Does it strengthen the weekly rhythm?
+2. Does it respect partner autonomy?
+3. Is it the simplest solution that works?
+4. Can it work offline?
+5. Does it follow Material Design 3 patterns?
+
+### Non-Negotiables Check
+
+- [ ] NO tracking of partner's incomplete tasks
+- [ ] NO notifications for partner's task completions (default off)
+- [ ] NO assigning tasks without acceptance workflow
+- [ ] NO shame language in UI copy
+- [ ] NO complex task hierarchies
+
+### Technical Compliance
+
+- [ ] Clean Architecture with MVI pattern
+- [ ] Domain layer is 100% shared code (Kotlin Multiplatform)
+- [ ] UI uses Jetpack Compose with Material Design 3
+- [ ] Offline-first architecture with SQLDelight
+- [ ] Build validation: `:composeApp:compileDebugKotlinAndroid` succeeds
 
 ## Project Structure
 
@@ -48,51 +72,45 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
+
+**Tandem uses Kotlin Multiplatform with the following structure:**
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
+composeApp/
 ├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
+│   ├── commonMain/kotlin/           # Shared code (domain, data, presentation)
+│   │   ├── domain/                  # Use cases, entities, repository interfaces
+│   │   ├── data/                    # Repository implementations, data sources
+│   │   └── presentation/            # ViewModels, UI state
+│   ├── androidMain/kotlin/          # Android-specific code
+│   │   ├── ui/                      # Compose UI screens and components
+│   │   ├── theme/                   # Material Design 3 theme
+│   │   └── di/                      # Koin modules
+│   └── iosMain/kotlin/              # iOS-specific code (future)
+└── build.gradle.kts
 
-frontend/
+shared/
 ├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
+│   ├── commonMain/kotlin/           # Additional shared utilities
+│   ├── androidMain/kotlin/
+│   └── iosMain/kotlin/
+└── build.gradle.kts
 
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
+iosApp/                              # iOS application entry point (future)
+└── iosApp/
 
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+# Testing (within composeApp/src/)
+commonTest/kotlin/                   # Shared unit tests
+androidInstrumentedTest/kotlin/      # Android UI tests
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Build Validation**: All features must pass `:composeApp:compileDebugKotlinAndroid`
+
+**Structure Decision**: Tandem follows Kotlin Multiplatform Clean Architecture with MVI:
+- Domain layer in `commonMain` (100% shared)
+- Data layer in `commonMain` with platform-specific implementations when needed
+- Presentation layer (ViewModels) in `commonMain`
+- UI layer (Compose) in `androidMain` (platform-specific)
 
 ## Complexity Tracking
 
