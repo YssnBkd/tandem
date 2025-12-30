@@ -266,7 +266,7 @@ Use Kotlin Multiplatform with the following technical approach:
 ## Tech Stack
 - Kotlin 2.0+ with Compose Multiplatform 1.6+
 - Jetpack Compose for Android UI
-- Firebase Authentication (Android SDK)
+- Supabase Authentication (Android SDK)
 - Jetpack Navigation Compose with type-safe routes
 - Koin for dependency injection
 - Kotlin Coroutines + Flow for async operations
@@ -295,7 +295,7 @@ androidApp/
 
 ### Authentication Flow
 1. App checks DataStore for persisted auth token
-2. If token exists → validate with Firebase → navigate to MainScreen
+2. If token exists → validate with Supabase → navigate to MainScreen
 3. If no token → show WelcomeScreen
 4. After sign-in → persist token → navigate to MainScreen
 
@@ -324,7 +324,7 @@ Generate implementation tasks for Feature 001: Core Infrastructure.
 
 Focus on:
 1. Setting up the project structure and build configuration
-2. Implementing authentication with Firebase
+2. Implementing authentication with Supabase
 3. Creating the navigation shell
 4. Establishing the theming system
 5. Writing unit tests for auth use cases
@@ -963,7 +963,7 @@ As a user, I see my partner's task completions appear in real-time.
 - R3.4: Include optional note
 
 ### Sync
-- R4.1: Real-time updates for task changes (Firebase Realtime DB or Firestore)
+- R4.1: Real-time updates for task changes (Supabase)
 - R4.2: Sync task completions within 2 seconds
 - R4.3: Offline queue for sync when reconnected
 
