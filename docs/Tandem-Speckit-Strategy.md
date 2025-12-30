@@ -133,6 +133,7 @@ Create the constitution for Tandem, a weekly productivity app for couples.
 - All public functions documented with KDoc
 - Unit tests for all use cases and ViewModels
 - UI tests for critical flows
+- Test if build is successful (:composeApp:compileDebugKotlinAndroid) to validate Android implementations
 
 ### State Management
 - Single source of truth per feature (ViewModel)
