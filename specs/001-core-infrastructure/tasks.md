@@ -27,18 +27,18 @@
 
 **Purpose**: Add required dependencies and configure build system
 
-- [ ] T001 Add Supabase, Koin, Navigation, DataStore, and Serialization versions to `gradle/libs.versions.toml`
-- [ ] T002 Add Supabase library declarations (bom, auth, compose-auth) to `gradle/libs.versions.toml`
-- [ ] T003 [P] Add Koin library declarations (core, android, compose, compose-viewmodel) to `gradle/libs.versions.toml`
-- [ ] T004 [P] Add Navigation and DataStore library declarations to `gradle/libs.versions.toml`
-- [ ] T005 [P] Add Ktor client (Android) and kotlinx-serialization library declarations to `gradle/libs.versions.toml`
-- [ ] T006 Add kotlinSerialization plugin declaration to `gradle/libs.versions.toml`
-- [ ] T007 Update `composeApp/build.gradle.kts` to apply serialization plugin
-- [ ] T008 Update `composeApp/build.gradle.kts` androidMain dependencies (Supabase, Koin, Navigation, DataStore)
-- [ ] T009 Update `composeApp/build.gradle.kts` commonMain dependencies (Koin core, kotlinx-serialization)
-- [ ] T010 Add BuildConfig generation for SUPABASE_URL, SUPABASE_KEY, GOOGLE_WEB_CLIENT_ID in `composeApp/build.gradle.kts`
-- [ ] T011 Create `local.properties.example` with placeholder values for secrets documentation
-- [ ] T012 Verify build succeeds with `:composeApp:compileDebugKotlinAndroid`
+- [X] T001 Add Supabase, Koin, Navigation, DataStore, and Serialization versions to `gradle/libs.versions.toml`
+- [X] T002 Add Supabase library declarations (bom, auth, compose-auth) to `gradle/libs.versions.toml`
+- [X] T003 [P] Add Koin library declarations (core, android, compose, compose-viewmodel) to `gradle/libs.versions.toml`
+- [X] T004 [P] Add Navigation and DataStore library declarations to `gradle/libs.versions.toml`
+- [X] T005 [P] Add Ktor client (Android) and kotlinx-serialization library declarations to `gradle/libs.versions.toml`
+- [X] T006 Add kotlinSerialization plugin declaration to `gradle/libs.versions.toml`
+- [X] T007 Update `composeApp/build.gradle.kts` to apply serialization plugin
+- [X] T008 Update `composeApp/build.gradle.kts` androidMain dependencies (Supabase, Koin, Navigation, DataStore)
+- [X] T009 Update `composeApp/build.gradle.kts` commonMain dependencies (Koin core, kotlinx-serialization)
+- [X] T010 Add BuildConfig generation for SUPABASE_URL, SUPABASE_KEY, GOOGLE_WEB_CLIENT_ID in `composeApp/build.gradle.kts`
+- [X] T011 Create `local.properties.example` with placeholder values for secrets documentation
+- [X] T012 Verify build succeeds with `:composeApp:compileDebugKotlinAndroid`
 
 **Checkpoint**: Build configuration complete - dependencies available
 
@@ -52,48 +52,48 @@
 
 ### Domain Models (shared/commonMain)
 
-- [ ] T013 Create `AuthProvider` enum in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/AuthProvider.kt`
-- [ ] T014 [P] Create `User` data class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/User.kt`
-- [ ] T015 [P] Create `AuthError` sealed class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/AuthError.kt`
-- [ ] T016 [P] Create `ValidationResult` sealed interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/ValidationResult.kt`
+- [X] T013 Create `AuthProvider` enum in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/AuthProvider.kt`
+- [X] T014 [P] Create `User` data class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/User.kt`
+- [X] T015 [P] Create `AuthError` sealed class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/AuthError.kt`
+- [X] T016 [P] Create `ValidationResult` sealed interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/ValidationResult.kt`
 
 ### Repository Interface (shared/commonMain)
 
-- [ ] T017 Create `AuthRepository` interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/AuthRepository.kt`
+- [X] T017 Create `AuthRepository` interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/AuthRepository.kt`
 
 ### Presentation State (composeApp/commonMain)
 
-- [ ] T018 [P] Create `AuthUiState` sealed interface in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/auth/AuthUiState.kt`
-- [ ] T019 [P] Create `AuthEvent` sealed interface in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/auth/AuthEvent.kt`
+- [X] T018 [P] Create `AuthUiState` sealed interface in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/auth/AuthUiState.kt`
+- [X] T019 [P] Create `AuthEvent` sealed interface in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/auth/AuthEvent.kt`
 
 ### Validators (shared/commonMain)
 
-- [ ] T020 [P] Create `EmailValidator` object in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/validation/EmailValidator.kt`
-- [ ] T021 [P] Create `PasswordValidator` object in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/validation/PasswordValidator.kt`
-- [ ] T022 [P] Create `DisplayNameValidator` object in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/validation/DisplayNameValidator.kt`
+- [X] T020 [P] Create `EmailValidator` object in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/validation/EmailValidator.kt`
+- [X] T021 [P] Create `PasswordValidator` object in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/validation/PasswordValidator.kt`
+- [X] T022 [P] Create `DisplayNameValidator` object in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/validation/DisplayNameValidator.kt`
 
 ### Repository Implementation (composeApp/androidMain)
 
-- [ ] T023 Create `AuthRepositoryImpl` class in `composeApp/src/androidMain/kotlin/org/epoque/tandem/data/repository/AuthRepositoryImpl.kt`
+- [X] T023 Create `AuthRepositoryImpl` class in `composeApp/src/androidMain/kotlin/org/epoque/tandem/data/repository/AuthRepositoryImpl.kt`
 
 ### Dependency Injection (composeApp/androidMain)
 
-- [ ] T024 Create `AppModule` Koin module in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/AppModule.kt`
-- [ ] T025 [P] Create `AuthModule` Koin module in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/AuthModule.kt`
-- [ ] T026 Create `TandemApp` Application class with Koin init in `composeApp/src/androidMain/kotlin/org/epoque/tandem/TandemApp.kt`
-- [ ] T027 Update `AndroidManifest.xml` to use TandemApp as application class
+- [X] T024 Create `AppModule` Koin module in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/AppModule.kt`
+- [X] T025 [P] Create `AuthModule` Koin module in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/AuthModule.kt`
+- [X] T026 Create `TandemApp` Application class with Koin init in `composeApp/src/androidMain/kotlin/org/epoque/tandem/TandemApp.kt`
+- [X] T027 Update `AndroidManifest.xml` to use TandemApp as application class
 
 ### Navigation Foundation (composeApp/androidMain)
 
-- [ ] T028 Create `Routes` sealed classes with @Serializable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/Routes.kt`
+- [X] T028 Create `Routes` sealed classes with @Serializable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/Routes.kt`
 
 ### Unit Tests for Validators
 
-- [ ] T029 [P] Create `EmailValidatorTest` in `composeApp/src/commonTest/kotlin/org/epoque/tandem/domain/validation/EmailValidatorTest.kt`
-- [ ] T030 [P] Create `PasswordValidatorTest` in `composeApp/src/commonTest/kotlin/org/epoque/tandem/domain/validation/PasswordValidatorTest.kt`
-- [ ] T031 [P] Create `DisplayNameValidatorTest` in `composeApp/src/commonTest/kotlin/org/epoque/tandem/domain/validation/DisplayNameValidatorTest.kt`
+- [X] T029 [P] Create `EmailValidatorTest` in `composeApp/src/commonTest/kotlin/org/epoque/tandem/domain/validation/EmailValidatorTest.kt`
+- [X] T030 [P] Create `PasswordValidatorTest` in `composeApp/src/commonTest/kotlin/org/epoque/tandem/domain/validation/PasswordValidatorTest.kt`
+- [X] T031 [P] Create `DisplayNameValidatorTest` in `composeApp/src/commonTest/kotlin/org/epoque/tandem/domain/validation/DisplayNameValidatorTest.kt`
 
-- [ ] T032 Verify build and tests pass with `:composeApp:compileDebugKotlinAndroid` and `:composeApp:testDebugUnitTest`
+- [X] T032 Verify build and tests pass with `:composeApp:compileDebugKotlinAndroid` and `:composeApp:testDebugUnitTest`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -107,24 +107,24 @@
 
 ### Unit Tests for User Story 1
 
-- [ ] T033 [P] [US1] Create `AuthViewModelTest` with registration test cases in `composeApp/src/commonTest/kotlin/org/epoque/tandem/presentation/auth/AuthViewModelTest.kt`
+- [X] T033 [P] [US1] Create `AuthViewModelTest` with registration test cases in `composeApp/src/commonTest/kotlin/org/epoque/tandem/presentation/auth/AuthViewModelTest.kt`
 
 ### Implementation for User Story 1
 
-- [ ] T034 [US1] Create `AuthViewModel` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/auth/AuthViewModel.kt`
-- [ ] T035 [P] [US1] Create `Color.kt` with brand colors and light/dark palettes in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/theme/Color.kt`
-- [ ] T036 [P] [US1] Create `Type.kt` with typography scale in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/theme/Type.kt`
-- [ ] T037 [US1] Create `Theme.kt` with MD3 theme and dynamic colors in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/theme/Theme.kt`
-- [ ] T038 [US1] Create `WelcomeScreen` composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/auth/WelcomeScreen.kt`
-- [ ] T039 [US1] Create `RegisterScreen` composable with form validation in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/auth/RegisterScreen.kt`
-- [ ] T040 [US1] Create `AuthNavGraph` navigation extension in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/AuthNavGraph.kt`
-- [ ] T041 [US1] Create `TandemNavHost` main NavHost in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/TandemNavHost.kt`
-- [ ] T042 [US1] Update `MainActivity` to use TandemNavHost with TandemTheme in `composeApp/src/androidMain/kotlin/org/epoque/tandem/MainActivity.kt`
-- [ ] T043 [US1] Implement Google Sign-In button with ComposeAuth in `WelcomeScreen`
-- [ ] T044 [US1] Add input validation error display to `RegisterScreen`
-- [ ] T045 [US1] Add loading state and error handling to auth screens
+- [X] T034 [US1] Create `AuthViewModel` in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/auth/AuthViewModel.kt`
+- [X] T035 [P] [US1] Create `Color.kt` with brand colors and light/dark palettes in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/theme/Color.kt`
+- [X] T036 [P] [US1] Create `Type.kt` with typography scale in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/theme/Type.kt`
+- [X] T037 [US1] Create `Theme.kt` with MD3 theme and dynamic colors in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/theme/Theme.kt`
+- [X] T038 [US1] Create `WelcomeScreen` composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/auth/WelcomeScreen.kt`
+- [X] T039 [US1] Create `RegisterScreen` composable with form validation in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/auth/RegisterScreen.kt`
+- [X] T040 [US1] Create `AuthNavGraph` navigation extension in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/AuthNavGraph.kt`
+- [X] T041 [US1] Create `TandemNavHost` main NavHost in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/TandemNavHost.kt`
+- [X] T042 [US1] Update `MainActivity` to use TandemNavHost with TandemTheme in `composeApp/src/androidMain/kotlin/org/epoque/tandem/MainActivity.kt`
+- [X] T043 [US1] Implement Google Sign-In button with ComposeAuth in `WelcomeScreen`
+- [X] T044 [US1] Add input validation error display to `RegisterScreen`
+- [X] T045 [US1] Add loading state and error handling to auth screens
 
-- [ ] T046 Verify build passes and test User Story 1 manually on device
+- [X] T046 Verify build passes and test User Story 1 manually on device
 
 **Checkpoint**: User Story 1 complete - new users can register. MVP achieved.
 
@@ -138,21 +138,21 @@
 
 ### Unit Tests for User Story 2
 
-- [ ] T047 [P] [US2] Add sign-in and sign-out test cases to `AuthViewModelTest`
+- [X] T047 [P] [US2] Add sign-in and sign-out test cases to `AuthViewModelTest`
 
 ### Implementation for User Story 2
 
-- [ ] T048 [US2] Create `SignInScreen` composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/auth/SignInScreen.kt`
-- [ ] T049 [US2] Add SignIn route to `AuthNavGraph`
-- [ ] T050 [US2] Implement session auto-restore in `AuthRepositoryImpl` using Supabase sessionStatus flow
-- [ ] T051 [US2] Add sign-out functionality to `AuthViewModel`
-- [ ] T052 [US2] Update `TandemNavHost` to observe auth state and navigate conditionally
-- [ ] T053 [US2] Add "Already have an account? Sign In" link to `WelcomeScreen`
-- [ ] T054 [US2] Add "Don't have an account? Register" link to `SignInScreen`
-- [ ] T055 [US2] Handle invalid credentials error display in `SignInScreen`
-- [ ] T056 [US2] Add network error handling with retry capability
+- [X] T048 [US2] Create `SignInScreen` composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/auth/SignInScreen.kt`
+- [X] T049 [US2] Add SignIn route to `AuthNavGraph`
+- [X] T050 [US2] Implement session auto-restore in `AuthRepositoryImpl` using Supabase sessionStatus flow
+- [X] T051 [US2] Add sign-out functionality to `AuthViewModel`
+- [X] T052 [US2] Update `TandemNavHost` to observe auth state and navigate conditionally
+- [X] T053 [US2] Add "Already have an account? Sign In" link to `WelcomeScreen`
+- [X] T054 [US2] Add "Don't have an account? Register" link to `SignInScreen`
+- [X] T055 [US2] Handle invalid credentials error display in `SignInScreen`
+- [X] T056 [US2] Add network error handling with retry capability
 
-- [ ] T057 Verify build passes and test User Story 2 manually
+- [X] T057 Verify build passes and test User Story 2 manually
 
 **Checkpoint**: User Stories 1 AND 2 complete - full auth flow working
 
@@ -166,18 +166,18 @@
 
 ### Implementation for User Story 3
 
-- [ ] T058 [P] [US3] Create `NavigationTab` sealed class in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/NavigationTab.kt`
-- [ ] T059 [P] [US3] Create `WeekScreen` placeholder in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/WeekScreen.kt`
-- [ ] T060 [P] [US3] Create `ProgressScreen` placeholder in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/ProgressScreen.kt`
-- [ ] T061 [P] [US3] Create `GoalsScreen` placeholder in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/GoalsScreen.kt`
-- [ ] T062 [US3] Create `MainScreen` with BottomNavigation scaffold in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/MainScreen.kt`
-- [ ] T063 [US3] Create `MainNavGraph` navigation extension in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/MainNavGraph.kt`
-- [ ] T064 [US3] Add Main route to `TandemNavHost` for authenticated users
-- [ ] T065 [US3] Implement tab state preservation across configuration changes
-- [ ] T066 [US3] Add user display name and sign-out option to MainScreen (e.g., in TopAppBar dropdown)
-- [ ] T067 [US3] Ensure Week tab is default destination when entering MainScreen
+- [X] T058 [P] [US3] Create `NavigationTab` sealed class in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/NavigationTab.kt`
+- [X] T059 [P] [US3] Create `WeekScreen` placeholder in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/WeekScreen.kt`
+- [X] T060 [P] [US3] Create `ProgressScreen` placeholder in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/ProgressScreen.kt`
+- [X] T061 [P] [US3] Create `GoalsScreen` placeholder in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/GoalsScreen.kt`
+- [X] T062 [US3] Create `MainScreen` with BottomNavigation scaffold in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/MainScreen.kt`
+- [X] T063 [US3] Create `MainNavGraph` navigation extension in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/MainNavGraph.kt`
+- [X] T064 [US3] Add Main route to `TandemNavHost` for authenticated users
+- [X] T065 [US3] Implement tab state preservation across configuration changes
+- [X] T066 [US3] Add user display name and sign-out option to MainScreen (e.g., in TopAppBar dropdown)
+- [X] T067 [US3] Ensure Week tab is default destination when entering MainScreen
 
-- [ ] T068 Verify build passes and test User Story 3 manually
+- [X] T068 Verify build passes and test User Story 3 manually
 
 **Checkpoint**: User Stories 1, 2, AND 3 complete - full navigation working
 
@@ -191,14 +191,14 @@
 
 ### Implementation for User Story 4
 
-- [ ] T069 [US4] Update `Theme.kt` to use `isSystemInDarkTheme()` for automatic theme detection
-- [ ] T070 [US4] Implement dynamic colors for Android 12+ in `Theme.kt`
-- [ ] T071 [US4] Apply TandemTheme to all screens (verify wrapping in `TandemNavHost`)
-- [ ] T072 [US4] Test theme consistency across all auth screens (Welcome, SignIn, Register)
-- [ ] T073 [US4] Test theme consistency across all main screens (Week, Progress, Goals, MainScreen)
-- [ ] T074 [US4] Verify brand accent color is visible in both light and dark modes
+- [X] T069 [US4] Update `Theme.kt` to use `isSystemInDarkTheme()` for automatic theme detection
+- [X] T070 [US4] Implement dynamic colors for Android 12+ in `Theme.kt`
+- [X] T071 [US4] Apply TandemTheme to all screens (verify wrapping in `TandemNavHost`)
+- [X] T072 [US4] Test theme consistency across all auth screens (Welcome, SignIn, Register)
+- [X] T073 [US4] Test theme consistency across all main screens (Week, Progress, Goals, MainScreen)
+- [X] T074 [US4] Verify brand accent color is visible in both light and dark modes
 
-- [ ] T075 Verify build passes and test User Story 4 manually
+- [X] T075 Verify build passes and test User Story 4 manually
 
 **Checkpoint**: All user stories complete - full feature ready
 
@@ -208,14 +208,14 @@
 
 **Purpose**: Final improvements, cleanup, and validation
 
-- [ ] T076 [P] Add KDoc comments to all public classes and functions
-- [ ] T077 [P] Add content descriptions for accessibility (TalkBack support) to all interactive elements
-- [ ] T078 Ensure minimum touch target 48dp for all buttons
-- [ ] T079 Run all unit tests and verify they pass
-- [ ] T080 Run `:composeApp:compileDebugKotlinAndroid` build validation
+- [X] T076 [P] Add KDoc comments to all public classes and functions
+- [X] T077 [P] Add content descriptions for accessibility (TalkBack support) to all interactive elements
+- [X] T078 Ensure minimum touch target 48dp for all buttons
+- [X] T079 Run all unit tests and verify they pass
+- [X] T080 Run `:composeApp:compileDebugKotlinAndroid` build validation
 - [ ] T081 Test complete user flow: fresh install → register → navigate tabs → sign out → sign in → theme switch
-- [ ] T082 Remove any unused imports and dead code
-- [ ] T083 Verify no `!!` operators used (null safety per constitution)
+- [X] T082 Remove any unused imports and dead code
+- [X] T083 Verify no `!!` operators used (null safety per constitution)
 
 ---
 

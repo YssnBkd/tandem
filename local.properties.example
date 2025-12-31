@@ -1,0 +1,13 @@
+# Tandem - Local Properties Example
+# Copy this file to local.properties and fill in your values
+# NEVER commit local.properties to version control
+
+# Supabase Configuration
+# Get these from: https://supabase.com/dashboard/project/YOUR_PROJECT/settings/api
+SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co
+SUPABASE_KEY=your_anon_key_here
+
+# Google Sign-In Configuration
+# Get this from: https://console.cloud.google.com/apis/credentials
+# Use the Web Application client ID (NOT the Android client ID)
+GOOGLE_WEB_CLIENT_ID=your_web_client_id.apps.googleusercontent.com
