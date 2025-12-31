@@ -1,19 +1,17 @@
 <!--
 Sync Impact Report:
-- Version: Initial creation → 1.0.0
+- Version: 1.0.0 → 1.0.1
 - Ratification: 2025-12-31
-- Modified principles: N/A (initial creation)
-- Added sections:
-  * Core Principles (5 principles: Relationship-First Design, Weekly Rhythm, Autonomous Partnership, Celebration Over Judgment, Intentional Simplicity)
-  * Technical Principles (Platform, Architecture, Code Quality, State Management, Data Layer, Dependency Injection, Design System, Performance, Accessibility)
-  * Decision Framework
-  * Non-Negotiables
+- Modified principles:
+  * Platform: Updated Minimum Android SDK from 26 (Android 8.0) to 24 (Android 7.0) to match project template
+- Added sections: N/A
 - Removed sections: N/A
-- Templates requiring updates:
-  ✅ plan-template.md - Updated to reference KMP structure and Android builds
-  ✅ spec-template.md - Compatible with relationship-first user scenarios
-  ✅ tasks-template.md - Compatible with independent story testing approach
+- Templates requiring updates: None (PATCH version - SDK alignment correction)
 - Follow-up TODOs: None
+
+Previous Sync (1.0.0):
+- Initial creation with 5 Core Principles and full Technical Principles
+- Templates updated: plan-template.md, spec-template.md, tasks-template.md
 -->
 
 # Tandem Constitution
@@ -56,7 +54,7 @@ Resist feature creep. NO due dates within weeks. NO priority levels. NO subtasks
 
 - Kotlin Multiplatform with Compose Multiplatform
 - Android-first (Material Design 3), iOS preparation
-- Minimum Android SDK: 26 (Android 8.0)
+- Minimum Android SDK: 24 (Android 7.0)
 
 ### Architecture
 
@@ -165,4 +163,4 @@ When the constitution changes:
 3. Review tasks-template.md for task categorization alignment
 4. Update any agent guidance files referencing specific principles
 
-**Version**: 1.0.0 | **Ratified**: 2025-12-31 | **Last Amended**: 2025-12-31
+**Version**: 1.0.1 | **Ratified**: 2025-12-31 | **Last Amended**: 2025-12-31
