@@ -97,6 +97,7 @@ As a user, I can update week review data to reflect on my weekly progress and re
 - What happens when incrementing repeat count beyond the target? The count continues to increment (no upper limit enforced).
 - What happens when the week ID format is invalid? System rejects the operation with a validation error.
 - What happens when attempting to update a non-existent task? System indicates the task was not found.
+- What happens when the same task is modified concurrently? Last-write-wins; the most recent update overwrites previous values.
 
 ## Requirements *(mandatory)*
 
@@ -134,7 +135,14 @@ As a user, I can update week review data to reflect on my weekly progress and re
 
 - **OwnerType**: Categorizes who a task belongs to - SELF (user's own task), PARTNER (task for the user's partner), or SHARED (joint responsibility).
 
-- **TaskStatus**: Tracks the lifecycle of a task - PENDING (not started), PENDING_ACCEPTANCE (awaiting partner confirmation), COMPLETED (done), TRIED (attempted but incomplete), SKIPPED (intentionally not done), DECLINED (partner rejected).
+- **TaskStatus**: Tracks the lifecycle of a task - PENDING (not started), PENDING_ACCEPTANCE (awaiting partner confirmation), COMPLETED (done), TRIED (attempted but incomplete), SKIPPED (intentionally not done), DECLINED (partner rejected). The data layer allows any status transition; business rules for valid transitions are enforced at a higher layer.
+
+## Clarifications
+
+### Session 2026-01-01
+
+- Q: Should the data layer enforce valid task status transitions? → A: Allow any status transition (validation at higher layer)
+- Q: How should concurrent edits to the same task be handled? → A: Last-write-wins (most recent update overwrites previous)
 
 ## Assumptions
 
