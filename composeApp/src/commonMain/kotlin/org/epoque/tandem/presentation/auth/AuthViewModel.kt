@@ -69,6 +69,8 @@ class AuthViewModel(
             is AuthEvent.SignInWithEmail -> signInWithEmail()
             is AuthEvent.RegisterWithEmail -> registerWithEmail()
             is AuthEvent.SignInWithGoogle -> signInWithGoogle()
+            is AuthEvent.SetGoogleSignInLoading -> setGoogleSignInLoading(event.isLoading)
+            is AuthEvent.SetGoogleSignInError -> setGoogleSignInError(event.message)
             is AuthEvent.SignOut -> signOut()
             is AuthEvent.ClearError -> clearError()
         }
@@ -183,5 +185,13 @@ class AuthViewModel(
 
     private fun clearError() {
         _formState.update { it.copy(errorMessage = null) }
+    }
+
+    private fun setGoogleSignInLoading(isLoading: Boolean) {
+        _formState.update { it.copy(isLoading = isLoading, errorMessage = null) }
+    }
+
+    private fun setGoogleSignInError(message: String) {
+        _formState.update { it.copy(isLoading = false, errorMessage = message) }
     }
 }

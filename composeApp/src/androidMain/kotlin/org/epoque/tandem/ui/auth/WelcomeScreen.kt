@@ -29,9 +29,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import io.github.jan.supabase.compose.auth.ComposeAuth
+import io.github.jan.supabase.compose.auth.composable.NativeSignInResult
+import io.github.jan.supabase.compose.auth.composable.rememberSignInWithGoogle
 import org.epoque.tandem.presentation.auth.AuthEvent
 import org.epoque.tandem.presentation.auth.AuthFormState
 import org.epoque.tandem.presentation.auth.AuthViewModel
+import org.koin.compose.koinInject
 
 /**
  * Welcome screen with sign-in options.
@@ -42,10 +46,36 @@ fun WelcomeScreen(
     viewModel: AuthViewModel,
     onNavigateToSignIn: () -> Unit,
     onNavigateToRegister: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    composeAuth: ComposeAuth = koinInject()
 ) {
     val formState by viewModel.formState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Native Google Sign-in using Credential Manager
+    val googleSignInState = composeAuth.rememberSignInWithGoogle(
+        onResult = { result ->
+            when (result) {
+                NativeSignInResult.Success -> {
+                    // Auth state flow handles navigation automatically
+                    viewModel.onEvent(AuthEvent.SetGoogleSignInLoading(false))
+                }
+                NativeSignInResult.ClosedByUser -> {
+                    viewModel.onEvent(AuthEvent.SetGoogleSignInLoading(false))
+                }
+                is NativeSignInResult.Error -> {
+                    viewModel.onEvent(AuthEvent.SetGoogleSignInError(result.message))
+                }
+                is NativeSignInResult.NetworkError -> {
+                    viewModel.onEvent(AuthEvent.SetGoogleSignInError(result.message))
+                }
+            }
+        },
+        fallback = {
+            // Fallback to OAuth if native sign-in is unavailable
+            viewModel.onEvent(AuthEvent.SignInWithGoogle)
+        }
+    )
 
     LaunchedEffect(formState.errorMessage) {
         formState.errorMessage?.let { message ->
@@ -60,7 +90,10 @@ fun WelcomeScreen(
     ) { paddingValues ->
         WelcomeContent(
             formState = formState,
-            onSignInWithGoogle = { viewModel.onEvent(AuthEvent.SignInWithGoogle) },
+            onSignInWithGoogle = {
+                viewModel.onEvent(AuthEvent.SetGoogleSignInLoading(true))
+                googleSignInState.startFlow()
+            },
             onNavigateToSignIn = onNavigateToSignIn,
             onNavigateToRegister = onNavigateToRegister,
             modifier = Modifier.padding(paddingValues)

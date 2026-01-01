@@ -19,8 +19,14 @@ sealed interface AuthEvent {
     /** Submit registration with email/password */
     data object RegisterWithEmail : AuthEvent
 
-    /** Initiate Google Sign-In */
+    /** Initiate Google Sign-In (OAuth fallback) */
     data object SignInWithGoogle : AuthEvent
+
+    /** Set loading state for native Google Sign-in */
+    data class SetGoogleSignInLoading(val isLoading: Boolean) : AuthEvent
+
+    /** Set error from native Google Sign-in */
+    data class SetGoogleSignInError(val message: String) : AuthEvent
 
     /** Sign out current user */
     data object SignOut : AuthEvent

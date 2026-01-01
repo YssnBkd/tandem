@@ -2,12 +2,18 @@
 # Copy this file to local.properties and fill in your values
 # NEVER commit local.properties to version control
 
+# Android SDK Location
+sdk.dir=/Users/YOUR_USERNAME/Library/Android/sdk
+
 # Supabase Configuration
 # Get these from: https://supabase.com/dashboard/project/YOUR_PROJECT/settings/api
 SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co
-SUPABASE_KEY=your_anon_key_here
+SUPABASE_KEY=sb_publishable_xxxxxxxxxxxxx
+# NOTE: Use PUBLISHABLE key (starts with sb_publishable_), NOT secret key!
+# Legacy projects may use anon key (starts with eyJhbGc...) - that's fine too
 
 # Google Sign-In Configuration
 # Get this from: https://console.cloud.google.com/apis/credentials
-# Use the Web Application client ID (NOT the Android client ID)
-GOOGLE_WEB_CLIENT_ID=your_web_client_id.apps.googleusercontent.com
+# IMPORTANT: Use the Web Application client ID (NOT the Android client ID)
+GOOGLE_WEB_CLIENT_ID=xxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com
+# Format: NUMBERS-RANDOM_STRING.apps.googleusercontent.com

@@ -3,6 +3,7 @@ package org.epoque.tandem.di
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.compose.auth.ComposeAuth
+import io.github.jan.supabase.compose.auth.composeAuth
 import io.github.jan.supabase.compose.auth.googleNativeLogin
 import io.github.jan.supabase.createSupabaseClient
 import org.epoque.tandem.BuildConfig
@@ -26,4 +27,7 @@ val appModule = module {
             }
         }
     }
+
+    // Provide ComposeAuth for native Google Sign-in in UI layer
+    single<ComposeAuth> { get<SupabaseClient>().composeAuth }
 }

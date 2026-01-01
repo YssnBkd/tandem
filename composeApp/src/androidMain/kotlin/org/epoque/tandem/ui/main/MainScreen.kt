@@ -37,7 +37,7 @@ fun MainScreen(
     onSignOut: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var selectedTab by rememberSaveable { mutableStateOf<NavigationTab>(NavigationTab.Week) }
+    var selectedTab by rememberSaveable(stateSaver = NavigationTab.Saver) { mutableStateOf(NavigationTab.Week) }
     var showMenu by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(

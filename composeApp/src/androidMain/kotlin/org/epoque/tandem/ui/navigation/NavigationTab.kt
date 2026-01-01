@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
@@ -41,5 +42,11 @@ sealed class NavigationTab(
 
     companion object {
         val entries = listOf(Week, Progress, Goals)
+
+        /** Saver for use with rememberSaveable */
+        val Saver: Saver<NavigationTab, String> = Saver(
+            save = { it.title },
+            restore = { title -> entries.find { it.title == title } ?: Week }
+        )
     }
 }
