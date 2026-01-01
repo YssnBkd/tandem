@@ -1,0 +1,28 @@
+package org.epoque.tandem.ui.main
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+
+/**
+ * Week tab screen showing weekly schedule/progress.
+ * Placeholder implementation - will be expanded with actual features.
+ */
+@Composable
+fun WeekScreen(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Week",
+            style = MaterialTheme.typography.headlineMedium
+        )
+    }
+}

@@ -119,7 +119,7 @@ Create the constitution for Tandem, a weekly productivity app for couples.
 ### Platform
 - Kotlin Multiplatform with Compose Multiplatform
 - Android-first (Material Design 3), iOS preparation
-- Minimum Android SDK: 26 (Android 8.0)
+- Minimum Android SDK: 24 (Android 7.0)
 
 ### Architecture
 - Clean Architecture with MVI pattern
@@ -276,15 +276,15 @@ Use Kotlin Multiplatform with the following technical approach:
 
 ### Module Structure
 ```
-shared/
-├── commonMain/
-│   ├── domain/
-│   │   ├── model/User.kt
-│   │   ├── repository/AuthRepository.kt
-│   │   └── usecase/auth/
-│   └── data/
-│       └── repository/AuthRepositoryImpl.kt
-androidApp/
+shared/src/commonMain/kotlin/org/epoque/tandem/
+├── domain/
+│   ├── model/User.kt
+│   ├── repository/AuthRepository.kt
+│   └── usecase/auth/
+└── data/
+    └── repository/AuthRepositoryImpl.kt
+
+composeApp/src/androidMain/kotlin/org/epoque/tandem/
 ├── ui/
 │   ├── theme/
 │   ├── navigation/
@@ -490,19 +490,18 @@ Use SQLDelight for local database with the following approach:
 
 ## Module Structure
 ```
-shared/
-├── commonMain/
-│   ├── domain/
-│   │   ├── model/Task.kt, Week.kt
-│   │   ├── repository/TaskRepository.kt, WeekRepository.kt
-│   │   └── usecase/task/, week/
-│   └── data/
-│       ├── local/
-│       │   ├── TandemDatabase.sq
-│       │   └── TaskQueries.sq, WeekQueries.sq
-│       └── repository/
-│           ├── TaskRepositoryImpl.kt
-│           └── WeekRepositoryImpl.kt
+shared/src/commonMain/kotlin/org/epoque/tandem/
+├── domain/
+│   ├── model/Task.kt, Week.kt
+│   ├── repository/TaskRepository.kt, WeekRepository.kt
+│   └── usecase/task/, week/
+└── data/
+    ├── local/
+    │   ├── TandemDatabase.sq
+    │   └── TaskQueries.sq, WeekQueries.sq
+    └── repository/
+        ├── TaskRepositoryImpl.kt
+        └── WeekRepositoryImpl.kt
 ```
 ```
 
@@ -1231,7 +1230,7 @@ Run these commands in Claude Code in sequence:
 
 After completing each feature:
 1. Run the app and test manually
-2. Run unit tests: `./gradlew test`
+2. Run unit tests: `./gradlew :shared:test :composeApp:testDebugUnitTest`
 3. Fix any issues before proceeding
 4. Commit to version control
 5. Move to next feature
@@ -1277,7 +1276,7 @@ Don't treat the first `/speckit.specify` output as final:
 ### 5.3 Test Incrementally
 
 After each `/speckit.implement`:
-- Build the app: `./gradlew assembleDebug`
+- Build the app: `./gradlew :composeApp:assembleDebug`
 - Run on device/emulator
 - Test the specific feature
 - Fix bugs before moving on
@@ -1318,6 +1317,6 @@ git commit -m "feat(001): Core Infrastructure complete"
 
 ### Key Files
 - `.specify/memory/constitution.md` - Core principles
-- `.specify/specs/XXX-feature/spec.md` - Feature specification
-- `.specify/specs/XXX-feature/plan.md` - Technical plan
-- `.specify/specs/XXX-feature/tasks.md` - Implementation tasks
+- `specs/XXX-feature-name/spec.md` - Feature specification
+- `specs/XXX-feature-name/plan.md` - Technical plan
+- `specs/XXX-feature-name/tasks.md` - Implementation tasks
