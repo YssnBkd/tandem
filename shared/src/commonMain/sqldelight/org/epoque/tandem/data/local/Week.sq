@@ -1,0 +1,71 @@
+import kotlinx.datetime.Instant;
+import kotlinx.datetime.LocalDate;
+
+CREATE TABLE Week (
+    id TEXT NOT NULL,
+    start_date TEXT AS LocalDate NOT NULL,
+    end_date TEXT AS LocalDate NOT NULL,
+    user_id TEXT NOT NULL,
+    overall_rating INTEGER,
+    review_note TEXT,
+    reviewed_at INTEGER AS Instant,
+    planning_completed_at INTEGER AS Instant,
+    PRIMARY KEY (id, user_id)
+);
+
+CREATE INDEX week_start_date ON Week(start_date);
+
+-- Insert or replace a week
+upsertWeek:
+INSERT OR REPLACE INTO Week (
+    id, start_date, end_date, user_id, overall_rating, review_note,
+    reviewed_at, planning_completed_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Get all weeks
+getAllWeeks:
+SELECT * FROM Week;
+
+-- Get week by ID only (returns first match)
+getWeekByIdOnly:
+SELECT * FROM Week WHERE id = ? LIMIT 1;
+
+-- Get week by ID and user
+getWeekById:
+SELECT * FROM Week WHERE id = ? AND user_id = ?;
+
+-- Get weeks by user ID
+getWeeksByUserId:
+SELECT * FROM Week WHERE user_id = ? ORDER BY start_date DESC;
+
+-- Get week by user and start date
+getWeekByUserAndStartDate:
+SELECT * FROM Week WHERE user_id = ? AND start_date = ?;
+
+-- Get current/active week for user (where planning is not complete)
+getActiveWeekForUser:
+SELECT * FROM Week WHERE user_id = ? AND planning_completed_at IS NULL ORDER BY start_date DESC LIMIT 1;
+
+-- Get reviewed weeks for user
+getReviewedWeeksForUser:
+SELECT * FROM Week WHERE user_id = ? AND reviewed_at IS NOT NULL ORDER BY start_date DESC;
+
+-- Get unreviewed weeks for user
+getUnreviewedWeeksForUser:
+SELECT * FROM Week WHERE user_id = ? AND reviewed_at IS NULL ORDER BY start_date DESC;
+
+-- Delete week by ID and user
+deleteWeekById:
+DELETE FROM Week WHERE id = ? AND user_id = ?;
+
+-- Mark week planning as complete
+markPlanningComplete:
+UPDATE Week SET planning_completed_at = ? WHERE id = ? AND user_id = ?;
+
+-- Add or update week review
+updateWeekReview:
+UPDATE Week SET overall_rating = ?, review_note = ?, reviewed_at = ? WHERE id = ? AND user_id = ?;
+
+-- Count weeks by user
+countWeeksByUser:
+SELECT COUNT(*) FROM Week WHERE user_id = ?;
