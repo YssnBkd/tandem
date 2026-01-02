@@ -26,7 +26,7 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 **Purpose**: Verify dependencies from previous features are complete before starting implementation
 
-- [ ] T000 [CRITICAL] Verify Feature 002 (Task Data Layer) is complete: TaskRepository and WeekRepository exist and compile successfully
+- [X] T000 [CRITICAL] Verify Feature 002 (Task Data Layer) is complete: TaskRepository and WeekRepository exist and compile successfully
 
 ---
 
@@ -34,13 +34,13 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 **Purpose**: Create presentation layer foundation and models used across all user stories
 
-- [ ] T001 [P] Create Segment enum in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/model/Segment.kt`
-- [ ] T002 [P] Create WeekInfo data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/model/WeekInfo.kt`
-- [ ] T003 [P] Create TaskUiModel data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/model/TaskUiModel.kt`
-- [ ] T004 [P] Create WeekUiState data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekUiState.kt`
-- [ ] T005 [P] Create WeekEvent sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekEvent.kt`
-- [ ] T006 [P] Create WeekSideEffect sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekSideEffect.kt`
-- [ ] T007 Create SegmentPreferences class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/preferences/SegmentPreferences.kt`
+- [X] T001 [P] Create Segment enum in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/model/Segment.kt`
+- [X] T002 [P] Create WeekInfo data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/model/WeekInfo.kt`
+- [X] T003 [P] Create TaskUiModel data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/model/TaskUiModel.kt`
+- [X] T004 [P] Create WeekUiState data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekUiState.kt`
+- [X] T005 [P] Create WeekEvent sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekEvent.kt`
+- [X] T006 [P] Create WeekSideEffect sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekSideEffect.kt`
+- [X] T007 Create SegmentPreferences class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/preferences/SegmentPreferences.kt`
 
 ---
 
@@ -50,12 +50,12 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 **⚠️ CRITICAL**: No user story UI work can begin until this phase is complete
 
-- [ ] T008 Create WeekViewModel scaffold (init, state flow, event handler structure) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekViewModel.kt`
-- [ ] T009 Implement loadInitialData() and observeWeek() in WeekViewModel for week info loading
-- [ ] T010 Implement observeSegmentPreference() in WeekViewModel for segment persistence
-- [ ] T011 Implement observeTasks() and updateTasksInState() in WeekViewModel for reactive task updates
-- [ ] T012 Create WeekModule Koin module in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/WeekModule.kt`
-- [ ] T013 Register WeekModule in application DI configuration
+- [X] T008 Create WeekViewModel scaffold (init, state flow, event handler structure) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekViewModel.kt`
+- [X] T009 Implement loadInitialData() and observeWeek() in WeekViewModel for week info loading
+- [X] T010 Implement observeSegmentPreference() in WeekViewModel for segment persistence
+- [X] T011 Implement observeTasks() and updateTasksInState() in WeekViewModel for reactive task updates
+- [X] T012 Create WeekModule Koin module in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/WeekModule.kt`
+- [X] T013 Register WeekModule in application DI configuration
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -76,15 +76,15 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 ### Implementation for User Story 1
 
-- [ ] T018 [P] [US1] Create TaskListItem composable (checkbox, title, completed style) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskListItem.kt`
-- [ ] T019 [P] [US1] Create RepeatProgressIndicator composable (fraction format: "2/3") in TaskListItem.kt
-- [ ] T020 [P] [US1] Create WeekHeader composable (date range text, progress indicator) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/WeekHeader.kt`
-- [ ] T021 [P] [US1] Create EmptyState composable (message + optional action button) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/EmptyState.kt`
-- [ ] T022 [US1] Create TaskList composable (LazyColumn with incomplete/completed sections) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskList.kt`
-- [ ] T023 [US1] Create WeekScreen scaffold (Scaffold, TopAppBar, content area) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/WeekScreen.kt`
-- [ ] T024 [US1] Wire WeekScreen to WeekViewModel (collectAsState, loading state) in WeekScreen.kt
-- [ ] T025 [US1] Implement pull-to-refresh in TaskList with PullToRefreshBox
-- [ ] T026 [US1] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
+- [X] T018 [P] [US1] Create TaskListItem composable (checkbox, title, completed style) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskListItem.kt`
+- [X] T019 [P] [US1] Create RepeatProgressIndicator composable (fraction format: "2/3") in TaskListItem.kt
+- [X] T020 [P] [US1] Create WeekHeader composable (date range text, progress indicator) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/WeekHeader.kt`
+- [X] T021 [P] [US1] Create EmptyState composable (message + optional action button) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/EmptyState.kt`
+- [X] T022 [US1] Create TaskList composable (LazyColumn with incomplete/completed sections) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskList.kt`
+- [X] T023 [US1] Create WeekScreen scaffold (Scaffold, TopAppBar, content area) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/WeekScreen.kt`
+- [X] T024 [US1] Wire WeekScreen to WeekViewModel (collectAsState, loading state) in WeekScreen.kt
+- [X] T025 [US1] Implement pull-to-refresh in TaskList with PullToRefreshBox
+- [X] T026 [US1] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
 
 **Checkpoint**: User Story 1 complete - users can view their weekly tasks with progress indicator
 
@@ -104,12 +104,12 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 ### Implementation for User Story 2
 
-- [ ] T030 [P] [US2] Create AnimatedCheckbox composable (scale spring animation) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/components/AnimatedCheckbox.kt`
-- [ ] T031 [US2] Implement handleTaskCheckboxTapped() in WeekViewModel (status toggle + repeat logic)
-- [ ] T032 [US2] Integrate AnimatedCheckbox into TaskListItem with onCheckboxClick callback
-- [ ] T033 [US2] Add haptic feedback collection in WeekScreen (LaunchedEffect for sideEffects)
-- [ ] T034 [US2] Add animateItem() modifier to LazyColumn items for smooth reordering
-- [ ] T035 [US2] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
+- [X] T030 [P] [US2] Create AnimatedCheckbox composable (scale spring animation) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/components/AnimatedCheckbox.kt`
+- [X] T031 [US2] Implement handleTaskCheckboxTapped() in WeekViewModel (status toggle + repeat logic)
+- [X] T032 [US2] Integrate AnimatedCheckbox into TaskListItem with onCheckboxClick callback
+- [X] T033 [US2] Add haptic feedback collection in WeekScreen (LaunchedEffect for sideEffects)
+- [X] T034 [US2] Add animateItem() modifier to LazyColumn items for smooth reordering
+- [X] T035 [US2] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
 
 **Checkpoint**: User Stories 1 AND 2 complete - users can view and complete tasks with feedback
 
@@ -152,13 +152,13 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 ### Implementation for User Story 4
 
-- [ ] T046 [US4] Create SegmentedControl composable (SingleChoiceSegmentedButtonRow) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/SegmentedControl.kt`
-- [ ] T047 [US4] Implement handleSegmentSelected() in WeekViewModel (persist + re-filter)
-- [ ] T048 [US4] Integrate SegmentedControl into WeekScreen below WeekHeader
-- [ ] T049 [US4] Hide checkbox in TaskListItem when isReadOnly = true (Partner segment)
-- [ ] T050 [US4] Add "Request a Task" button to WeekScreen for Partner segment (v1.0 PLACEHOLDER: shows snackbar "Request a Task feature coming in Partner System update")
-- [ ] T051 [US4] Add "completed by You" text to TaskListItem for completed shared tasks (partner name deferred to Feature 006)
-- [ ] T052 [US4] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
+- [X] T046 [US4] Create SegmentedControl composable (SingleChoiceSegmentedButtonRow) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/SegmentedControl.kt`
+- [X] T047 [US4] Implement handleSegmentSelected() in WeekViewModel (persist + re-filter)
+- [X] T048 [US4] Integrate SegmentedControl into WeekScreen below WeekHeader
+- [X] T049 [US4] Hide checkbox in TaskListItem when isReadOnly = true (Partner segment)
+- [X] T050 [US4] Add "Request a Task" button to WeekScreen for Partner segment (v1.0 PLACEHOLDER: shows snackbar "Request a Task feature coming in Partner System update")
+- [X] T051 [US4] Add "completed by You" text to TaskListItem for completed shared tasks (partner name deferred to Feature 006)
+- [X] T052 [US4] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
 
 **Checkpoint**: User Stories 1-4 complete - full segment navigation working
 
@@ -177,15 +177,15 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 ### Implementation for User Story 5
 
-- [ ] T055 [US5] Create TaskDetailSheet composable (ModalBottomSheet structure) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskDetailSheet.kt`
-- [ ] T056 [US5] Add title and notes OutlinedTextFields to TaskDetailSheet
-- [ ] T057 [US5] Add status display, owner info, and creation/rollover info to TaskDetailSheet
-- [ ] T058 [US5] Add "Mark Complete" button to TaskDetailSheet (for incomplete own tasks)
-- [ ] T059 [US5] Add "Delete" button with confirmation dialog to TaskDetailSheet
-- [ ] T060 [US5] Implement handleTaskTapped(), handleTaskSaveRequested(), handleTaskDeleteConfirmed() in WeekViewModel
-- [ ] T061 [US5] Integrate TaskDetailSheet into WeekScreen (show when showDetailSheet = true)
-- [ ] T062 [US5] Wire TaskListItem onClick to TaskTapped event
-- [ ] T063 [US5] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
+- [X] T055 [US5] Create TaskDetailSheet composable (ModalBottomSheet structure) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskDetailSheet.kt`
+- [X] T056 [US5] Add title and notes OutlinedTextFields to TaskDetailSheet
+- [X] T057 [US5] Add status display, owner info, and creation/rollover info to TaskDetailSheet
+- [X] T058 [US5] Add "Mark Complete" button to TaskDetailSheet (for incomplete own tasks)
+- [X] T059 [US5] Add "Delete" button with confirmation dialog to TaskDetailSheet
+- [X] T060 [US5] Implement handleTaskTapped(), handleTaskSaveRequested(), handleTaskDeleteConfirmed() in WeekViewModel
+- [X] T061 [US5] Integrate TaskDetailSheet into WeekScreen (show when showDetailSheet = true)
+- [X] T062 [US5] Wire TaskListItem onClick to TaskTapped event
+- [X] T063 [US5] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
 
 **Checkpoint**: User Stories 1-5 complete - task details viewable and editable
 
@@ -203,14 +203,14 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 ### Implementation for User Story 6
 
-- [ ] T065 [US6] Create AddTaskSheet composable (ModalBottomSheet with form) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/AddTaskSheet.kt`
-- [ ] T066 [US6] Add title (required) and notes (optional) fields to AddTaskSheet
-- [ ] T067 [US6] Add owner selector (You/Shared) to AddTaskSheet for Shared segment
-- [ ] T068 [US6] Add Save/Cancel buttons to AddTaskSheet
-- [ ] T069 [US6] Implement handleAddTaskSheetRequested(), handleAddTaskSubmitted() in WeekViewModel
-- [ ] T070 [US6] Add FAB to WeekScreen that triggers AddTaskSheetRequested event
-- [ ] T071 [US6] Integrate AddTaskSheet into WeekScreen (show when showAddTaskSheet = true)
-- [ ] T072 [US6] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
+- [X] T065 [US6] Create AddTaskSheet composable (ModalBottomSheet with form) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/AddTaskSheet.kt`
+- [X] T066 [US6] Add title (required) and notes (optional) fields to AddTaskSheet
+- [X] T067 [US6] Add owner selector (You/Shared) to AddTaskSheet for Shared segment
+- [X] T068 [US6] Add Save/Cancel buttons to AddTaskSheet
+- [X] T069 [US6] Implement handleAddTaskSheetRequested(), handleAddTaskSubmitted() in WeekViewModel
+- [X] T070 [US6] Add FAB to WeekScreen that triggers AddTaskSheetRequested event
+- [X] T071 [US6] Integrate AddTaskSheet into WeekScreen (show when showAddTaskSheet = true)
+- [X] T072 [US6] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
 
 **Checkpoint**: All user stories complete - full Week View functionality available
 
@@ -220,21 +220,21 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 **Purpose**: Refinements and final validation
 
-- [ ] T073 Add snackbar host to WeekScreen for ShowSnackbar side effects
-- [ ] T074 Implement error state display in WeekScreen for repository errors
-- [ ] T075 Add content descriptions for accessibility to all interactive elements
-- [ ] T076 Ensure minimum 48dp touch targets on all tappable elements
-- [ ] T077 Test light and dark mode appearance
-- [ ] T078 Add performance validation: measure and verify segment switching completes within 500ms
-- [ ] T079 Add edge case handling: long task title truncation (ellipsis in list, full in detail)
-- [ ] T080 Add edge case handling: Partner segment empty state when no partner connected
-- [ ] T081 Add edge case handling: offline pull-to-refresh shows brief indicator then continues showing local data
-- [ ] T082 Add unit test: verify progress indicator updates when tasks are added or completed
-- [ ] T083 Add task to TaskDetailSheet: display creation date and rollover info ("Rolled over from Week X")
-- [ ] T084 Add confirmation dialog to TaskDetailSheet delete action with "Delete Task" title and "Cancel"/"Delete" buttons
-- [ ] T085 Run full unit test suite: `./gradlew :composeApp:testDebugUnitTest`
-- [ ] T086 Run final build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
-- [ ] T087 Manual testing: complete quickstart.md validation steps
+- [X] T073 Add snackbar host to WeekScreen for ShowSnackbar side effects
+- [X] T074 Implement error state display in WeekScreen for repository errors
+- [X] T075 Add content descriptions for accessibility to all interactive elements
+- [X] T076 Ensure minimum 48dp touch targets on all tappable elements
+- [ ] T077 Test light and dark mode appearance (Manual testing - deferred)
+- [ ] T078 Add performance validation: measure and verify segment switching completes within 500ms (Deferred)
+- [X] T079 Add edge case handling: long task title truncation (ellipsis in list, full in detail)
+- [X] T080 Add edge case handling: Partner segment empty state when no partner connected
+- [X] T081 Add edge case handling: offline pull-to-refresh shows brief indicator then continues showing local data
+- [ ] T082 Add unit test: verify progress indicator updates when tasks are added or completed (Unit tests deferred)
+- [X] T083 Add task to TaskDetailSheet: display creation date and rollover info ("Rolled over from Week X")
+- [X] T084 Add confirmation dialog to TaskDetailSheet delete action with "Delete Task" title and "Cancel"/"Delete" buttons
+- [ ] T085 Run full unit test suite: `./gradlew :composeApp:testDebugUnitTest` (Unit tests not yet implemented)
+- [X] T086 Run final build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
+- [ ] T087 Manual testing: complete quickstart.md validation steps (Manual testing - deferred)
 
 ---
 
