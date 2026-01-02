@@ -3,6 +3,7 @@ package org.epoque.tandem
 import android.app.Application
 import org.epoque.tandem.di.appModule
 import org.epoque.tandem.di.authModule
+import org.epoque.tandem.di.taskModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -23,7 +24,8 @@ class TandemApp : Application() {
             androidContext(this@TandemApp)
             modules(
                 appModule,
-                authModule
+                authModule,
+                taskModule
             )
         }
     }

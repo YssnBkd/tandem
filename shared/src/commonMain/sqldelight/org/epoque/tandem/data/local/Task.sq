@@ -1,0 +1,83 @@
+import kotlinx.datetime.Instant;
+import kotlinx.datetime.LocalDate;
+import org.epoque.tandem.domain.model.OwnerType;
+import org.epoque.tandem.domain.model.TaskStatus;
+
+CREATE TABLE Task (
+    id TEXT NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    notes TEXT,
+    owner_id TEXT NOT NULL,
+    owner_type TEXT AS OwnerType NOT NULL,
+    week_id TEXT NOT NULL,
+    status TEXT AS TaskStatus NOT NULL,
+    created_by TEXT NOT NULL,
+    repeat_target INTEGER,
+    repeat_completed INTEGER NOT NULL DEFAULT 0,
+    linked_goal_id TEXT,
+    review_note TEXT,
+    rolled_from_week_id TEXT,
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL
+);
+
+CREATE INDEX task_week_id ON Task(week_id);
+CREATE INDEX task_owner_id ON Task(owner_id);
+CREATE INDEX task_status ON Task(status);
+CREATE INDEX task_owner_type ON Task(owner_type);
+
+-- Insert or replace a task
+upsertTask:
+INSERT OR REPLACE INTO Task (
+    id, title, notes, owner_id, owner_type, week_id, status, created_by,
+    repeat_target, repeat_completed, linked_goal_id, review_note, rolled_from_week_id,
+    created_at, updated_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Get all tasks
+getAllTasks:
+SELECT * FROM Task;
+
+-- Get task by ID
+getTaskById:
+SELECT * FROM Task WHERE id = ?;
+
+-- Get tasks by week ID
+getTasksByWeekId:
+SELECT * FROM Task WHERE week_id = ?;
+
+-- Get tasks by week ID and owner type
+getTasksByWeekIdAndOwnerType:
+SELECT * FROM Task WHERE week_id = ? AND owner_type = ?;
+
+-- Get tasks by week ID and status
+getTasksByWeekIdAndStatus:
+SELECT * FROM Task WHERE week_id = ? AND status = ?;
+
+-- Get tasks by owner ID
+getTasksByOwnerId:
+SELECT * FROM Task WHERE owner_id = ?;
+
+-- Delete task by ID
+deleteTaskById:
+DELETE FROM Task WHERE id = ?;
+
+-- Delete all tasks for a week
+deleteTasksByWeekId:
+DELETE FROM Task WHERE week_id = ?;
+
+-- Update task status
+updateTaskStatus:
+UPDATE Task SET status = ?, updated_at = ? WHERE id = ?;
+
+-- Update repeat progress
+updateRepeatProgress:
+UPDATE Task SET repeat_completed = ?, updated_at = ? WHERE id = ?;
+
+-- Update review note
+updateReviewNote:
+UPDATE Task SET review_note = ?, updated_at = ? WHERE id = ?;
+
+-- Count tasks by week and status
+countTasksByWeekAndStatus:
+SELECT COUNT(*) FROM Task WHERE week_id = ? AND status = ?;
