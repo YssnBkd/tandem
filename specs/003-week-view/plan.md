@@ -44,7 +44,7 @@ Implement the main Week tab UI screen where users view, add, and complete tasks 
 
 - [x] NO tracking of partner's incomplete tasks - Partner segment is read-only view; no editing of partner task status
 - [x] NO notifications for partner's task completions (default off) - Not implemented in this feature
-- [x] NO assigning tasks without acceptance workflow - "Request a Task" creates PENDING_ACCEPTANCE status
+- [x] NO assigning tasks without acceptance workflow - "Request a Task" button is v1.0 placeholder only; full implementation with acceptance workflow in Feature 006
 - [x] NO shame language in UI copy - Uses positive framing (progress indicator, celebration)
 - [x] NO complex task hierarchies - Flat task list, no subtasks/categories
 
@@ -222,7 +222,7 @@ fun TaskListItem(
 **Visual States**:
 - Incomplete: Normal text, unchecked checkbox
 - Completed: Strikethrough text, checked checkbox, 50% alpha
-- Repeating: Shows progress dots (●●○) or fraction (2/3)
+- Repeating: Shows fraction format (2/3)
 
 ### ModalBottomSheets
 
@@ -303,7 +303,7 @@ LazyColumn {
 Use DataStore to persist last selected segment:
 
 ```kotlin
-// SegmentPreferences.kt
+// SegmentPreferences.kt (in commonMain)
 class SegmentPreferences(private val dataStore: DataStore<Preferences>) {
 
     private object Keys {

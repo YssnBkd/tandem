@@ -22,6 +22,14 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 ---
 
+## Phase 0: Prerequisites
+
+**Purpose**: Verify dependencies from previous features are complete before starting implementation
+
+- [ ] T000 [CRITICAL] Verify Feature 002 (Task Data Layer) is complete: TaskRepository and WeekRepository exist and compile successfully
+
+---
+
 ## Phase 1: Setup (Shared Infrastructure)
 
 **Purpose**: Create presentation layer foundation and models used across all user stories
@@ -32,7 +40,7 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 - [ ] T004 [P] Create WeekUiState data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekUiState.kt`
 - [ ] T005 [P] Create WeekEvent sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekEvent.kt`
 - [ ] T006 [P] Create WeekSideEffect sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekSideEffect.kt`
-- [ ] T007 Create SegmentPreferences class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/data/preferences/SegmentPreferences.kt`
+- [ ] T007 Create SegmentPreferences class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/preferences/SegmentPreferences.kt`
 
 ---
 
@@ -69,7 +77,7 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 ### Implementation for User Story 1
 
 - [ ] T018 [P] [US1] Create TaskListItem composable (checkbox, title, completed style) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskListItem.kt`
-- [ ] T019 [P] [US1] Create RepeatProgressIndicator composable (dots or fraction) in TaskListItem.kt
+- [ ] T019 [P] [US1] Create RepeatProgressIndicator composable (fraction format: "2/3") in TaskListItem.kt
 - [ ] T020 [P] [US1] Create WeekHeader composable (date range text, progress indicator) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/WeekHeader.kt`
 - [ ] T021 [P] [US1] Create EmptyState composable (message + optional action button) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/EmptyState.kt`
 - [ ] T022 [US1] Create TaskList composable (LazyColumn with incomplete/completed sections) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskList.kt`
@@ -120,9 +128,9 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] Create QuickAddField composable (OutlinedTextField + submit handling) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/QuickAddField.kt`
+- [ ] T038 [US3] Create QuickAddField composable (OutlinedTextField + submit handling + inline error display) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/QuickAddField.kt`
 - [ ] T039 [US3] Implement handleQuickAddTextChanged() in WeekViewModel
-- [ ] T040 [US3] Implement handleQuickAddSubmitted() in WeekViewModel (validation + create task)
+- [ ] T040 [US3] Implement handleQuickAddSubmitted() in WeekViewModel (validation + inline error for empty title + create task)
 - [ ] T041 [US3] Integrate QuickAddField into WeekScreen above TaskList
 - [ ] T042 [US3] Add keyboard focus handling (ClearFocus side effect) in WeekScreen
 - [ ] T043 [US3] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
@@ -148,8 +156,8 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 - [ ] T047 [US4] Implement handleSegmentSelected() in WeekViewModel (persist + re-filter)
 - [ ] T048 [US4] Integrate SegmentedControl into WeekScreen below WeekHeader
 - [ ] T049 [US4] Hide checkbox in TaskListItem when isReadOnly = true (Partner segment)
-- [ ] T050 [US4] Add "Request a Task" button to WeekScreen for Partner segment
-- [ ] T051 [US4] Add "completed by [name]" text to TaskListItem for completed shared tasks
+- [ ] T050 [US4] Add "Request a Task" button to WeekScreen for Partner segment (v1.0 PLACEHOLDER: shows snackbar "Request a Task feature coming in Partner System update")
+- [ ] T051 [US4] Add "completed by You" text to TaskListItem for completed shared tasks (partner name deferred to Feature 006)
 - [ ] T052 [US4] Run build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
 
 **Checkpoint**: User Stories 1-4 complete - full segment navigation working
@@ -217,9 +225,16 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 - [ ] T075 Add content descriptions for accessibility to all interactive elements
 - [ ] T076 Ensure minimum 48dp touch targets on all tappable elements
 - [ ] T077 Test light and dark mode appearance
-- [ ] T078 Run full unit test suite: `./gradlew :composeApp:testDebugUnitTest`
-- [ ] T079 Run final build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
-- [ ] T080 Manual testing: complete quickstart.md validation steps
+- [ ] T078 Add performance validation: measure and verify segment switching completes within 500ms
+- [ ] T079 Add edge case handling: long task title truncation (ellipsis in list, full in detail)
+- [ ] T080 Add edge case handling: Partner segment empty state when no partner connected
+- [ ] T081 Add edge case handling: offline pull-to-refresh shows brief indicator then continues showing local data
+- [ ] T082 Add unit test: verify progress indicator updates when tasks are added or completed
+- [ ] T083 Add task to TaskDetailSheet: display creation date and rollover info ("Rolled over from Week X")
+- [ ] T084 Add confirmation dialog to TaskDetailSheet delete action with "Delete Task" title and "Cancel"/"Delete" buttons
+- [ ] T085 Run full unit test suite: `./gradlew :composeApp:testDebugUnitTest`
+- [ ] T086 Run final build validation: `./gradlew :composeApp:compileDebugKotlinAndroid`
+- [ ] T087 Manual testing: complete quickstart.md validation steps
 
 ---
 
@@ -227,7 +242,8 @@ Based on plan.md, this project uses Kotlin Multiplatform structure:
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: No dependencies - can start immediately
+- **Prerequisites (Phase 0)**: MUST complete first - verifies Feature 002 dependency
+- **Setup (Phase 1)**: Depends on Phase 0 passing - creates foundational models
 - **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
 - **User Stories (Phase 3-8)**: All depend on Foundational phase completion
   - US1 & US2 are both P1: Complete US1 first (view tasks), then US2 (complete tasks)
@@ -327,6 +343,7 @@ With multiple developers:
 
 | Phase | Tasks | Story |
 |-------|-------|-------|
+| Prerequisites | 1 | - |
 | Setup | 7 | - |
 | Foundational | 6 | - |
 | US1 | 13 | View Weekly Tasks |
@@ -335,8 +352,8 @@ With multiple developers:
 | US4 | 9 | Segments |
 | US5 | 11 | Task Details |
 | US6 | 9 | Add with Details |
-| Polish | 8 | - |
-| **Total** | **80** | 6 user stories |
+| Polish | 15 | - |
+| **Total** | **88** | 6 user stories |
 
 ---
 

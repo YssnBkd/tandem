@@ -81,9 +81,9 @@ As a user, I want to switch between "You", "Partner", and "Shared" segments to v
 
 2. **Given** the user is on the "You" segment, **When** they tap the "Partner" segment, **Then** the task list updates to show their partner's tasks in read-only mode (no checkboxes).
 
-3. **Given** the user is on the "Partner" segment, **When** viewing their partner's tasks, **Then** they see a "Request a Task" button at the bottom.
+3. **Given** the user is on the "Partner" segment, **When** viewing their partner's tasks, **Then** they see a "Request a Task" button at the bottom (v1.0: tapping shows "Coming in Partner System update" message).
 
-4. **Given** the user is on the "Shared" segment, **When** viewing a completed shared task, **Then** they see "completed by [partner name]" indicating who completed it.
+4. **Given** the user is on the "Shared" segment, **When** viewing a completed shared task, **Then** they see "completed by You" if they completed it (partner name display deferred to Feature 006).
 
 5. **Given** the user switches to a different segment and later returns, **When** they reopen the Week tab, **Then** the app remembers and restores their last selected segment.
 
@@ -151,13 +151,13 @@ As a user, I want to add a task with additional details like notes, so I can pro
 #### Task List Display
 - **FR-001**: System MUST display tasks grouped by status with incomplete tasks first and completed tasks last
 - **FR-002**: System MUST show task title and visual completion status indicator for each task
-- **FR-003**: System MUST show repeat progress indicators (e.g., "1/3") for repeating tasks
+- **FR-003**: System MUST show repeat progress indicators as fraction format (e.g., "1/3") for repeating tasks
 - **FR-004**: System MUST support pull-to-refresh gesture to trigger data synchronization
 - **FR-005**: System MUST display an empty state message when no tasks exist for the current week
 
 #### Task Completion
 - **FR-006**: System MUST allow users to toggle task completion by tapping the checkbox
-- **FR-007**: System MUST provide haptic feedback (light impact) on task completion
+- **FR-007**: System MUST provide haptic feedback (light impact) on task completion; gracefully degrade to no haptic if device does not support it (no error or crash)
 - **FR-008**: System MUST animate the checkmark appearance when a task is completed
 - **FR-009**: System MUST visually move completed tasks to the bottom of the list with a fade effect
 - **FR-010**: System MUST increment repeat count for repeating tasks instead of marking fully complete until target reached
@@ -166,15 +166,15 @@ As a user, I want to add a task with additional details like notes, so I can pro
 - **FR-011**: System MUST display an always-visible text field at the top of the task list for quick task entry
 - **FR-012**: System MUST create a new task when user submits text in the quick-add field
 - **FR-013**: System MUST clear the quick-add field after successful task creation
-- **FR-014**: System MUST show validation error if user attempts to submit an empty task title
+- **FR-014**: System MUST show inline validation error below the quick-add field if user attempts to submit an empty task title
 
 #### Segment Navigation
 - **FR-015**: System MUST display a segmented control with "You", "Partner", and "Shared" options
 - **FR-016**: System MUST persist the user's last selected segment and restore it on next visit
 - **FR-017**: System MUST display partner's tasks in read-only mode (no checkboxes) on the Partner segment
-- **FR-018**: System MUST display a "Request a Task" button on the Partner segment
+- **FR-018**: System MUST display a "Request a Task" button on the Partner segment (v1.0: placeholder only - tapping shows message "Request a Task feature coming in Partner System update")
 - **FR-019**: System MUST allow either partner to complete tasks on the Shared segment
-- **FR-020**: System MUST display "completed by [name]" for completed shared tasks
+- **FR-020**: System MUST display "completed by [name]" for completed shared tasks (v1.0: displays "You" if completed by self; partner name feature deferred to Feature 006)
 
 #### Task Detail View
 - **FR-021**: System MUST display a modal/sheet when user taps on a task
@@ -203,12 +203,13 @@ As a user, I want to add a task with additional details like notes, so I can pro
 
 ## Assumptions
 
-- **Task Data Layer Available**: Feature 002 (Task Data Layer) is implemented and provides TaskRepository and WeekRepository with required CRUD operations
+- **Task Data Layer Available**: Feature 002 (Task Data Layer) MUST be fully implemented and provide TaskRepository and WeekRepository with required CRUD operations (verify with prerequisite check before implementation)
 - **Authentication Available**: Feature 001 (Core Infrastructure) provides authenticated user context and navigation shell
 - **Partner Connection Deferred**: Partner data synchronization and real-time sync are handled in Feature 006; this feature assumes local partner task data may be stale or empty
-- **Haptic Feedback**: Device supports light impact haptic feedback; graceful degradation if unavailable
-- **Week Definition**: Weeks follow ISO 8601 (Monday-Sunday) as established in Task Data Layer
+- **Haptic Feedback**: Attempt haptic feedback on supported devices; gracefully degrade to visual-only feedback if unavailable (no error/crash)
+- **Week Definition**: Weeks follow ISO 8601 (Monday-Sunday) as established in Task Data Layer; ViewModel uses WeekRepository to ensure consistency
 - **Single User Testing**: This feature can be tested without a connected partner; Partner segment will show empty state
+- **Pull-to-Refresh**: Triggers local database refresh (re-query); no remote sync until Feature 006
 
 ## Out of Scope
 
@@ -225,7 +226,7 @@ As a user, I want to add a task with additional details like notes, so I can pro
 
 - **SC-001**: Users can view their current week's tasks within 2 seconds of opening the Week tab
 - **SC-002**: Users can add a new task via quick-add in under 5 seconds (type and submit)
-- **SC-003**: Task completion provides immediate visual and haptic feedback (under 100ms perceived response)
+- **SC-003**: Task completion provides immediate visual and haptic feedback (checkbox visual state change occurs within 100ms of tap event; animation begins immediately)
 - **SC-004**: Progress indicator updates in real-time when tasks are completed or added (no manual refresh required)
 - **SC-005**: Segment switching displays the new task set within 500ms
 - **SC-006**: 95% of users can successfully add and complete a task on their first attempt without guidance
