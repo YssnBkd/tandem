@@ -23,9 +23,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.epoque.tandem.domain.model.User
 import org.epoque.tandem.ui.navigation.NavigationTab
+import org.epoque.tandem.ui.week.WeekScreen
 
 /**
  * Main app screen with bottom navigation for authenticated users.

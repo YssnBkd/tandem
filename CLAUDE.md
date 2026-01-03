@@ -5,6 +5,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-31
 ## Active Technologies
 - Kotlin 2.3.0 (Kotlin Multiplatform) + SQLDelight 2.0+, Kotlin Coroutines Flow, kotlinx.datetime (002-task-data-layer)
 - SQLDelight (local), offline-first (no sync in this feature) (002-task-data-layer)
+- Kotlin 2.1+ (Kotlin Multiplatform) + Compose Multiplatform, Koin, SQLDelight, DataStore, kotlinx.datetime (003-week-view)
+- SQLDelight (via Feature 002), DataStore (segment preference persistence) (003-week-view)
 
 - Kotlin 2.3.0 (Kotlin Multiplatform) (001-core-infrastructure)
 
@@ -24,6 +26,7 @@ tests/
 Kotlin 2.3.0 (Kotlin Multiplatform): Follow standard conventions
 
 ## Recent Changes
+- 003-week-view: Added Kotlin 2.1+ (Kotlin Multiplatform) + Compose Multiplatform, Koin, SQLDelight, DataStore, kotlinx.datetime
 - 002-task-data-layer: Added Kotlin 2.3.0 (Kotlin Multiplatform) + SQLDelight 2.0+, Kotlin Coroutines Flow, kotlinx.datetime
 
 - 001-core-infrastructure: Added Kotlin 2.3.0 (Kotlin Multiplatform)
