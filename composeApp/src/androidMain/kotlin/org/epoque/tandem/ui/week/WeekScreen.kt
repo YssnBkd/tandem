@@ -47,7 +47,11 @@ fun WeekScreen(
     // https://www.sinasamaki.com/haptic-feedback-in-jetpack-compose/
     val hapticFeedback = LocalHapticFeedback.current
 
-    // Collect side effects for one-time actions (haptics, snackbars, etc.)
+    // Snackbar host state for showing messages
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Single collector for all side effects (Channel can only be consumed once)
+    // Following best practices: https://developer.android.com/kotlin/flow/stateflow-and-sharedflow
     LaunchedEffect(Unit) {
         viewModel.sideEffects.collect { effect ->
             when (effect) {
@@ -56,7 +60,10 @@ fun WeekScreen(
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
                 is WeekSideEffect.ShowSnackbar -> {
-                    // TODO: Show snackbar (will be implemented in polish phase)
+                    snackbarHostState.showSnackbar(
+                        message = effect.message,
+                        duration = SnackbarDuration.Short
+                    )
                 }
                 is WeekSideEffect.NavigateToPartnerInvite -> {
                     // TODO: Navigate to partner invite (future feature)
@@ -68,24 +75,6 @@ fun WeekScreen(
                     // Keyboard focus is cleared automatically by QuickAddField
                     // using LocalFocusManager.clearFocus()
                 }
-            }
-        }
-    }
-
-    // Snackbar host state for showing messages
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    // Show snackbar when side effect is triggered
-    LaunchedEffect(Unit) {
-        viewModel.sideEffects.collect { effect ->
-            when (effect) {
-                is WeekSideEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = effect.message,
-                        duration = SnackbarDuration.Short
-                    )
-                }
-                else -> { /* Handled in other LaunchedEffect */ }
             }
         }
     }
@@ -179,26 +168,7 @@ fun WeekScreen(
                     )
                 }
 
-                // Empty state
-                uiState.showEmptyState -> {
-                    EmptyState(
-                        message = uiState.emptyStateMessage,
-                        actionText = uiState.emptyStateActionText,
-                        onActionClick = when (uiState.selectedSegment) {
-                            Segment.PARTNER -> {
-                                if (!uiState.hasPartner) {
-                                    { viewModel.onEvent(WeekEvent.InvitePartnerTapped) }
-                                } else null
-                            }
-                            Segment.SHARED -> {
-                                { viewModel.onEvent(WeekEvent.AddTaskSheetRequested) }
-                            }
-                            else -> null
-                        }
-                    )
-                }
-
-                // Task list with segment control and quick add field
+                // Main content: always show segment control and quick add, with task list or empty state
                 else -> {
                     Column(modifier = Modifier.fillMaxSize()) {
                         // Segment control for switching between You/Partner/Shared
@@ -223,7 +193,7 @@ fun WeekScreen(
                             )
                         }
 
-                        // "Request a Task" button for Partner segment when tasks exist
+                        // "Request a Task" button for Partner segment
                         if (uiState.isReadOnly && uiState.hasPartner) {
                             RequestTaskButton(
                                 onClick = {
@@ -232,19 +202,40 @@ fun WeekScreen(
                             )
                         }
 
-                        // Task list
-                        TaskList(
-                            incompleteTasks = uiState.incompleteTasks,
-                            completedTasks = uiState.completedTasks,
-                            isReadOnly = uiState.isReadOnly,
-                            onTaskClick = { taskId ->
-                                viewModel.onEvent(WeekEvent.TaskTapped(taskId))
-                            },
-                            onCheckboxClick = { taskId ->
-                                viewModel.onEvent(WeekEvent.TaskCheckboxTapped(taskId))
-                            },
-                            modifier = Modifier.weight(1f)
-                        )
+                        // Task list or empty state
+                        if (uiState.showEmptyState) {
+                            // Empty state shown inside the content area
+                            EmptyState(
+                                message = uiState.emptyStateMessage,
+                                actionText = uiState.emptyStateActionText,
+                                onActionClick = when (uiState.selectedSegment) {
+                                    Segment.PARTNER -> {
+                                        if (!uiState.hasPartner) {
+                                            { viewModel.onEvent(WeekEvent.InvitePartnerTapped) }
+                                        } else null
+                                    }
+                                    Segment.SHARED -> {
+                                        { viewModel.onEvent(WeekEvent.AddTaskSheetRequested) }
+                                    }
+                                    else -> null
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
+                        } else {
+                            // Task list
+                            TaskList(
+                                incompleteTasks = uiState.incompleteTasks,
+                                completedTasks = uiState.completedTasks,
+                                isReadOnly = uiState.isReadOnly,
+                                onTaskClick = { taskId ->
+                                    viewModel.onEvent(WeekEvent.TaskTapped(taskId))
+                                },
+                                onCheckboxClick = { taskId ->
+                                    viewModel.onEvent(WeekEvent.TaskCheckboxTapped(taskId))
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
                 }
             }

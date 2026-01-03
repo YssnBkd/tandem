@@ -2,14 +2,26 @@ package org.epoque.tandem.presentation.week
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.Task
 import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.domain.repository.AuthRepository
+import org.epoque.tandem.domain.repository.AuthState
 import org.epoque.tandem.domain.repository.TaskRepository
 import org.epoque.tandem.domain.repository.WeekRepository
 import org.epoque.tandem.presentation.week.model.Segment
@@ -76,9 +88,21 @@ class WeekViewModel(
 
     /**
      * Load initial week data.
+     * Waits for authentication, then ensures the current week exists before observing.
      */
     private fun loadInitialData() {
         viewModelScope.launch {
+            // Wait for authentication before creating/observing week
+            authRepository.authState
+                .filterIsInstance<AuthState.Authenticated>()
+                .first()
+                .let { authState ->
+                    val userId = authState.user.id
+                    // This creates the week if it doesn't exist
+                    weekRepository.getOrCreateCurrentWeek(userId)
+                }
+
+            // Now observe the week (guaranteed to exist)
             val currentWeekId = weekRepository.getCurrentWeekId()
             weekRepository.observeWeek(currentWeekId).collect { week ->
                 week?.let {
@@ -103,21 +127,27 @@ class WeekViewModel(
     }
 
     /**
-     * Observe tasks based on selected segment and week.
-     * Uses combined flow to react to both segment and week changes.
+     * Observe tasks based on selected segment, week, and auth state.
+     * Uses combined flow to react to auth, segment, and week changes.
+     * Waits for authentication before observing tasks.
      */
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     private fun observeTasks() {
         viewModelScope.launch {
             combine(
+                authRepository.authState,
                 segmentPreferences.selectedSegment,
                 weekRepository.observeWeek(weekRepository.getCurrentWeekId())
-            ) { segment, week ->
-                segment to week
-            }.flatMapLatest { (segment, week) ->
+            ) { authState, segment, week ->
+                Triple(authState, segment, week)
+            }.flatMapLatest { (authState, segment, week) ->
+                // Only observe if authenticated
+                val userId = (authState as? AuthState.Authenticated)?.user?.id
+                    ?: return@flatMapLatest flowOf(emptyList())
+
                 if (week == null) {
                     flowOf(emptyList())
                 } else {
-                    val userId = currentUserId ?: return@flatMapLatest flowOf(emptyList())
                     taskRepository.observeTasksByWeekAndOwnerType(
                         weekId = week.id,
                         ownerType = segment.toOwnerType(),
@@ -195,6 +225,14 @@ class WeekViewModel(
         _uiState.update { it.copy(quickAddText = text, quickAddError = null) }
     }
 
+    /**
+     * Handle quick add task submission.
+     * Following Android best practices:
+     * - Try-catch with specific exception types
+     * - Never consume CancellationException
+     * - Notify view of errors via snackbar
+     * @see https://developer.android.com/kotlin/coroutines/coroutines-best-practices
+     */
     private fun handleQuickAddSubmitted() {
         val title = _uiState.value.quickAddText.trim()
 
@@ -204,7 +242,13 @@ class WeekViewModel(
         }
 
         viewModelScope.launch {
-            val userId = currentUserId ?: return@launch
+            // Show feedback if not authenticated yet
+            val userId = currentUserId
+            if (userId == null) {
+                _sideEffects.send(WeekSideEffect.ShowSnackbar("Please wait, signing in..."))
+                return@launch
+            }
+
             val weekId = weekRepository.getCurrentWeekId()
 
             val ownerType = when (_uiState.value.selectedSegment) {
@@ -231,10 +275,17 @@ class WeekViewModel(
                 updatedAt = Instant.DISTANT_PAST   // Set by repository
             )
 
-            taskRepository.createTask(task)
-
-            _uiState.update { it.copy(quickAddText = "", quickAddError = null) }
-            _sideEffects.send(WeekSideEffect.ClearFocus)
+            try {
+                taskRepository.createTask(task)
+                _uiState.update { it.copy(quickAddText = "", quickAddError = null) }
+                _sideEffects.send(WeekSideEffect.ClearFocus)
+            } catch (e: CancellationException) {
+                throw e  // Never consume CancellationException (Android best practice)
+            } catch (e: IllegalArgumentException) {
+                _sideEffects.send(WeekSideEffect.ShowSnackbar("Invalid task: ${e.message}"))
+            } catch (e: Exception) {
+                _sideEffects.send(WeekSideEffect.ShowSnackbar("Failed to create task"))
+            }
         }
     }
 
@@ -342,13 +393,27 @@ class WeekViewModel(
         _uiState.update { it.copy(showAddTaskSheet = false) }
     }
 
+    /**
+     * Handle add task submission from the Add Task sheet.
+     * Following Android best practices:
+     * - Try-catch with specific exception types
+     * - Never consume CancellationException
+     * - Notify view of errors via snackbar
+     * @see https://developer.android.com/kotlin/coroutines/coroutines-best-practices
+     */
     private fun handleAddTaskSubmitted(title: String, notes: String?, ownerType: OwnerType) {
         if (title.isBlank()) {
             return
         }
 
         viewModelScope.launch {
-            val userId = currentUserId ?: return@launch
+            // Show feedback if not authenticated yet
+            val userId = currentUserId
+            if (userId == null) {
+                _sideEffects.send(WeekSideEffect.ShowSnackbar("Please wait, signing in..."))
+                return@launch
+            }
+
             val weekId = weekRepository.getCurrentWeekId()
 
             val task = Task(
@@ -369,10 +434,17 @@ class WeekViewModel(
                 updatedAt = Instant.DISTANT_PAST
             )
 
-            taskRepository.createTask(task)
-
-            _uiState.update { it.copy(showAddTaskSheet = false) }
-            _sideEffects.send(WeekSideEffect.ShowSnackbar("Task added"))
+            try {
+                taskRepository.createTask(task)
+                _uiState.update { it.copy(showAddTaskSheet = false) }
+                _sideEffects.send(WeekSideEffect.ShowSnackbar("Task added"))
+            } catch (e: CancellationException) {
+                throw e  // Never consume CancellationException (Android best practice)
+            } catch (e: IllegalArgumentException) {
+                _sideEffects.send(WeekSideEffect.ShowSnackbar("Invalid task: ${e.message}"))
+            } catch (e: Exception) {
+                _sideEffects.send(WeekSideEffect.ShowSnackbar("Failed to create task"))
+            }
         }
     }
 
