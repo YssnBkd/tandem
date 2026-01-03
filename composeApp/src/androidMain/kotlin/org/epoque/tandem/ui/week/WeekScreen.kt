@@ -3,6 +3,7 @@ package org.epoque.tandem.ui.week
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -121,6 +122,17 @@ fun WeekScreen(
                     }
                 },
                 actions = {
+                    // Plan Week button - always accessible
+                    IconButton(
+                        onClick = onNavigateToPlanning
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.EditCalendar,
+                            contentDescription = "Plan your week",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
                     // Progress indicator in top bar
                     Text(
                         text = uiState.progressText,
