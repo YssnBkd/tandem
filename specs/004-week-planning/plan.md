@@ -9,6 +9,16 @@
 
 Weekly planning flow (Sunday Setup) where users review incomplete tasks from the previous week, add new tasks, review partner requests, and complete planning with a confirmation summary. Implements a 4-step wizard using Jetpack Navigation Compose with nested navigation, DataStore for planning progress persistence, and follows existing MVI patterns from Features 001-003.
 
+## How to Use This Plan
+
+| Document | Purpose | When to Use |
+|----------|---------|-------------|
+| **[quickstart.md](./quickstart.md)** | Step-by-step implementation tasks with cross-references | **Start here** - primary implementation guide |
+| [data-model.md](./data-model.md) | Data structures, SQL queries, state classes | When implementing repositories and state |
+| [contracts/planning-operations.md](./contracts/planning-operations.md) | ViewModel method implementations | When implementing event handlers |
+| [research.md](./research.md) | Design decisions and rationale | When you need context on "why" |
+| [spec.md](./spec.md) | Requirements and acceptance criteria | When verifying behavior |
+
 ## Technical Context
 
 **Language/Version**: Kotlin 2.1+ (Kotlin Multiplatform)
@@ -30,9 +40,14 @@ Weekly planning flow (Sunday Setup) where users review incomplete tasks from the
 - **Task.status**: Includes `PENDING_ACCEPTANCE` for partner requests
 
 ### Missing Operations (NEEDS IMPLEMENTATION)
-- **getIncompleteTasksForWeek(weekId)**: Query tasks with status != COMPLETED && status != SKIPPED && status != TRIED
-- **getPreviousWeekId(currentWeekId)**: Calculate previous ISO 8601 week ID
-- **getTasksByStatus(status, userId)**: Query pending partner requests
+
+> See [quickstart.md → Task 1](./quickstart.md#task-1-extend-repositories-with-new-queries) for implementation steps.
+
+| Operation | Purpose | Implementation Details |
+|-----------|---------|----------------------|
+| `observeIncompleteTasksForWeek(weekId, userId)` | Query rollover candidates | [data-model.md](./data-model.md#new-queries-sqldelight), [contracts](./contracts/planning-operations.md#observeincompletetasksforweek) |
+| `observeTasksByStatus(status, userId)` | Query partner requests | [data-model.md](./data-model.md#new-queries-sqldelight), [contracts](./contracts/planning-operations.md#observetasksbystatus) |
+| `getPreviousWeekId(currentWeekId)` | Calculate previous week | [research.md](./research.md#2-iso-8601-week-id-calculation---previous-week) |
 
 ## Constitution Check
 
@@ -76,13 +91,16 @@ Weekly planning flow (Sunday Setup) where users review incomplete tasks from the
 
 ```text
 specs/004-week-planning/
-├── plan.md              # This file
-├── research.md          # Phase 0 output
-├── data-model.md        # Phase 1 output
-├── quickstart.md        # Phase 1 output
-├── contracts/           # Phase 1 output (internal operations, no REST API)
+├── plan.md              # This file - overview and constitution check
+├── quickstart.md        # PRIMARY: 9 implementation tasks with cross-references
+├── data-model.md        # Data structures, SQL, state classes
+├── research.md          # Design decisions and rationale
+├── contracts/           # ViewModel operation implementations
+│   └── planning-operations.md
 └── tasks.md             # Phase 2 output (/speckit.tasks command)
 ```
+
+> **Implementation Flow**: Start with [quickstart.md](./quickstart.md) - it contains 9 ordered tasks, each linking to the relevant sections in data-model.md, contracts/, and research.md.
 
 ### Source Code (this feature)
 
