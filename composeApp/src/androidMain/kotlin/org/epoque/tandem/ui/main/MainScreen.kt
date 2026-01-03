@@ -37,6 +37,7 @@ import org.epoque.tandem.ui.week.WeekScreen
 fun MainScreen(
     user: User?,
     onSignOut: () -> Unit,
+    onNavigateToPlanning: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var selectedTab by rememberSaveable(stateSaver = NavigationTab.Saver) { mutableStateOf(NavigationTab.Week) }
@@ -110,7 +111,9 @@ fun MainScreen(
                 .padding(paddingValues)
         ) {
             when (selectedTab) {
-                NavigationTab.Week -> WeekScreen()
+                NavigationTab.Week -> WeekScreen(
+                    onNavigateToPlanning = onNavigateToPlanning
+                )
                 NavigationTab.Progress -> ProgressScreen()
                 NavigationTab.Goals -> GoalsScreen()
             }

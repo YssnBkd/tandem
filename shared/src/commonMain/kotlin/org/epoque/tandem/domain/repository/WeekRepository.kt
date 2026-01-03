@@ -66,6 +66,15 @@ interface WeekRepository {
      */
     fun getCurrentWeekId(): String
 
+    /**
+     * Calculate the previous week ID from a given week ID.
+     * Handles year boundaries (e.g., "2026-W01" → "2025-W52" or "2025-W53").
+     *
+     * @param currentWeekId ISO 8601 week ID
+     * @return The previous week's ID
+     */
+    fun getPreviousWeekId(currentWeekId: String): String
+
     // ═══════════════════════════════════════════════════════════════════════════
     // WRITE OPERATIONS
     // ═══════════════════════════════════════════════════════════════════════════

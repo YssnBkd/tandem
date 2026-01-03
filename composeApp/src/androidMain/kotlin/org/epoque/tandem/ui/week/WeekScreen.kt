@@ -3,6 +3,7 @@ package org.epoque.tandem.ui.week
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -20,6 +21,8 @@ import org.epoque.tandem.presentation.week.WeekEvent
 import org.epoque.tandem.presentation.week.WeekSideEffect
 import org.epoque.tandem.presentation.week.WeekViewModel
 import org.epoque.tandem.presentation.week.model.Segment
+import org.epoque.tandem.ui.planning.PlanningBanner
+import org.epoque.tandem.ui.planning.shouldShowPlanningBanner
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -35,6 +38,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeekScreen(
+    onNavigateToPlanning: () -> Unit = {},
     viewModel: WeekViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -118,6 +122,17 @@ fun WeekScreen(
                     }
                 },
                 actions = {
+                    // Plan Week button - always accessible
+                    IconButton(
+                        onClick = onNavigateToPlanning
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.EditCalendar,
+                            contentDescription = "Plan your week",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
                     // Progress indicator in top bar
                     Text(
                         text = uiState.progressText,
@@ -171,6 +186,13 @@ fun WeekScreen(
                 // Main content: always show segment control and quick add, with task list or empty state
                 else -> {
                     Column(modifier = Modifier.fillMaxSize()) {
+                        // Planning banner (shown Sunday after 6pm until planning complete)
+                        if (shouldShowPlanningBanner(uiState.isPlanningComplete)) {
+                            PlanningBanner(
+                                onStartPlanning = onNavigateToPlanning
+                            )
+                        }
+
                         // Segment control for switching between You/Partner/Shared
                         SegmentedControl(
                             selectedSegment = uiState.selectedSegment,

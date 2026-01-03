@@ -81,3 +81,18 @@ UPDATE Task SET review_note = ?, updated_at = ? WHERE id = ?;
 -- Count tasks by week and status
 countTasksByWeekAndStatus:
 SELECT COUNT(*) FROM Task WHERE week_id = ? AND status = ?;
+
+-- Get incomplete tasks for rollover (Feature 004: Week Planning)
+getIncompleteTasksByWeekId:
+SELECT * FROM Task
+WHERE week_id = ?
+  AND owner_id = ?
+  AND status = 'PENDING'
+ORDER BY created_at ASC;
+
+-- Get tasks by status for current user (Feature 004: Week Planning)
+getTasksByStatusAndOwnerId:
+SELECT * FROM Task
+WHERE status = ?
+  AND owner_id = ?
+ORDER BY created_at DESC;
