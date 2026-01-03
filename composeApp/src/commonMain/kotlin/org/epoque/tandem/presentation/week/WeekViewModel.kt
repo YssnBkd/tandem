@@ -108,7 +108,10 @@ class WeekViewModel(
                 week?.let {
                     val weekInfo = WeekInfo.fromWeek(it, currentWeekId)
                     _uiState.update { state ->
-                        state.copy(weekInfo = weekInfo)
+                        state.copy(
+                            weekInfo = weekInfo,
+                            isPlanningComplete = it.planningCompletedAt != null
+                        )
                     }
                 }
             }

@@ -48,7 +48,10 @@ data class WeekUiState(
 
     // Partner state
     val hasPartner: Boolean = false,
-    val partnerName: String? = null
+    val partnerName: String? = null,
+
+    // Planning state
+    val isPlanningComplete: Boolean = false
 ) {
     /**
      * Whether the current segment allows task completion.

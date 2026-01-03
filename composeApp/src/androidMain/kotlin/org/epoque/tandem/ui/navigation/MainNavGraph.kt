@@ -25,6 +25,9 @@ fun NavGraphBuilder.mainNavGraph(
             user = user,
             onSignOut = {
                 authViewModel.onEvent(AuthEvent.SignOut)
+            },
+            onNavigateToPlanning = {
+                navController.navigate(Routes.Planning.Start)
             }
         )
     }

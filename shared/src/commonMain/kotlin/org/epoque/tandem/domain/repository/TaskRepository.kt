@@ -56,6 +56,26 @@ interface TaskRepository {
         userId: String
     ): Flow<List<Task>>
 
+    /**
+     * Observe incomplete tasks from a specific week (for rollover in planning).
+     * Returns only tasks with status = PENDING.
+     *
+     * @param weekId ISO 8601 week ID
+     * @param userId The current user's ID
+     * @return Flow of incomplete tasks from the specified week
+     */
+    fun observeIncompleteTasksForWeek(weekId: String, userId: String): Flow<List<Task>>
+
+    /**
+     * Observe tasks by status for the current user.
+     * Used for querying partner requests (PENDING_ACCEPTANCE status).
+     *
+     * @param status The task status to filter by
+     * @param userId The current user's ID
+     * @return Flow of tasks with the specified status
+     */
+    fun observeTasksByStatus(status: TaskStatus, userId: String): Flow<List<Task>>
+
     // ═══════════════════════════════════════════════════════════════════════════
     // READ OPERATIONS (One-shot)
     // ═══════════════════════════════════════════════════════════════════════════

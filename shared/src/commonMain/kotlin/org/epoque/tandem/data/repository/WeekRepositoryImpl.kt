@@ -107,6 +107,42 @@ class WeekRepositoryImpl(
         return "$year-W${weekNumber.toString().padStart(2, '0')}"
     }
 
+    override fun getPreviousWeekId(currentWeekId: String): String {
+        validateWeekId(currentWeekId)
+
+        val parts = currentWeekId.split("-W")
+        val year = parts[0].toInt()
+        val weekNumber = parts[1].toInt()
+
+        return if (weekNumber == 1) {
+            // Year boundary: go to previous year's last week
+            val previousYear = year - 1
+            val lastWeekOfPreviousYear = calculateLastWeekOfYear(previousYear)
+            "$previousYear-W${lastWeekOfPreviousYear.toString().padStart(2, '0')}"
+        } else {
+            // Same year: decrement week number
+            val previousWeek = weekNumber - 1
+            "$year-W${previousWeek.toString().padStart(2, '0')}"
+        }
+    }
+
+    private fun calculateLastWeekOfYear(year: Int): Int {
+        // ISO 8601: A year has 53 weeks if Dec 31 is Thursday or if it's a leap year and Dec 31 is Friday
+        val dec31 = LocalDate(year, 12, 31)
+        val dec31DayOfWeek = dec31.dayOfWeek
+
+        return if (dec31DayOfWeek == DayOfWeek.THURSDAY ||
+                   (isLeapYear(year) && dec31DayOfWeek == DayOfWeek.FRIDAY)) {
+            53
+        } else {
+            52
+        }
+    }
+
+    private fun isLeapYear(year: Int): Boolean {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+    }
+
     private fun calculateWeekBoundaries(weekId: String): Pair<LocalDate, LocalDate> {
         validateWeekId(weekId)
 

@@ -21,17 +21,17 @@
 
 ---
 
-## Phase 1: Setup (Shared Infrastructure)
+## Phase 1: Setup (Shared Infrastructure) ✅
 
 **Purpose**: Project structure and verification
 
-- [ ] T001 Verify Feature 002 (Task Data Layer) is complete - repositories exist at `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/`
-- [ ] T002 Verify Feature 003 (Week View) is complete - WeekViewModel pattern exists at `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/`
-- [ ] T003 Run build verification: `./gradlew :composeApp:compileDebugKotlinAndroid`
+- [X] T001 Verify Feature 002 (Task Data Layer) is complete - repositories exist at `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/`
+- [X] T002 Verify Feature 003 (Week View) is complete - WeekViewModel pattern exists at `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/`
+- [X] T003 Run build verification: `./gradlew :composeApp:compileDebugKotlinAndroid`
 
 ---
 
-## Phase 2: Foundational (Blocking Prerequisites)
+## Phase 2: Foundational (Blocking Prerequisites) ✅
 
 **Purpose**: Repository extensions and DataStore that ALL user stories depend on
 
@@ -39,7 +39,7 @@
 
 ### Directory Structure
 
-- [ ] T004 Create planning feature directory structure:
+- [X] T004 Create planning feature directory structure:
   - `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/`
   - `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/preferences/`
   - `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/`
@@ -47,27 +47,27 @@
 
 ### Data Layer Extensions
 
-- [ ] T005 Add SQL queries to `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/Task.sq`:
+- [X] T005 Add SQL queries to `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/Task.sq`:
   - `getIncompleteTasksByWeekId` (weekId, ownerId, status='PENDING')
   - `getTasksByStatusAndOwnerId` (status, ownerId)
   - See [data-model.md#new-queries-sqldelight]
-- [ ] T006 [P] Add `observeIncompleteTasksForWeek(weekId, userId)` to interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/TaskRepository.kt`
-- [ ] T007 [P] Add `observeTasksByStatus(status, userId)` to interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/TaskRepository.kt`
-- [ ] T008 Implement `observeIncompleteTasksForWeek()` in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/TaskRepositoryImpl.kt` (depends on T005, T006) - see [contracts/planning-operations.md#observeincompletetasksforweek]
-- [ ] T009 Implement `observeTasksByStatus()` in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/TaskRepositoryImpl.kt` (depends on T005, T007) - see [contracts/planning-operations.md#observetasksbystatus]
-- [ ] T010 Add `getPreviousWeekId(currentWeekId)` to interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/WeekRepository.kt`
-- [ ] T011 Implement `getPreviousWeekId()` with year boundary handling (W01 → previous year W52/W53) in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/WeekRepositoryImpl.kt` (depends on T010) - see [research.md#2-iso-8601-week-id-calculation---previous-week], reference existing `calculateWeekBoundaries()` at lines 110-134
+- [X] T006 [P] Add `observeIncompleteTasksForWeek(weekId, userId)` to interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/TaskRepository.kt`
+- [X] T007 [P] Add `observeTasksByStatus(status, userId)` to interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/TaskRepository.kt`
+- [X] T008 Implement `observeIncompleteTasksForWeek()` in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/TaskRepositoryImpl.kt` (depends on T005, T006) - see [contracts/planning-operations.md#observeincompletetasksforweek]
+- [X] T009 Implement `observeTasksByStatus()` in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/TaskRepositoryImpl.kt` (depends on T005, T007) - see [contracts/planning-operations.md#observetasksbystatus]
+- [X] T010 Add `getPreviousWeekId(currentWeekId)` to interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/WeekRepository.kt`
+- [X] T011 Implement `getPreviousWeekId()` with year boundary handling (W01 → previous year W52/W53) in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/WeekRepositoryImpl.kt` (depends on T010) - see [research.md#2-iso-8601-week-id-calculation---previous-week], reference existing `calculateWeekBoundaries()` at lines 110-134
 
 ### Presentation Layer State Models
 
-- [ ] T012 [P] Create `PlanningStep` enum in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningStep.kt` - see [data-model.md#planningstep-enum]
-- [ ] T013 [P] Create `PlanningUiState` data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningUiState.kt` - see [data-model.md#planninguistate]. Note: Import `TaskUiModel` from `org.epoque.tandem.presentation.week.model.TaskUiModel`
-- [ ] T014 [P] Create `PlanningEvent` sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningEvent.kt` - see [data-model.md#planningevent-sealed-class]
-- [ ] T015 [P] Create `PlanningSideEffect` sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningSideEffect.kt` - see [data-model.md#planningsideeffect]
+- [X] T012 [P] Create `PlanningStep` enum in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningStep.kt` - see [data-model.md#planningstep-enum]
+- [X] T013 [P] Create `PlanningUiState` data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningUiState.kt` - see [data-model.md#planninguistate]. Note: Import `TaskUiModel` from `org.epoque.tandem.presentation.week.model.TaskUiModel`
+- [X] T014 [P] Create `PlanningEvent` sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningEvent.kt` - see [data-model.md#planningevent-sealed-class]
+- [X] T015 [P] Create `PlanningSideEffect` sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningSideEffect.kt` - see [data-model.md#planningsideeffect]
 
 ### DataStore Progress Persistence
 
-- [ ] T016 Create `PlanningProgress.kt` in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/preferences/PlanningProgress.kt` with:
+- [X] T016 Create `PlanningProgress.kt` in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/preferences/PlanningProgress.kt` with:
   - `PlanningProgressState` data class - see [data-model.md#planningprogressstate]
   - `PlanningProgress` class with `planningProgress: Flow`, `saveProgress()`, `clearProgress()`
   - Stale week handling (discard if weekId != current)
@@ -75,7 +75,7 @@
 
 ### ViewModel Core Structure
 
-- [ ] T017 Create `PlanningViewModel` skeleton in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningViewModel.kt` with:
+- [X] T017 Create `PlanningViewModel` skeleton in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningViewModel.kt` with:
   - Constructor dependencies: `taskRepository: TaskRepository`, `weekRepository: WeekRepository`, `authRepository: AuthRepository`, `planningProgress: PlanningProgress`
   - `private val _uiState = MutableStateFlow(PlanningUiState())`
   - `val uiState: StateFlow<PlanningUiState> = _uiState.asStateFlow()`
@@ -83,7 +83,7 @@
   - `val sideEffects: Flow<PlanningSideEffect> = _sideEffects.receiveAsFlow()`
   - `private val currentUserId: String? get() = authRepository.currentUser?.id`
   - See WeekViewModel.kt:43-54, 476-477 for pattern
-- [ ] T018 Implement ViewModel init sequence in `PlanningViewModel.kt` with **CRITICAL ORDER**:
+- [X] T018 Implement ViewModel init sequence in `PlanningViewModel.kt` with **CRITICAL ORDER**:
   1. Wait for `AuthState.Authenticated` using `filterIsInstance<AuthState.Authenticated>().first()`
   2. Extract `userId` from `authState.user.id` and **store as ViewModel property** for event handlers
   3. Call `getOrCreateCurrentWeek(userId)` and **store `currentWeek` as ViewModel property**
@@ -97,27 +97,27 @@
 
 ### Navigation Setup
 
-- [ ] T019 Add `Routes.Planning` sealed interface to `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/Routes.kt`:
+- [X] T019 Add `Routes.Planning` sealed interface to `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/Routes.kt`:
   - `@Serializable data object Start : Planning`
   - `@Serializable data class Wizard(val stepIndex: Int = 0) : Planning`
   - See [research.md#1-jetpack-navigation-compose---nested-wizard-flow]
-- [ ] T020 Create `PlanningNavGraph.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/PlanningNavGraph.kt` with nested NavHost for step screens (depends on T019) - see pattern in `AuthNavGraph.kt`
-- [ ] T021 Wire up planning navigation in `MainNavGraph.kt` at `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/MainNavGraph.kt` (depends on T020)
+- [X] T020 Create `PlanningNavGraph.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/PlanningNavGraph.kt` with nested NavHost for step screens (depends on T019) - see pattern in `AuthNavGraph.kt`
+- [X] T021 Wire up planning navigation in `MainNavGraph.kt` at `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/MainNavGraph.kt` (depends on T020)
 
 ### Dependency Injection
 
-- [ ] T022 Create `PlanningModule.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/PlanningModule.kt` with:
+- [X] T022 Create `PlanningModule.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/PlanningModule.kt` with:
   - DataStore for planning preferences (`preferencesDataStore(name = "planning_preferences")`)
   - `single { PlanningProgress(get(named("planning"))) }`
   - `viewModel { PlanningViewModel(...) }`
   - See [quickstart.md#task-9], pattern in `WeekModule.kt`
-- [ ] T023 Register `planningModule` in `TandemApp.kt` at `composeApp/src/androidMain/kotlin/org/epoque/tandem/TandemApp.kt` - add to `modules()` list
+- [X] T023 Register `planningModule` in `TandemApp.kt` at `composeApp/src/androidMain/kotlin/org/epoque/tandem/TandemApp.kt` - add to `modules()` list
 
-**CHECKPOINT**: Run `./gradlew :composeApp:compileDebugKotlinAndroid` - build MUST pass before proceeding
+**CHECKPOINT**: Run `./gradlew :composeApp:compileDebugKotlinAndroid` - build MUST pass before proceeding ✅
 
 ---
 
-## Phase 3: User Story 1 - Complete Weekly Planning Flow (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Complete Weekly Planning Flow (Priority: P1) 🎯 MVP ✅
 
 **Goal**: Users can complete the full 4-step planning wizard from banner to confirmation
 
@@ -125,29 +125,29 @@
 
 ### ViewModel Event Handlers for US1
 
-- [ ] T024 [US1] Implement `onEvent()` dispatcher in `PlanningViewModel.kt` - route all `PlanningEvent` types to handlers
-- [ ] T025 [US1] Implement `handleBackPressed()` with `NavigateBack` side effect in `PlanningViewModel.kt`
-- [ ] T026 [US1] Implement `handleExitRequested()` with progress save via `planningProgress.saveProgress()` in `PlanningViewModel.kt`
-- [ ] T027 [US1] Implement `handlePlanningCompleted()` in `PlanningViewModel.kt`:
+- [X] T024 [US1] Implement `onEvent()` dispatcher in `PlanningViewModel.kt` - route all `PlanningEvent` types to handlers
+- [X] T025 [US1] Implement `handleBackPressed()` with `NavigateBack` side effect in `PlanningViewModel.kt`
+- [X] T026 [US1] Implement `handleExitRequested()` with progress save via `planningProgress.saveProgress()` in `PlanningViewModel.kt`
+- [X] T027 [US1] Implement `handlePlanningCompleted()` in `PlanningViewModel.kt`:
   - Call `weekRepository.markPlanningCompleted(weekId)`
   - Call `planningProgress.clearProgress()`
   - Calculate summary totals
   - Send `ExitPlanning` side effect
   - See [contracts/planning-operations.md#handleplanningcompleted]
-- [ ] T028 [US1] Implement step skipping logic in `PlanningViewModel.kt`:
+- [X] T028 [US1] Implement step skipping logic in `PlanningViewModel.kt`:
   - `getInitialStep()` - skip ROLLOVER if no rollover tasks
   - `getNextStep()` - skip PARTNER_REQUESTS if no partner requests
   - See [contracts/planning-operations.md#step-skipping-logic]
 
 ### UI Components for US1
 
-- [ ] T029 [P] [US1] Create `ProgressDots.kt` composable (step indicator 1-4) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/components/ProgressDots.kt`
-- [ ] T030 [US1] Create `PlanningScreen.kt` main container in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/PlanningScreen.kt` with:
+- [X] T029 [P] [US1] Create `ProgressDots.kt` composable (step indicator 1-4) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/components/ProgressDots.kt`
+- [X] T030 [US1] Create `PlanningScreen.kt` main container in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/PlanningScreen.kt` with:
   - NavHost routing to: `RolloverStepScreen` (step 0), `AddTasksStepScreen` (step 1), `PartnerRequestsStepScreen` (step 2), `ConfirmationStepScreen` (step 3)
   - **CRITICAL: Single LaunchedEffect** collecting `viewModel.sideEffects` (see WeekScreen.kt:55-79 for pattern)
   - Handle all `PlanningSideEffect` types: `ShowSnackbar`, `NavigateToStep`, `NavigateBack`, `ExitPlanning`, `TriggerHapticFeedback`, `ClearFocus`
   - See [contracts/planning-operations.md], [data-model.md#planningsideeffect]
-- [ ] T031 [US1] Create `ConfirmationStepScreen.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/ConfirmationStepScreen.kt` with:
+- [X] T031 [US1] Create `ConfirmationStepScreen.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/ConfirmationStepScreen.kt` with:
   - Checkmark success icon
   - "X tasks planned" summary text
   - "Done" button emitting `PlanningCompleted` event
@@ -156,13 +156,13 @@
 
 ### Banner Integration for US1
 
-- [ ] T032 [US1] Create `PlanningBanner.kt` composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/PlanningBanner.kt` with:
+- [X] T032 [US1] Create `PlanningBanner.kt` composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/PlanningBanner.kt` with:
   - "Start" button that navigates to `Routes.Planning.Wizard(0)`
   - Private helper function `shouldShowPlanningBanner(week: Week): Boolean`:
     - Return false if `week.planningCompletedAt != null`
     - Check if Sunday >= 6pm using `Clock.System.now()` and `kotlinx.datetime`
     - See [quickstart.md#task-8] for time calculation logic
-- [ ] T033 [US1] Integrate `PlanningBanner` into `WeekScreen.kt` at `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/WeekScreen.kt`:
+- [X] T033 [US1] Integrate `PlanningBanner` into `WeekScreen.kt` at `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/WeekScreen.kt`:
   - Add banner above content when `shouldShowPlanningBanner()` returns true
   - Pass navigation callback to banner
 
@@ -170,7 +170,7 @@
 
 ---
 
-## Phase 4: User Story 2 - Roll Over Incomplete Tasks (Priority: P2)
+## Phase 4: User Story 2 - Roll Over Incomplete Tasks (Priority: P2) ✅
 
 **Goal**: Users can review incomplete tasks from last week and add or skip them
 
@@ -178,7 +178,7 @@
 
 ### ViewModel Event Handlers for US2
 
-- [ ] T034 [US2] Implement `handleRolloverTaskAdded(taskId)` in `PlanningViewModel.kt`:
+- [X] T034 [US2] Implement `handleRolloverTaskAdded(taskId)` in `PlanningViewModel.kt`:
   - Get `userId` from stored ViewModel property (set in T018 init)
   - Get `currentWeekId` via `weekRepository.getCurrentWeekId()`
   - Get original task via `taskRepository.getTaskById(taskId)`
@@ -189,24 +189,24 @@
   - Send `TriggerHapticFeedback` side effect
   - Import `TaskUiModel` from `org.epoque.tandem.presentation.week.model`
   - See [contracts/planning-operations.md#handlerollovertaskadded]
-- [ ] T035 [US2] Implement `handleRolloverTaskSkipped(taskId)` in `PlanningViewModel.kt`:
+- [X] T035 [US2] Implement `handleRolloverTaskSkipped(taskId)` in `PlanningViewModel.kt`:
   - Update state: increment `currentRolloverIndex`, `processedRolloverCount`
   - **Call `saveProgress()`** after state update
   - No database changes
   - See [contracts/planning-operations.md#handlerollovertaskskipped]
-- [ ] T036 [US2] Implement `handleRolloverStepComplete()` in `PlanningViewModel.kt`:
+- [X] T036 [US2] Implement `handleRolloverStepComplete()` in `PlanningViewModel.kt`:
   - Call `getNextStep(ROLLOVER)` to determine next step
   - Send `NavigateToStep` side effect
 
 ### UI Components for US2
 
-- [ ] T037 [P] [US2] Create `PlanningCard.kt` composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/components/PlanningCard.kt` with:
+- [X] T037 [P] [US2] Create `PlanningCard.kt` composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/components/PlanningCard.kt` with:
   - Full-screen card using `Surface` with `RoundedCornerShape(16.dp)`
   - Optional swipe gestures (right = add, left = skip, threshold 100dp)
   - **Visible action buttons** with 48dp touch targets (FR-023)
   - Content descriptions for accessibility (FR-024)
   - See [research.md#4-material-design-3-full-screen-cards]
-- [ ] T038 [US2] Create `RolloverStepScreen.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/RolloverStepScreen.kt` with:
+- [X] T038 [US2] Create `RolloverStepScreen.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/RolloverStepScreen.kt` with:
   - `PlanningCard` showing current rollover task (title, notes)
   - "Add to This Week" button → emits `RolloverTaskAdded(taskId)`
     - **48dp minimum touch target** (FR-023)
@@ -221,7 +221,7 @@
 
 ---
 
-## Phase 5: User Story 3 - Add New Tasks During Planning (Priority: P2)
+## Phase 5: User Story 3 - Add New Tasks During Planning (Priority: P2) ✅
 
 **Goal**: Users can add new tasks during Step 2 with a visible submit button
 
@@ -229,9 +229,9 @@
 
 ### ViewModel Event Handlers for US3
 
-- [ ] T039 [US3] Implement `handleNewTaskTextChanged(text)` in `PlanningViewModel.kt`:
+- [X] T039 [US3] Implement `handleNewTaskTextChanged(text)` in `PlanningViewModel.kt`:
   - Update `_uiState` with new `newTaskText`, clear `newTaskError`
-- [ ] T040 [US3] Implement `handleNewTaskSubmitted()` in `PlanningViewModel.kt`:
+- [X] T040 [US3] Implement `handleNewTaskSubmitted()` in `PlanningViewModel.kt`:
   - Get `userId` from stored ViewModel property (set in T018 init)
   - Get `currentWeekId` via `weekRepository.getCurrentWeekId()`
   - Validate title not empty (set `newTaskError` if empty, return early)
@@ -242,20 +242,20 @@
   - Send `ClearFocus` side effect
   - Handle `CancellationException` (re-throw), other exceptions (show snackbar)
   - See [contracts/planning-operations.md#handlenewtasksubmitted]
-- [ ] T041 [US3] Implement `handleDoneAddingTasks()` in `PlanningViewModel.kt`:
+- [X] T041 [US3] Implement `handleDoneAddingTasks()` in `PlanningViewModel.kt`:
   - Call `getNextStep(ADD_TASKS)` to determine next step
   - Send `NavigateToStep` side effect
 
 ### UI Components for US3
 
-- [ ] T042 [P] [US3] Create `TaskInputField.kt` composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/components/TaskInputField.kt` with:
+- [X] T042 [P] [US3] Create `TaskInputField.kt` composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/components/TaskInputField.kt` with:
   - `OutlinedTextField` for task title
   - **VISIBLE Add button** as `trailingIcon` using `IconButton` with `Modifier.size(48.dp)` (FR-010, FR-023)
   - **NOT keyboard-only submission** - button must be tappable
   - Inline error display below field when `error != null`
   - Content description: "Add task"
   - See [quickstart.md#task-5], spec FR-010
-- [ ] T043 [US3] Create `AddTasksStepScreen.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/AddTasksStepScreen.kt` with:
+- [X] T043 [US3] Create `AddTasksStepScreen.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/AddTasksStepScreen.kt` with:
   - `TaskInputField` at top
   - `LazyColumn` showing `addedTasks` list (running list of tasks added this session)
   - "Done Adding Tasks" button → emits `DoneAddingTasks` event
@@ -267,7 +267,7 @@
 
 ---
 
-## Phase 6: User Story 4 - Review Partner Task Requests (Priority: P3)
+## Phase 6: User Story 4 - Review Partner Task Requests (Priority: P3) ✅
 
 **Goal**: Users can accept or discuss partner requests in Step 3
 
@@ -275,23 +275,23 @@
 
 ### ViewModel Event Handlers for US4
 
-- [ ] T044 [US4] Implement `handlePartnerRequestAccepted(taskId)` in `PlanningViewModel.kt`:
+- [X] T044 [US4] Implement `handlePartnerRequestAccepted(taskId)` in `PlanningViewModel.kt`:
   - Call `taskRepository.updateTaskStatus(taskId, TaskStatus.PENDING)`
   - Update state: increment `currentRequestIndex`, `partnerRequestsAccepted`
   - **Call `saveProgress()`** after state update
   - Send `TriggerHapticFeedback` side effect
   - See [contracts/planning-operations.md#handlepartnerrequestaccepted]
-- [ ] T045 [US4] Implement `handlePartnerRequestDiscussed(taskId)` in `PlanningViewModel.kt`:
+- [X] T045 [US4] Implement `handlePartnerRequestDiscussed(taskId)` in `PlanningViewModel.kt`:
   - Send `ShowSnackbar("Discuss feature coming soon")` side effect
   - Update state: increment `currentRequestIndex`, `processedRequestCount`
   - **Call `saveProgress()`** after state update
   - See [contracts/planning-operations.md#handlepartnerrequestdiscussed]
-- [ ] T046 [US4] Implement `handlePartnerRequestsStepComplete()` in `PlanningViewModel.kt`:
+- [X] T046 [US4] Implement `handlePartnerRequestsStepComplete()` in `PlanningViewModel.kt`:
   - Send `NavigateToStep(CONFIRMATION)` side effect
 
 ### UI Components for US4
 
-- [ ] T047 [US4] Create `PartnerRequestsStepScreen.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/PartnerRequestsStepScreen.kt` with:
+- [X] T047 [US4] Create `PartnerRequestsStepScreen.kt` in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/PartnerRequestsStepScreen.kt` with:
   - `PlanningCard` showing current partner request (reuse from T037)
   - Display task title and optional note from partner (FR-018)
   - "Accept" button → emits `PartnerRequestAccepted(taskId)`
@@ -307,7 +307,7 @@
 
 ---
 
-## Phase 7: User Story 5 - View Planning Summary (Priority: P3)
+## Phase 7: User Story 5 - View Planning Summary (Priority: P3) ✅
 
 **Goal**: Users see a summary screen showing what they planned
 
@@ -315,15 +315,15 @@
 
 ### Implementation for US5
 
-- [ ] T048 [US5] Enhance `PlanningUiState.kt` with computed summary:
+- [X] T048 [US5] Enhance `PlanningUiState.kt` with computed summary:
   - Ensure `totalTasksPlanned = rolloverTasksAdded + newTasksCreated + partnerRequestsAccepted`
   - Add any missing fields for breakdown display
-- [ ] T049 [US5] Enhance `ConfirmationStepScreen.kt` with detailed breakdown:
+- [X] T049 [US5] Enhance `ConfirmationStepScreen.kt` with detailed breakdown:
   - Show "X rolled over from last week"
   - Show "Y new tasks added"
   - Show "Z partner requests accepted"
   - Total: "X tasks planned for this week"
-- [ ] T050 [US5] Add "See Partner's Week" button to `ConfirmationStepScreen.kt`:
+- [X] T050 [US5] Add "See Partner's Week" button to `ConfirmationStepScreen.kt`:
   - Placeholder for future feature (FR-022)
   - Show "Coming soon" snackbar on tap
   - **48dp minimum touch target** (FR-023)
@@ -333,22 +333,22 @@
 
 ---
 
-## Phase 8: Polish & Cross-Cutting Concerns
+## Phase 8: Polish & Cross-Cutting Concerns ✅
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T051 [P] Verify all touch targets are 48dp+ (FR-023) across: `PlanningCard.kt`, `TaskInputField.kt`, `RolloverStepScreen.kt`, `AddTasksStepScreen.kt`, `PartnerRequestsStepScreen.kt`, `ConfirmationStepScreen.kt`
-- [ ] T052 [P] Verify all action buttons have content descriptions (FR-024) across all step screens
-- [ ] T053 [P] Test empty state handling:
+- [X] T051 [P] Verify all touch targets are 48dp+ (FR-023) across: `PlanningCard.kt`, `TaskInputField.kt`, `RolloverStepScreen.kt`, `AddTasksStepScreen.kt`, `PartnerRequestsStepScreen.kt`, `ConfirmationStepScreen.kt`
+- [X] T052 [P] Verify all action buttons have content descriptions (FR-024) across all step screens
+- [X] T053 [P] Test empty state handling:
   - No rollover tasks → skip directly to ADD_TASKS step
   - No partner requests → skip directly to CONFIRMATION step
   - Zero tasks total → can still complete planning
-- [ ] T054 [P] Test progress persistence:
+- [X] T054 [P] Test progress persistence:
   - Exit mid-planning → reopen app → resume from same position
   - Switch weeks → stale progress discarded
-- [ ] T055 [P] Test year boundary: `getPreviousWeekId("2026-W01")` → returns `"2025-W52"` or `"2025-W53"`
-- [ ] T056 Run final build verification: `./gradlew :composeApp:compileDebugKotlinAndroid`
-- [ ] T057 Run unit tests: `./gradlew :composeApp:testDebugUnitTest`
+- [X] T055 [P] Test year boundary: `getPreviousWeekId("2026-W01")` → returns `"2025-W52"` or `"2025-W53"`
+- [X] T056 Run final build verification: `./gradlew :composeApp:compileDebugKotlinAndroid`
+- [X] T057 Run unit tests: `./gradlew :composeApp:testDebugUnitTest`
 
 ### E2E Database Verification Commands
 

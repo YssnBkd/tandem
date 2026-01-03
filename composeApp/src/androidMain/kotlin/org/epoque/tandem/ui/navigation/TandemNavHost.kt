@@ -7,9 +7,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.epoque.tandem.presentation.auth.AuthUiState
 import org.epoque.tandem.presentation.auth.AuthViewModel
+import org.epoque.tandem.ui.planning.PlanningScreen
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -65,5 +67,14 @@ fun TandemNavHost(
             navController = navController,
             authViewModel = authViewModel
         )
+
+        // Planning wizard flow
+        composable<Routes.Planning.Start> {
+            PlanningScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }

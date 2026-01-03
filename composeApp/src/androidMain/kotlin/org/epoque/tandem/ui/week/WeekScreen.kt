@@ -20,6 +20,8 @@ import org.epoque.tandem.presentation.week.WeekEvent
 import org.epoque.tandem.presentation.week.WeekSideEffect
 import org.epoque.tandem.presentation.week.WeekViewModel
 import org.epoque.tandem.presentation.week.model.Segment
+import org.epoque.tandem.ui.planning.PlanningBanner
+import org.epoque.tandem.ui.planning.shouldShowPlanningBanner
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -35,6 +37,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeekScreen(
+    onNavigateToPlanning: () -> Unit = {},
     viewModel: WeekViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -171,6 +174,13 @@ fun WeekScreen(
                 // Main content: always show segment control and quick add, with task list or empty state
                 else -> {
                     Column(modifier = Modifier.fillMaxSize()) {
+                        // Planning banner (shown Sunday after 6pm until planning complete)
+                        if (shouldShowPlanningBanner(uiState.isPlanningComplete)) {
+                            PlanningBanner(
+                                onStartPlanning = onNavigateToPlanning
+                            )
+                        }
+
                         // Segment control for switching between You/Partner/Shared
                         SegmentedControl(
                             selectedSegment = uiState.selectedSegment,

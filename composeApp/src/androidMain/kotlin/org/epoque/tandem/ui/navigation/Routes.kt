@@ -44,4 +44,17 @@ sealed interface Routes {
         @Serializable
         data object Goals : Main
     }
+
+    /**
+     * Weekly planning routes.
+     */
+    sealed interface Planning : Routes {
+        /** Planning entry point (shown from banner) */
+        @Serializable
+        data object Start : Planning
+
+        /** Planning wizard with step index (0-3) */
+        @Serializable
+        data class Wizard(val stepIndex: Int = 0) : Planning
+    }
 }

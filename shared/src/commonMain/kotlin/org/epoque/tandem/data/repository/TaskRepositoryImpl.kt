@@ -121,6 +121,20 @@ class TaskRepositoryImpl(
             }
     }
 
+    override fun observeIncompleteTasksForWeek(weekId: String, userId: String): Flow<List<Task>> {
+        return queries.getIncompleteTasksByWeekId(weekId, userId)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { tasks -> tasks.map { it.toDomain() } }
+    }
+
+    override fun observeTasksByStatus(status: TaskStatus, userId: String): Flow<List<Task>> {
+        return queries.getTasksByStatusAndOwnerId(status, userId)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { tasks -> tasks.map { it.toDomain() } }
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════
     // READ OPERATIONS (One-shot)
     // ═══════════════════════════════════════════════════════════════════════════
