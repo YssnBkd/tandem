@@ -51,7 +51,12 @@ data class WeekUiState(
     val partnerName: String? = null,
 
     // Planning state
-    val isPlanningComplete: Boolean = false
+    val isPlanningComplete: Boolean = false,
+
+    // Review state
+    val isReviewWindowOpen: Boolean = false,
+    val isWeekReviewed: Boolean = false,
+    val currentStreak: Int = 0
 ) {
     /**
      * Whether the current segment allows task completion.
@@ -92,4 +97,10 @@ data class WeekUiState(
         Segment.PARTNER -> if (!hasPartner) "Invite Partner" else null
         Segment.SHARED -> "Add Shared Task"
     }
+
+    /**
+     * Whether to show the review banner.
+     * Show when review window is open and week hasn't been reviewed.
+     */
+    val showReviewBanner: Boolean get() = isReviewWindowOpen && !isWeekReviewed
 }

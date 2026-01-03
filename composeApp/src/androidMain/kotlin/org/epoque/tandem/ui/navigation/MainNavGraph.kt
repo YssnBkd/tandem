@@ -28,6 +28,9 @@ fun NavGraphBuilder.mainNavGraph(
             },
             onNavigateToPlanning = {
                 navController.navigate(Routes.Planning.Start)
+            },
+            onNavigateToReview = {
+                navController.navigate(Routes.Review.Start)
             }
         )
     }

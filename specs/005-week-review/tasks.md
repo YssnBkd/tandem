@@ -159,8 +159,8 @@ class GetReviewStatsUseCase {
 **Command**: `./gradlew :shared:compileKotlinMetadata`
 
 **Verify**:
-- [ ] All use cases compile without errors
-- [ ] No missing imports from domain/repository
+- [X] All use cases compile without errors
+- [X] No missing imports from domain/repository
 - [ ] Unit tests pass for streak calculation edge cases
 
 ---
@@ -279,9 +279,9 @@ private fun calculateAndSetStats() {
 **Command**: `./gradlew :composeApp:compileDebugKotlinAndroid`
 
 **Verify**:
-- [ ] ViewModel compiles with all dependencies
-- [ ] No circular dependencies between state/events/ViewModel
-- [ ] DataStore integration works
+- [X] ViewModel compiles with all dependencies
+- [X] No circular dependencies between state/events/ViewModel
+- [X] DataStore integration works
 
 ---
 
@@ -422,11 +422,11 @@ fun ReviewProgressDots(
 ### Task 3.7 [V] - US1 Validation
 
 **Verify**:
-- [ ] Complete solo review flow from start to finish
-- [ ] Rating required before task review
-- [ ] All tasks can be marked Done/Tried/Skipped
-- [ ] Summary shows correct completion percentage
-- [ ] Exit and resume preserves progress
+- [X] Complete solo review flow from start to finish
+- [X] Rating required before task review
+- [X] All tasks can be marked Done/Tried/Skipped
+- [X] Summary shows correct completion percentage
+- [X] Exit and resume preserves progress
 
 ---
 
@@ -532,10 +532,10 @@ if (showReviewBanner) {
 ### Task 4.4 [V] - US2 Validation
 
 **Verify**:
-- [ ] Banner appears on Friday 6PM (test with mock clock)
-- [ ] Banner disappears after review completion
-- [ ] Mode selection shows current streak
-- [ ] Both mode buttons navigate to rating
+- [X] Banner appears on Friday 6PM (test with mock clock)
+- [X] Banner disappears after review completion
+- [X] Mode selection shows current streak
+- [X] Both mode buttons navigate to rating
 
 ---
 
@@ -573,10 +573,10 @@ if (showReviewBanner) {
 ### Task 5.3 [V] - US3 Validation
 
 **Verify**:
-- [ ] Quick Finish available on rating screen
-- [ ] Quick Finish available during task review
-- [ ] Only unreviewed tasks marked Skipped
-- [ ] Completion percentage reflects skipped tasks
+- [X] Quick Finish available on rating screen
+- [X] Quick Finish available during task review
+- [X] Only unreviewed tasks marked Skipped
+- [X] Completion percentage reflects skipped tasks
 
 ---
 
@@ -616,10 +616,10 @@ if (showReviewBanner) {
 ### Task 6.3 [V] - US4 Validation
 
 **Verify**:
-- [ ] Streak count accurate after multiple reviews
-- [ ] Appropriate encouragement message displays
-- [ ] "Start Next Week" navigates to planning
-- [ ] "Done" closes review and returns to week view
+- [X] Streak count accurate after multiple reviews
+- [X] Appropriate encouragement message displays
+- [X] "Start Next Week" navigates to planning
+- [X] "Done" closes review and returns to week view
 
 ---
 
@@ -676,9 +676,9 @@ if (showReviewBanner) {
 - Contracts: [contracts/review-operations.md#updatetasknote](./contracts/review-operations.md#updatetasknote)
 
 **Verify**:
-- [ ] Note field appears in `TaskOutcomeCard`
-- [ ] Field is clearly labeled as optional
-- [ ] Debounce works (500ms delay before save)
+- [X] Note field appears in `TaskOutcomeCard`
+- [X] Field is clearly labeled as optional
+- [X] Debounce works (500ms delay before save)
 
 ---
 
@@ -689,8 +689,8 @@ if (showReviewBanner) {
 - **Repository method**: [data-model.md#existing-repository-methods-used](./data-model.md#existing-repository-methods-used) - `updateTaskReviewNote`
 
 **Verify**:
-- [ ] `taskRepository.updateTaskReviewNote(taskId, note)` is called
-- [ ] Notes persist after review completion
+- [X] `taskRepository.updateTaskReviewNote(taskId, note)` is called
+- [X] Notes persist after review completion
 - [ ] Notes visible when viewing task elsewhere (if UI exists)
 
 ---
@@ -700,9 +700,9 @@ if (showReviewBanner) {
 **Requirements**: [spec.md](./spec.md) - User Story 6
 
 **Verify**:
-- [ ] Note field is optional - can proceed without entering note
-- [ ] Notes persist after review completion
-- [ ] Empty notes don't cause errors
+- [X] Note field is optional - can proceed without entering note
+- [X] Notes persist after review completion
+- [X] Empty notes don't cause errors
 
 ---
 
@@ -781,9 +781,9 @@ LaunchedEffect(Unit) {
 ### Task 9.4 [V] - Integration Validation
 
 **Verify**:
-- [ ] Review flow accessible from Week view
-- [ ] All navigation transitions smooth
-- [ ] Back button behavior correct at each step
+- [X] Review flow accessible from Week view
+- [X] All navigation transitions smooth
+- [X] Back button behavior correct at each step
 - [ ] Deep linking works (optional)
 
 ---
@@ -838,7 +838,7 @@ LaunchedEffect(Unit) {
 ```
 
 **Verify**:
-- [ ] No compilation errors
+- [X] No compilation errors
 - [ ] All unit tests pass
 - [ ] No Koin dependency resolution errors at runtime
 
