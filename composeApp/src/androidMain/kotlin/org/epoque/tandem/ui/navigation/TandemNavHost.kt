@@ -120,6 +120,11 @@ fun TandemNavHost(
                 }
             )
 
+            // Progress detail navigation
+            progressNavGraph(
+                navController = navController
+            )
+
             // Planning wizard flow
             composable<Routes.Planning.Start> {
                 PlanningScreen(

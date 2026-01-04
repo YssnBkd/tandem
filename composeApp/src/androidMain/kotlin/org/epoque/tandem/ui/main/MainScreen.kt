@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.epoque.tandem.domain.model.User
 import org.epoque.tandem.ui.navigation.NavigationTab
+import org.epoque.tandem.ui.progress.ProgressScreen
 import org.epoque.tandem.ui.week.WeekScreen
 
 /**
@@ -41,6 +42,7 @@ fun MainScreen(
     onNavigateToReview: () -> Unit = {},
     onNavigateToPartnerInvite: () -> Unit = {},
     onNavigateToPartnerSettings: () -> Unit = {},
+    onNavigateToPastWeekDetail: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var selectedTab by rememberSaveable(stateSaver = NavigationTab.Saver) { mutableStateOf(NavigationTab.Week) }
@@ -120,7 +122,9 @@ fun MainScreen(
                     onNavigateToPartnerInvite = onNavigateToPartnerInvite,
                     onNavigateToPartnerSettings = onNavigateToPartnerSettings
                 )
-                NavigationTab.Progress -> ProgressScreen()
+                NavigationTab.Progress -> ProgressScreen(
+                    onNavigateToWeekDetail = onNavigateToPastWeekDetail
+                )
                 NavigationTab.Goals -> GoalsScreen()
             }
         }

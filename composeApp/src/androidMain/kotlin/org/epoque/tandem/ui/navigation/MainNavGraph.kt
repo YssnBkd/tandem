@@ -35,7 +35,10 @@ fun NavGraphBuilder.mainNavGraph(
                 navController.navigate(Routes.Review.Start)
             },
             onNavigateToPartnerInvite = onNavigateToPartnerInvite,
-            onNavigateToPartnerSettings = onNavigateToPartnerSettings
+            onNavigateToPartnerSettings = onNavigateToPartnerSettings,
+            onNavigateToPastWeekDetail = { weekId ->
+                navController.navigate(Routes.Progress.PastWeekDetail(weekId))
+            }
         )
     }
 }

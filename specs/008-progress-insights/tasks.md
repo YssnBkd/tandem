@@ -31,14 +31,14 @@
 
 **Purpose**: Create base project structure and foundational models for Progress feature
 
-- [ ] T001 [P] Create StreakResult domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/StreakResult.kt`
-- [ ] T002 [P] Create CompletionStats domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/CompletionStats.kt`
-- [ ] T003 [P] Create TrendDataPoint domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/TrendDataPoint.kt`
-- [ ] T004 [P] Create TrendChartData domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/TrendChartData.kt`
-- [ ] T005 [P] Create WeekSummary domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/WeekSummary.kt`
-- [ ] T006 [P] Create PastWeekDetail domain model (includes ReviewDetail, TaskOutcome) in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/PastWeekDetail.kt`
-- [ ] T007 [P] Create PastWeeksResult domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/PastWeeksResult.kt`
-- [ ] T008 Create ProgressPreferences DataStore class in `composeApp/src/androidMain/kotlin/org/epoque/tandem/data/preferences/ProgressPreferences.kt`
+- [X] T001 [P] Create StreakResult domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/StreakResult.kt`
+- [X] T002 [P] Create CompletionStats domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/CompletionStats.kt`
+- [X] T003 [P] Create TrendDataPoint domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/TrendDataPoint.kt`
+- [X] T004 [P] Create TrendChartData domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/TrendChartData.kt`
+- [X] T005 [P] Create WeekSummary domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/WeekSummary.kt`
+- [X] T006 [P] Create PastWeekDetail domain model (includes ReviewDetail, TaskOutcome) in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/PastWeekDetail.kt`
+- [X] T007 [P] Create PastWeeksResult domain model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/PastWeeksResult.kt`
+- [X] T008 Create ProgressPreferences DataStore class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/preferences/ProgressPreferences.kt`
 
 **Checkpoint**: All domain models compile, DataStore preference keys defined
 
@@ -50,13 +50,13 @@
 
 **WARNING**: No user story work can begin until this phase is complete
 
-- [ ] T009 Create GetCompletionStatsUseCase in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetCompletionStatsUseCase.kt`
-- [ ] T010 Create GetPendingMilestoneUseCase in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetPendingMilestoneUseCase.kt`
-- [ ] T011 Create MarkMilestoneCelebratedUseCase in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/MarkMilestoneCelebratedUseCase.kt`
-- [ ] T012 [P] Create MoodEmojis helper object in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/MoodEmojis.kt`
-- [ ] T013 [P] Create TaskStatusDisplay helper object in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/TaskStatusDisplay.kt`
-- [ ] T014 [P] Create StreakMilestones helper object in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/StreakMilestones.kt`
-- [ ] T015 Add Progress routes to Routes.kt: add `sealed interface Progress : Routes` with `PastWeekDetail(weekId: String)` route (note: `Routes.Main.Progress` already exists for tab, this adds detail navigation) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/Routes.kt`
+- [X] T009 Create GetCompletionStatsUseCase in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetCompletionStatsUseCase.kt`
+- [X] T010 Create GetPendingMilestoneUseCase in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetPendingMilestoneUseCase.kt`
+- [X] T011 Create MarkMilestoneCelebratedUseCase in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/MarkMilestoneCelebratedUseCase.kt`
+- [X] T012 [P] Create MoodEmojis helper object in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/MoodEmojis.kt`
+- [X] T013 [P] Create TaskStatusDisplay helper object in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/TaskStatusDisplay.kt`
+- [X] T014 [P] Create StreakMilestones helper object in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/StreakMilestones.kt`
+- [X] T015 Add Progress routes to Routes.kt: add `sealed interface Progress : Routes` with `PastWeekDetail(weekId: String)` route (note: `Routes.Main.Progress` already exists for tab, this adds detail navigation) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/Routes.kt`
 
 **Checkpoint**: Foundation ready - run `./gradlew :composeApp:compileDebugKotlinAndroid` to verify
 
@@ -70,14 +70,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Create CalculatePartnerStreakUseCase in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/CalculatePartnerStreakUseCase.kt`
+- [X] T016 [US1] Create CalculatePartnerStreakUseCase in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/CalculatePartnerStreakUseCase.kt`
   - **Dependencies**: `WeekRepository` (F005), `PartnerRepository` (F006), `ProgressPreferences` (T008)
   - **Logic**: Solo streak (user reviewed weeks) vs partner streak (BOTH reviewed same week)
   - Reference existing `CalculateStreakUseCase` in `domain/usecase/review/` for week query patterns
-- [ ] T017 [US1] Create ProgressUiState data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressUiState.kt`
-- [ ] T018 [US1] Create ProgressEvent sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressEvent.kt`
-- [ ] T019 [US1] Create ProgressSideEffect sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressSideEffect.kt`
-- [ ] T020 [US1] Create ProgressViewModel in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressViewModel.kt`
+- [X] T017 [US1] Create ProgressUiState data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressUiState.kt`
+- [X] T018 [US1] Create ProgressEvent sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressEvent.kt`
+- [X] T019 [US1] Create ProgressSideEffect sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressSideEffect.kt`
+- [X] T020 [US1] Create ProgressViewModel in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressViewModel.kt`
   - **Required imports**: `filterIsInstance`, `first` from kotlinx.coroutines.flow
   - **Init sequence** (see quickstart.md:176-233):
     1. Wait for `authRepository.authState.filterIsInstance<AuthState.Authenticated>().first().user.id`
@@ -87,16 +87,16 @@
     5. Trigger `TriggerMilestoneHaptic` side effect if `pendingMilestone != null`
   - **Error handling**: Re-throw `CancellationException`, catch others and set `error` state
   - **Events**: `DismissMilestone`, `Retry`, `ScreenVisible` (US2-4 will add more)
-- [ ] T021 [P] [US1] Create StreakCard composable (streak count, partner indicator, milestone celebration overlay) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/StreakCard.kt`
-- [ ] T022 [P] [US1] Create MilestoneCelebration composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/MilestoneCelebration.kt`
+- [X] T021 [P] [US1] Create StreakCard composable (streak count, partner indicator, milestone celebration overlay) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/StreakCard.kt`
+- [X] T022 [P] [US1] Create MilestoneCelebration composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/MilestoneCelebration.kt`
   - Auto-dismiss after 3s via `LaunchedEffect` with `delay(3000)`
   - Include visible dismiss button (IconButton with close icon, ≥48dp touch target)
   - Trigger haptic feedback via `LocalHapticFeedback.current.performHapticFeedback()`
   - Content description: "Dismiss milestone celebration"
-- [ ] T023 [US1] Create ProgressScreen composable shell (LazyColumn with StreakCard) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
-- [ ] T024 [US1] Create ProgressModule with use cases and ViewModel in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/ProgressModule.kt`
-- [ ] T025 [US1] Register ProgressModule in AppModule in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/AppModule.kt`
-- [ ] T026 [US1] Wire ProgressScreen to MainScreen Progress tab content in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/MainScreen.kt`
+- [X] T023 [US1] Create ProgressScreen composable shell (LazyColumn with StreakCard) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
+- [X] T024 [US1] Create ProgressModule with use cases and ViewModel in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/ProgressModule.kt`
+- [X] T025 [US1] Register ProgressModule in TandemApp.kt in `composeApp/src/androidMain/kotlin/org/epoque/tandem/TandemApp.kt`
+- [X] T026 [US1] Wire ProgressScreen to MainScreen Progress tab content in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/MainScreen.kt`
 
 **Checkpoint US1**: Run app, navigate to Progress tab, verify streak displays. Test milestone by reaching 5-week streak.
 
@@ -110,19 +110,19 @@
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Create GetCompletionTrendsUseCase (8 weeks, user + partner percentages) in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetCompletionTrendsUseCase.kt`
-- [ ] T028 [US2] Create GetMonthlyCompletionUseCase (current calendar month aggregation) in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetMonthlyCompletionUseCase.kt`
-- [ ] T029 [US2] Update ProgressViewModel to load trend data and monthly completion in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressViewModel.kt`
+- [X] T027 [US2] Create GetCompletionTrendsUseCase (8 weeks, user + partner percentages) in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetCompletionTrendsUseCase.kt`
+- [X] T028 [US2] Create GetMonthlyCompletionUseCase (current calendar month aggregation) in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetMonthlyCompletionUseCase.kt`
+- [X] T029 [US2] Update ProgressViewModel to load trend data and monthly completion in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressViewModel.kt`
   - Add to init sequence (after streak calculation):
     4. `val trends = getCompletionTrendsUseCase(userId)`
     5. `val monthlyUser = getMonthlyCompletionUseCase(userId)`
     6. `val monthlyPartner = partner?.let { getMonthlyCompletionUseCase(it.id) }`
   - Update UiState with `trendData`, `showTrendChart`, `userMonthlyCompletion`, `partnerMonthlyCompletion`
-- [ ] T030 [P] [US2] Create TrendChart composable (Canvas-based line chart, user + partner lines) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/TrendChart.kt`
-- [ ] T031 [P] [US2] Create TrendChartEmptyState composable (<4 weeks message) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/TrendChartEmptyState.kt`
-- [ ] T032 [P] [US2] Create CompletionBars composable (horizontal bars with percentages for user and partner) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/CompletionBars.kt`
-- [ ] T033 [US2] Update ProgressScreen to include CompletionBars and TrendChart sections in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
-- [ ] T034 [US2] Update ProgressModule with new use cases in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/ProgressModule.kt`
+- [X] T030 [P] [US2] Create TrendChart composable (Canvas-based line chart, user + partner lines) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/TrendChart.kt`
+- [X] T031 [P] [US2] Create TrendChartEmptyState composable (<4 weeks message) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/TrendChartEmptyState.kt`
+- [X] T032 [P] [US2] Create CompletionBars composable (horizontal bars with percentages for user and partner) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/CompletionBars.kt`
+- [X] T033 [US2] Update ProgressScreen to include CompletionBars and TrendChart sections in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
+- [X] T034 [US2] Update ProgressModule with new use cases in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/ProgressModule.kt`
 
 **Checkpoint US2**: Run app, verify trend chart shows 8 weeks of data, completion bars show monthly stats
 
@@ -136,19 +136,19 @@
 
 ### Implementation for User Story 3
 
-- [ ] T035 [US3] Create GetPastWeeksUseCase (offset pagination, 10 per page) in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetPastWeeksUseCase.kt`
-- [ ] T036 [US3] Create WeekSummaryUiModel data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/WeekSummaryUiModel.kt`
-- [ ] T037 [US3] Update ProgressUiState with pastWeeks list, hasMoreWeeks, isLoadingMoreWeeks in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressUiState.kt`
-- [ ] T038 [US3] Update ProgressEvent with LoadMoreWeeks event in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressEvent.kt`
-- [ ] T039 [US3] Update ProgressViewModel with loadPastWeeks and loadMoreWeeks functions in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressViewModel.kt`
+- [X] T035 [US3] Create GetPastWeeksUseCase (offset pagination, 10 per page) in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetPastWeeksUseCase.kt`
+- [X] T036 [US3] Create WeekSummaryUiModel data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/WeekSummaryUiModel.kt`
+- [X] T037 [US3] Update ProgressUiState with pastWeeks list, hasMoreWeeks, isLoadingMoreWeeks in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressUiState.kt`
+- [X] T038 [US3] Update ProgressEvent with LoadMoreWeeks event in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressEvent.kt`
+- [X] T039 [US3] Update ProgressViewModel with loadPastWeeks and loadMoreWeeks functions in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressViewModel.kt`
   - Add to init sequence (after monthly completion):
     7. `val pastWeeks = getPastWeeksUseCase(userId, offset = 0, limit = 10)`
   - Add `loadMoreWeeks()` function with offset tracking
   - Handle `LoadMoreWeeks` event in `onEvent()`
-- [ ] T040 [P] [US3] Create PastWeekItem composable (dateRange, completion text, mood emojis, 48dp touch target) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/PastWeekItem.kt`
-- [ ] T041 [P] [US3] Create PastWeeksList composable (LazyColumn with pagination trigger) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/PastWeeksList.kt`
-- [ ] T042 [US3] Update ProgressScreen to include Past Weeks header and PastWeeksList in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
-- [ ] T043 [US3] Update ProgressModule with GetPastWeeksUseCase in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/ProgressModule.kt`
+- [X] T040 [P] [US3] Create PastWeekItem composable (dateRange, completion text, mood emojis, 48dp touch target) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/PastWeekItem.kt`
+- [X] T041 [P] [US3] Create PastWeeksList composable (LazyColumn with pagination trigger) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/PastWeeksList.kt`
+- [X] T042 [US3] Update ProgressScreen to include Past Weeks header and PastWeeksList in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
+- [X] T043 [US3] Update ProgressModule with GetPastWeeksUseCase in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/ProgressModule.kt`
 
 **Checkpoint US3**: Run app, verify past weeks list shows 10 items, scroll to load more
 
@@ -162,23 +162,23 @@
 
 ### Implementation for User Story 4
 
-- [ ] T044 [US4] Create GetPastWeekDetailUseCase in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetPastWeekDetailUseCase.kt`
-- [ ] T045 [US4] Create PastWeekDetailUiState data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/PastWeekDetailUiState.kt`
-- [ ] T046 [US4] Create ReviewSummaryUiModel data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ReviewSummaryUiModel.kt`
-- [ ] T047 [US4] Create TaskOutcomeUiModel data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/TaskOutcomeUiModel.kt`
-- [ ] T048 [US4] Create PastWeekDetailEvent sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/PastWeekDetailEvent.kt`
-- [ ] T049 [US4] Create PastWeekDetailSideEffect sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/PastWeekDetailSideEffect.kt`
-- [ ] T050 [US4] Create PastWeekDetailViewModel (load week detail, handle back navigation) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/PastWeekDetailViewModel.kt`
-- [ ] T051 [P] [US4] Create ReviewSummaryCard composable (name, mood emoji, completion text, note) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ReviewSummaryCard.kt`
-- [ ] T052 [P] [US4] Create ReviewSummaryCards composable (side-by-side user and partner) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ReviewSummaryCards.kt`
-- [ ] T053 [P] [US4] Create TaskOutcomeItem composable (title, user status, partner status) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/TaskOutcomeItem.kt`
-- [ ] T054 [P] [US4] Create TaskOutcomesList composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/TaskOutcomesList.kt`
-- [ ] T055 [US4] Create PastWeekDetailScreen composable (TopAppBar, ReviewSummaryCards, TaskOutcomesList) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/PastWeekDetailScreen.kt`
-- [ ] T056 [US4] Create ProgressNavGraph with Progress routes and PastWeekDetail navigation in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/ProgressNavGraph.kt`
-- [ ] T057 [US4] Update TandemNavHost to include progressNavGraph in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/TandemNavHost.kt`
-- [ ] T058 [US4] Update ProgressViewModel to handle PastWeekTapped event with NavigateToWeekDetail side effect in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressViewModel.kt`
-- [ ] T059 [US4] Update ProgressScreen to collect side effects and trigger navigation in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
-- [ ] T060 [US4] Update ProgressModule with PastWeekDetailViewModel in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/ProgressModule.kt`
+- [X] T044 [US4] Create GetPastWeekDetailUseCase in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/usecase/progress/GetPastWeekDetailUseCase.kt`
+- [X] T045 [US4] Create PastWeekDetailUiState data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/PastWeekDetailUiState.kt`
+- [X] T046 [US4] Create ReviewSummaryUiModel data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ReviewSummaryUiModel.kt`
+- [X] T047 [US4] Create TaskOutcomeUiModel data class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/TaskOutcomeUiModel.kt`
+- [X] T048 [US4] Create PastWeekDetailEvent sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/PastWeekDetailEvent.kt`
+- [X] T049 [US4] Create PastWeekDetailSideEffect sealed class in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/PastWeekDetailSideEffect.kt`
+- [X] T050 [US4] Create PastWeekDetailViewModel (load week detail, handle back navigation) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/PastWeekDetailViewModel.kt`
+- [X] T051 [P] [US4] Create ReviewSummaryCard composable (name, mood emoji, completion text, note) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ReviewSummaryCard.kt`
+- [X] T052 [P] [US4] Create ReviewSummaryCards composable (side-by-side user and partner) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ReviewSummaryCards.kt`
+- [X] T053 [P] [US4] Create TaskOutcomeItem composable (title, user status, partner status) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/TaskOutcomeItem.kt`
+- [X] T054 [P] [US4] Create TaskOutcomesList composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/TaskOutcomesList.kt`
+- [X] T055 [US4] Create PastWeekDetailScreen composable (TopAppBar, ReviewSummaryCards, TaskOutcomesList) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/PastWeekDetailScreen.kt`
+- [X] T056 [US4] Create ProgressNavGraph with Progress routes and PastWeekDetail navigation in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/ProgressNavGraph.kt`
+- [X] T057 [US4] Update TandemNavHost to include progressNavGraph in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/TandemNavHost.kt`
+- [X] T058 [US4] Update ProgressViewModel to handle PastWeekTapped event with NavigateToWeekDetail side effect in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/progress/ProgressViewModel.kt`
+- [X] T059 [US4] Update ProgressScreen to collect side effects and trigger navigation in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
+- [X] T060 [US4] Update ProgressModule with PastWeekDetailViewModel in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/ProgressModule.kt`
 
 **Checkpoint US4**: Run app, tap past week, verify navigation to detail, verify back navigation preserves scroll position
 
@@ -188,25 +188,25 @@
 
 **Purpose**: Empty states, error handling, accessibility, and final touches
 
-- [ ] T061 [P] Create ProgressEmptyState composable (no history, encourage first week) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressEmptyState.kt`
-- [ ] T062 [P] Create ProgressErrorState composable (error message, retry button) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressErrorState.kt`
-- [ ] T063 Update ProgressScreen to show ProgressEmptyState when showEmptyState is true in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
-- [ ] T064 Update ProgressScreen to show ProgressErrorState when error is not null in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
-- [ ] T065 Verify all interactive elements have minimum 48dp touch targets:
+- [X] T061 [P] Create ProgressEmptyState composable (no history, encourage first week) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressEmptyState.kt`
+- [X] T062 [P] Create ProgressErrorState composable (error message, retry button) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressErrorState.kt`
+- [X] T063 Update ProgressScreen to show ProgressEmptyState when showEmptyState is true in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
+- [X] T064 Update ProgressScreen to show ProgressErrorState when error is not null in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/ProgressScreen.kt`
+- [X] T065 Verify all interactive elements have minimum 48dp touch targets:
   - `PastWeekItem` clickable row (T040)
   - `MilestoneCelebration` dismiss button (T022)
   - `ProgressErrorState` retry button (T062)
   - `PastWeekDetailScreen` back button in TopAppBar (T055)
   - Implementation: Use `Modifier.heightIn(min = 48.dp)` or `Modifier.size(48.dp)`
-- [ ] T066 Add content descriptions for accessibility:
+- [X] T066 Add content descriptions for accessibility:
   - `TrendChart`: "Completion trend chart showing {weekCount} weeks of data"
   - `CompletionBars`: "Your completion: {percentage}%, Partner completion: {percentage}%"
   - `StreakCard`: "{count}-week streak {with partner/solo}"
   - `PastWeekItem`: "Week of {dateRange}, {userCompletion} completed"
   - `MilestoneCelebration` dismiss: "Dismiss milestone celebration"
-- [ ] T067 Update PastWeeksList to disable "Load More" when offline (check network connectivity) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/PastWeeksList.kt`
-- [ ] T068 Run `./gradlew :composeApp:compileDebugKotlinAndroid` to verify build succeeds
-- [ ] T069 Run security advisors check via Supabase MCP to verify no RLS issues
+- [X] T067 Update PastWeeksList to disable "Load More" when offline (check network connectivity) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/progress/PastWeeksList.kt`
+- [X] T068 Run `./gradlew :composeApp:compileDebugKotlinAndroid` to verify build succeeds
+- [X] T069 Run security advisors check via Supabase MCP to verify no RLS issues
 
 ---
 

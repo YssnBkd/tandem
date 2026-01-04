@@ -46,6 +46,15 @@ sealed interface Routes {
     }
 
     /**
+     * Progress feature routes for detail navigation.
+     */
+    sealed interface Progress : Routes {
+        /** Past week detail screen */
+        @Serializable
+        data class PastWeekDetail(val weekId: String) : Progress
+    }
+
+    /**
      * Weekly planning routes.
      */
     sealed interface Planning : Routes {
