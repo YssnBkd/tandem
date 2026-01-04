@@ -5,6 +5,13 @@
 **Status**: Draft
 **Input**: User description: "Progress tab showing trends, insights, past weeks, and streak information with partner comparison"
 
+## Clarifications
+
+### Session 2026-01-04
+
+- Q: When is a week considered "missed" for streak calculation? → A: A week is missed if not completed before the next week starts (Monday 12:00 AM user's timezone).
+- Q: How should milestone celebrations appear and be dismissed? → A: Show once on first view after reaching milestone, auto-dismiss after a few seconds.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - View Streak with Partner (Priority: P1)
@@ -84,8 +91,8 @@ As a user, I want to tap a past week to see the full review details so that I ca
 ### Functional Requirements
 
 - **FR-001**: System MUST calculate streak as consecutive weeks where both partners completed their weekly review.
-- **FR-002**: System MUST reset streak to 0 when either partner misses a weekly review.
-- **FR-003**: System MUST display milestone celebrations at streak counts of 5, 10, 20, and 50 weeks.
+- **FR-002**: System MUST reset streak to 0 when either partner misses a weekly review (a week is missed if not completed before Monday 12:00 AM user's timezone).
+- **FR-003**: System MUST display milestone celebrations at streak counts of 5, 10, 20, and 50 weeks (shown once on first view after reaching milestone, auto-dismiss after a few seconds).
 - **FR-004**: System MUST query and display completion data for the past 8 weeks for trend visualization.
 - **FR-005**: System MUST calculate completion percentage per week as (completed tasks / total tasks) * 100.
 - **FR-006**: System MUST display completion comparison as horizontal bars with percentage labels for current month.
