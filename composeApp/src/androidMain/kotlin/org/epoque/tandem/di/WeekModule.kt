@@ -44,6 +44,8 @@ val weekModule = module {
         taskRepository = get(),
         weekRepository = get(),
         segmentPreferences = get(),
-        authRepository = get()
+        authRepository = get(),
+        isReviewWindowOpenUseCase = get(),
+        calculateStreakUseCase = get()
     ) }
 }

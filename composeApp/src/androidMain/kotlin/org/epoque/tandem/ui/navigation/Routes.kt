@@ -57,4 +57,29 @@ sealed interface Routes {
         @Serializable
         data class Wizard(val stepIndex: Int = 0) : Planning
     }
+
+    /**
+     * Weekly review routes.
+     */
+    sealed interface Review : Routes {
+        /** Review entry point (shown from banner) */
+        @Serializable
+        data object Start : Review
+
+        /** Mode selection screen */
+        @Serializable
+        data object ModeSelection : Review
+
+        /** Rating step screen */
+        @Serializable
+        data object Rating : Review
+
+        /** Task review step with index */
+        @Serializable
+        data class TaskReview(val taskIndex: Int = 0) : Review
+
+        /** Summary screen */
+        @Serializable
+        data object Summary : Review
+    }
 }

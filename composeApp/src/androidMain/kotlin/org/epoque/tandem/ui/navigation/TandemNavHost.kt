@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import org.epoque.tandem.presentation.auth.AuthUiState
 import org.epoque.tandem.presentation.auth.AuthViewModel
 import org.epoque.tandem.ui.planning.PlanningScreen
+import org.epoque.tandem.ui.review.ReviewScreen
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -73,6 +74,20 @@ fun TandemNavHost(
             PlanningScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        // Review wizard flow
+        composable<Routes.Review.Start> {
+            ReviewScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToPlanning = {
+                    navController.navigate(Routes.Planning.Start) {
+                        popUpTo(Routes.Review.Start) { inclusive = true }
+                    }
                 }
             )
         }

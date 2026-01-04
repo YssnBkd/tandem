@@ -23,6 +23,7 @@ import org.epoque.tandem.presentation.week.WeekViewModel
 import org.epoque.tandem.presentation.week.model.Segment
 import org.epoque.tandem.ui.planning.PlanningBanner
 import org.epoque.tandem.ui.planning.shouldShowPlanningBanner
+import org.epoque.tandem.ui.review.ReviewBanner
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -39,6 +40,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun WeekScreen(
     onNavigateToPlanning: () -> Unit = {},
+    onNavigateToReview: () -> Unit = {},
     viewModel: WeekViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -186,6 +188,14 @@ fun WeekScreen(
                 // Main content: always show segment control and quick add, with task list or empty state
                 else -> {
                     Column(modifier = Modifier.fillMaxSize()) {
+                        // Review banner (shown Friday 6PM - Sunday 11:59PM until week reviewed)
+                        if (uiState.showReviewBanner) {
+                            ReviewBanner(
+                                currentStreak = uiState.currentStreak,
+                                onStartReview = onNavigateToReview
+                            )
+                        }
+
                         // Planning banner (shown Sunday after 6pm until planning complete)
                         if (shouldShowPlanningBanner(uiState.isPlanningComplete)) {
                             PlanningBanner(

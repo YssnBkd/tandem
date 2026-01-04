@@ -24,6 +24,8 @@ import org.epoque.tandem.domain.repository.AuthRepository
 import org.epoque.tandem.domain.repository.AuthState
 import org.epoque.tandem.domain.repository.TaskRepository
 import org.epoque.tandem.domain.repository.WeekRepository
+import org.epoque.tandem.domain.usecase.review.CalculateStreakUseCase
+import org.epoque.tandem.domain.usecase.review.IsReviewWindowOpenUseCase
 import org.epoque.tandem.presentation.week.model.Segment
 import org.epoque.tandem.presentation.week.model.TaskUiModel
 import org.epoque.tandem.presentation.week.model.WeekInfo
@@ -44,7 +46,9 @@ class WeekViewModel(
     private val taskRepository: TaskRepository,
     private val weekRepository: WeekRepository,
     private val segmentPreferences: SegmentPreferences,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val isReviewWindowOpenUseCase: IsReviewWindowOpenUseCase,
+    private val calculateStreakUseCase: CalculateStreakUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WeekUiState())
@@ -89,18 +93,34 @@ class WeekViewModel(
     /**
      * Load initial week data.
      * Waits for authentication, then ensures the current week exists before observing.
+     * Also checks review window status and calculates streak.
      */
     private fun loadInitialData() {
         viewModelScope.launch {
             // Wait for authentication before creating/observing week
-            authRepository.authState
+            val userId = authRepository.authState
                 .filterIsInstance<AuthState.Authenticated>()
                 .first()
                 .let { authState ->
                     val userId = authState.user.id
                     // This creates the week if it doesn't exist
                     weekRepository.getOrCreateCurrentWeek(userId)
+                    userId
                 }
+
+            // Check review window status (runs synchronously, no IO)
+            val isReviewWindowOpen = isReviewWindowOpenUseCase()
+
+            // Calculate current streak
+            val streak = calculateStreakUseCase(userId)
+
+            // Update review state
+            _uiState.update { state ->
+                state.copy(
+                    isReviewWindowOpen = isReviewWindowOpen,
+                    currentStreak = streak
+                )
+            }
 
             // Now observe the week (guaranteed to exist)
             val currentWeekId = weekRepository.getCurrentWeekId()
@@ -110,7 +130,8 @@ class WeekViewModel(
                     _uiState.update { state ->
                         state.copy(
                             weekInfo = weekInfo,
-                            isPlanningComplete = it.planningCompletedAt != null
+                            isPlanningComplete = it.planningCompletedAt != null,
+                            isWeekReviewed = it.isReviewed
                         )
                     }
                 }
