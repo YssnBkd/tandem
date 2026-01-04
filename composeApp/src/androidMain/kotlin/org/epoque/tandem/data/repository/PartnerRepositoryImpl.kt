@@ -8,6 +8,8 @@ import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.decodeOldRecord
+import io.github.jan.supabase.realtime.decodeRecord
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.epoque.tandem.data.local.TandemDatabase
 import org.epoque.tandem.domain.model.OwnerType
@@ -146,25 +149,26 @@ class PartnerRepositoryImpl(
 
     /**
      * Remote task record structure from Supabase.
+     * Uses @SerialName for proper JSON deserialization with decodeRecord<T>().
      */
     @Serializable
     private data class RemoteTask(
         val id: String,
         val title: String,
         val notes: String? = null,
-        val owner_id: String,
-        val owner_type: String,
-        val week_id: String,
+        @SerialName("owner_id") val ownerId: String,
+        @SerialName("owner_type") val ownerType: String,
+        @SerialName("week_id") val weekId: String,
         val status: String,
-        val created_by: String,
-        val request_note: String? = null,
-        val repeat_target: Long? = null,
-        val repeat_completed: Long = 0,
-        val linked_goal_id: String? = null,
-        val review_note: String? = null,
-        val rolled_from_week_id: String? = null,
-        val created_at: String,
-        val updated_at: String
+        @SerialName("created_by") val createdBy: String,
+        @SerialName("request_note") val requestNote: String? = null,
+        @SerialName("repeat_target") val repeatTarget: Long? = null,
+        @SerialName("repeat_completed") val repeatCompleted: Long = 0,
+        @SerialName("linked_goal_id") val linkedGoalId: String? = null,
+        @SerialName("review_note") val reviewNote: String? = null,
+        @SerialName("rolled_from_week_id") val rolledFromWeekId: String? = null,
+        @SerialName("created_at") val createdAt: String,
+        @SerialName("updated_at") val updatedAt: String
     )
 
     override suspend fun startPartnerTaskSync(userId: String, partnerId: String) {
@@ -182,29 +186,35 @@ class PartnerRepositoryImpl(
                     table = "tasks"
                 }
 
-                // Collect changes and update local cache
+                // Collect changes and update local cache using proper decodeRecord API
                 changeFlow.onEach { action ->
-                    when (action) {
-                        is PostgresAction.Insert -> {
-                            val record = action.record
-                            if (record["owner_id"]?.toString()?.trim('"') == partnerId) {
-                                parseRemoteTask(record)?.let { upsertLocalTask(it) }
+                    try {
+                        when (action) {
+                            is PostgresAction.Insert -> {
+                                val task = action.decodeRecord<RemoteTask>()
+                                if (task.ownerId == partnerId) {
+                                    upsertLocalTask(task)
+                                }
                             }
-                        }
-                        is PostgresAction.Update -> {
-                            val record = action.record
-                            if (record["owner_id"]?.toString()?.trim('"') == partnerId) {
-                                parseRemoteTask(record)?.let { upsertLocalTask(it) }
+                            is PostgresAction.Update -> {
+                                val task = action.decodeRecord<RemoteTask>()
+                                if (task.ownerId == partnerId) {
+                                    upsertLocalTask(task)
+                                }
                             }
-                        }
-                        is PostgresAction.Delete -> {
-                            val oldRecord = action.oldRecord
-                            val taskId = oldRecord["id"]?.toString()?.trim('"')
-                            if (taskId != null && oldRecord["owner_id"]?.toString()?.trim('"') == partnerId) {
-                                deleteLocalTask(taskId)
+                            is PostgresAction.Delete -> {
+                                // Note: Requires REPLICA IDENTITY FULL on tasks table
+                                // to receive old record data on DELETE events
+                                val oldTask = action.decodeOldRecord<RemoteTask>()
+                                if (oldTask.ownerId == partnerId) {
+                                    deleteLocalTask(oldTask.id)
+                                }
                             }
+                            else -> { /* Ignore Select actions */ }
                         }
-                        else -> { /* Ignore Select actions */ }
+                    } catch (e: Exception) {
+                        // Log deserialization errors but continue processing
+                        e.printStackTrace()
                     }
                 }.launchIn(syncScope)
 
@@ -215,34 +225,6 @@ class PartnerRepositoryImpl(
                 // Log error but don't crash - realtime sync is a nice-to-have
                 e.printStackTrace()
             }
-        }
-    }
-
-    /**
-     * Parse a remote task record from JSON map.
-     */
-    private fun parseRemoteTask(record: Map<String, Any?>): RemoteTask? {
-        return try {
-            RemoteTask(
-                id = record["id"]?.toString()?.trim('"') ?: return null,
-                title = record["title"]?.toString()?.trim('"') ?: return null,
-                notes = record["notes"]?.toString()?.trim('"'),
-                owner_id = record["owner_id"]?.toString()?.trim('"') ?: return null,
-                owner_type = record["owner_type"]?.toString()?.trim('"') ?: "SELF",
-                week_id = record["week_id"]?.toString()?.trim('"') ?: return null,
-                status = record["status"]?.toString()?.trim('"') ?: "PENDING",
-                created_by = record["created_by"]?.toString()?.trim('"') ?: return null,
-                request_note = record["request_note"]?.toString()?.trim('"'),
-                repeat_target = record["repeat_target"]?.toString()?.toLongOrNull(),
-                repeat_completed = record["repeat_completed"]?.toString()?.toLongOrNull() ?: 0,
-                linked_goal_id = record["linked_goal_id"]?.toString()?.trim('"'),
-                review_note = record["review_note"]?.toString()?.trim('"'),
-                rolled_from_week_id = record["rolled_from_week_id"]?.toString()?.trim('"'),
-                created_at = record["created_at"]?.toString()?.trim('"') ?: return null,
-                updated_at = record["updated_at"]?.toString()?.trim('"') ?: return null
-            )
-        } catch (e: Exception) {
-            null
         }
     }
 
@@ -262,19 +244,19 @@ class PartnerRepositoryImpl(
             id = remote.id,
             title = remote.title,
             notes = remote.notes,
-            owner_id = remote.owner_id,
-            owner_type = parseOwnerType(remote.owner_type),
-            week_id = remote.week_id,
+            owner_id = remote.ownerId,
+            owner_type = parseOwnerType(remote.ownerType),
+            week_id = remote.weekId,
             status = parseTaskStatus(remote.status),
-            created_by = remote.created_by,
-            request_note = remote.request_note,
-            repeat_target = remote.repeat_target,
-            repeat_completed = remote.repeat_completed,
-            linked_goal_id = remote.linked_goal_id,
-            review_note = remote.review_note,
-            rolled_from_week_id = remote.rolled_from_week_id,
-            created_at = Instant.parse(remote.created_at),
-            updated_at = Instant.parse(remote.updated_at)
+            created_by = remote.createdBy,
+            request_note = remote.requestNote,
+            repeat_target = remote.repeatTarget,
+            repeat_completed = remote.repeatCompleted,
+            linked_goal_id = remote.linkedGoalId,
+            review_note = remote.reviewNote,
+            rolled_from_week_id = remote.rolledFromWeekId,
+            created_at = Instant.parse(remote.createdAt),
+            updated_at = Instant.parse(remote.updatedAt)
         )
     }
 
