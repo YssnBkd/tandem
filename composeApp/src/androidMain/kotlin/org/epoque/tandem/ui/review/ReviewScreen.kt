@@ -118,7 +118,7 @@ fun ReviewScreen(
                     ) {
                         reviewNavGraph(
                             navController = navController,
-                            state = state,
+                            stateProvider = { state },
                             onEvent = viewModel::onEvent
                         )
                     }

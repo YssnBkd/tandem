@@ -22,13 +22,18 @@ import org.epoque.tandem.ui.review.TaskReviewStepScreen
  * 2. Rating - Rate overall week with emoji scale
  * 3. TaskReview - Review each task (Done/Tried/Skipped)
  * 4. Summary - View completion stats and streak
+ *
+ * Note: Uses stateProvider lambda instead of direct state to ensure
+ * each composable reads fresh state on recomposition. This is required
+ * because NavGraphBuilder captures values at graph build time.
  */
 fun NavGraphBuilder.reviewNavGraph(
     navController: NavController,
-    state: ReviewUiState,
+    stateProvider: () -> ReviewUiState,
     onEvent: (ReviewEvent) -> Unit
 ) {
     composable<Routes.Review.ModeSelection> {
+        val state = stateProvider()
         ReviewModeSelectionScreen(
             currentStreak = state.currentStreak,
             onSoloSelected = {
@@ -43,6 +48,7 @@ fun NavGraphBuilder.reviewNavGraph(
     }
 
     composable<Routes.Review.Rating> {
+        val state = stateProvider()
         OverallRatingStepScreen(
             selectedRating = state.overallRating,
             note = state.overallNote,
@@ -61,6 +67,7 @@ fun NavGraphBuilder.reviewNavGraph(
     }
 
     composable<Routes.Review.TaskReview> { backStackEntry ->
+        val state = stateProvider()
         val route = backStackEntry.toRoute<Routes.Review.TaskReview>()
         val taskIndex = route.taskIndex
         val task = state.tasksToReview.getOrNull(taskIndex)
@@ -87,6 +94,7 @@ fun NavGraphBuilder.reviewNavGraph(
     }
 
     composable<Routes.Review.Summary> {
+        val state = stateProvider()
         ReviewSummaryScreen(
             completionPercentage = state.completionPercentage,
             doneCount = state.doneCount,
