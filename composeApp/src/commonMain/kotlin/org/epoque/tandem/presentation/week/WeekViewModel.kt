@@ -17,11 +17,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import org.epoque.tandem.domain.model.Goal
 import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.Task
 import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.domain.repository.AuthRepository
 import org.epoque.tandem.domain.repository.AuthState
+import org.epoque.tandem.domain.repository.GoalRepository
 import org.epoque.tandem.domain.repository.TaskRepository
 import org.epoque.tandem.domain.repository.WeekRepository
 import org.epoque.tandem.domain.usecase.review.CalculateStreakUseCase
@@ -48,7 +50,8 @@ class WeekViewModel(
     private val segmentPreferences: SegmentPreferences,
     private val authRepository: AuthRepository,
     private val isReviewWindowOpenUseCase: IsReviewWindowOpenUseCase,
-    private val calculateStreakUseCase: CalculateStreakUseCase
+    private val calculateStreakUseCase: CalculateStreakUseCase,
+    private val goalRepository: GoalRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WeekUiState())
@@ -57,10 +60,17 @@ class WeekViewModel(
     private val _sideEffects = Channel<WeekSideEffect>(Channel.BUFFERED)
     val sideEffects: Flow<WeekSideEffect> = _sideEffects.receiveAsFlow()
 
+    // Goal cache for looking up goal details
+    private var goalMap: Map<String, Goal> = emptyMap()
+
+    // Edited goal ID for task detail sheet
+    private var editedGoalId: String? = null
+
     init {
         loadInitialData()
         observeSegmentPreference()
         observeTasks()
+        observeGoals()
     }
 
     /**
@@ -77,6 +87,7 @@ class WeekViewModel(
             is WeekEvent.DetailSheetDismissed -> handleDetailSheetDismissed()
             is WeekEvent.TaskTitleChanged -> handleTaskTitleChanged(event.title)
             is WeekEvent.TaskNotesChanged -> handleTaskNotesChanged(event.notes)
+            is WeekEvent.TaskGoalChanged -> handleTaskGoalChanged(event.goalId)
             is WeekEvent.TaskSaveRequested -> handleTaskSaveRequested()
             is WeekEvent.TaskDeleteRequested -> handleTaskDeleteRequested()
             is WeekEvent.TaskDeleteConfirmed -> handleTaskDeleteConfirmed()
@@ -185,6 +196,53 @@ class WeekViewModel(
     }
 
     /**
+     * Observe user's active goals for the goal picker.
+     * Updates availableGoals in state and maintains goalMap for lookups.
+     */
+    private fun observeGoals() {
+        viewModelScope.launch {
+            val userId = authRepository.authState
+                .filterIsInstance<AuthState.Authenticated>()
+                .first()
+                .user.id
+
+            goalRepository.observeMyActiveGoals(userId).collect { goals ->
+                goalMap = goals.associateBy { it.id }
+                _uiState.update { it.copy(availableGoals = goals) }
+                // Re-update tasks to include goal info
+                val tasks = _uiState.value.tasks
+                if (tasks.isNotEmpty()) {
+                    // Trigger task UI update with new goal info
+                    updateTasksWithGoalInfo()
+                }
+            }
+        }
+    }
+
+    /**
+     * Re-map tasks with goal information when goals are updated.
+     */
+    private fun updateTasksWithGoalInfo() {
+        val currentTasks = _uiState.value.tasks
+        val updatedTasks = currentTasks.map { taskUi ->
+            val goal = taskUi.linkedGoalId?.let { goalMap[it] }
+            taskUi.copy(
+                linkedGoalName = goal?.name,
+                linkedGoalIcon = goal?.icon
+            )
+        }
+        val incomplete = updatedTasks.filter { !it.isCompleted }
+        val completed = updatedTasks.filter { it.isCompleted }
+        _uiState.update {
+            it.copy(
+                tasks = updatedTasks,
+                incompleteTasks = incomplete,
+                completedTasks = completed
+            )
+        }
+    }
+
+    /**
      * Update UI state with new task list.
      * Separates completed from incomplete and calculates progress.
      */
@@ -193,7 +251,14 @@ class WeekViewModel(
         val partnerName = _uiState.value.partnerName
 
         val uiModels = tasks.map { task ->
-            TaskUiModel.fromTask(task, userId, partnerName)
+            val goal = task.linkedGoalId?.let { goalMap[it] }
+            TaskUiModel.fromTask(
+                task = task,
+                currentUserId = userId,
+                partnerName = partnerName,
+                goalName = goal?.name,
+                goalIcon = goal?.icon
+            )
         }
 
         val incomplete = uiModels.filter { !it.isCompleted }
@@ -224,6 +289,8 @@ class WeekViewModel(
     private fun handleTaskCheckboxTapped(taskId: String) {
         viewModelScope.launch {
             val task = taskRepository.getTaskById(taskId) ?: return@launch
+            val wasCompleted = task.status == TaskStatus.COMPLETED ||
+                (task.isRepeating && task.repeatCompleted >= (task.repeatTarget ?: 0))
 
             if (task.isRepeating) {
                 val newCount = task.repeatCompleted + 1
@@ -239,6 +306,13 @@ class WeekViewModel(
                     TaskStatus.COMPLETED
                 }
                 taskRepository.updateTaskStatus(taskId, newStatus)
+            }
+
+            // Increment goal progress when task is completed (not uncompleted)
+            val isNowCompleted = !wasCompleted
+            val goalId = task.linkedGoalId
+            if (isNowCompleted && goalId != null) {
+                goalRepository.incrementProgress(goalId, 1)
             }
 
             _sideEffects.send(WeekSideEffect.TriggerHapticFeedback)
@@ -316,6 +390,7 @@ class WeekViewModel(
 
     private fun handleTaskTapped(taskId: String) {
         val task = _uiState.value.tasks.find { it.id == taskId }
+        editedGoalId = task?.linkedGoalId
         _uiState.update {
             it.copy(
                 selectedTaskId = taskId,
@@ -327,6 +402,7 @@ class WeekViewModel(
     }
 
     private fun handleDetailSheetDismissed() {
+        editedGoalId = null
         _uiState.update {
             it.copy(
                 selectedTaskId = null,
@@ -345,6 +421,10 @@ class WeekViewModel(
         _uiState.update { it.copy(editedTaskNotes = notes) }
     }
 
+    private fun handleTaskGoalChanged(goalId: String?) {
+        editedGoalId = goalId
+    }
+
     private fun handleTaskSaveRequested() {
         viewModelScope.launch {
             val taskId = _uiState.value.selectedTaskId ?: return@launch
@@ -359,6 +439,19 @@ class WeekViewModel(
             // Get current task to preserve status
             val currentTask = taskRepository.getTaskById(taskId) ?: return@launch
             taskRepository.updateTask(taskId, title, notes, currentTask.status)
+
+            // Update goal linking if changed
+            val newGoalId = editedGoalId
+            val oldGoalId = currentTask.linkedGoalId
+            if (newGoalId != oldGoalId) {
+                if (newGoalId != null) {
+                    taskRepository.linkTaskToGoal(taskId, newGoalId)
+                } else {
+                    taskRepository.unlinkTaskFromGoal(taskId)
+                }
+            }
+
+            editedGoalId = null
             _uiState.update {
                 it.copy(
                     showDetailSheet = false,
@@ -501,4 +594,10 @@ class WeekViewModel(
      */
     private val currentUserId: String?
         get() = authRepository.currentUser?.id
+
+    /**
+     * Get the edited goal ID for task detail sheet.
+     * Returns the goal ID being edited for the current selected task.
+     */
+    fun getEditedGoalId(): String? = editedGoalId
 }

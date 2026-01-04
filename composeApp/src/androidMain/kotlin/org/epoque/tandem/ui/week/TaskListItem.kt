@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.epoque.tandem.presentation.week.model.TaskUiModel
 import org.epoque.tandem.ui.week.components.AnimatedCheckbox
+import org.epoque.tandem.ui.week.components.GoalBadge
 
 /**
  * Individual task row in the Week View.
@@ -89,6 +90,17 @@ fun TaskListItem(
                 progressText = task.repeatProgressText,
                 modifier = Modifier.semantics {
                     contentDescription = "Progress: ${task.repeatProgressText}"
+                }
+            )
+        }
+
+        // Goal badge (if linked to a goal)
+        if (task.linkedGoalId != null && task.linkedGoalName != null && task.linkedGoalIcon != null) {
+            GoalBadge(
+                goalName = task.linkedGoalName,
+                goalIcon = task.linkedGoalIcon,
+                modifier = Modifier.semantics {
+                    contentDescription = "Linked to goal: ${task.linkedGoalName}"
                 }
             )
         }

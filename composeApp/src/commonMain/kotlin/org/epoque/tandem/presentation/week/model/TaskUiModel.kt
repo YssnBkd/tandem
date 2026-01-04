@@ -27,7 +27,12 @@ data class TaskUiModel(
     val statusDisplayText: String,       // "Completed", "In Progress"
     val createdByCurrentUser: Boolean,
     val rolledOver: Boolean,
-    val completedByName: String?         // For shared tasks
+    val completedByName: String?,        // For shared tasks
+
+    // Goal linking (Feature 007)
+    val linkedGoalId: String? = null,
+    val linkedGoalName: String? = null,
+    val linkedGoalIcon: String? = null
 ) {
     companion object {
         /**
@@ -36,11 +41,15 @@ data class TaskUiModel(
          * @param task Domain task entity
          * @param currentUserId Current user's ID for ownership checks
          * @param partnerName Partner's display name (for shared task completion)
+         * @param goalName Display name of linked goal (if any)
+         * @param goalIcon Emoji icon of linked goal (if any)
          */
         fun fromTask(
             task: Task,
             currentUserId: String,
-            partnerName: String? = null
+            partnerName: String? = null,
+            goalName: String? = null,
+            goalIcon: String? = null
         ): TaskUiModel {
             val isCompleted = task.status == TaskStatus.COMPLETED ||
                 (task.isRepeating && task.repeatCompleted >= (task.repeatTarget ?: 0))
@@ -74,7 +83,10 @@ data class TaskUiModel(
                 rolledOver = task.rolledFromWeekId != null,
                 completedByName = if (task.ownerType == OwnerType.SHARED && isCompleted) {
                     if (task.createdBy == currentUserId) "you" else partnerName
-                } else null
+                } else null,
+                linkedGoalId = task.linkedGoalId,
+                linkedGoalName = goalName,
+                linkedGoalIcon = goalIcon
             )
         }
     }

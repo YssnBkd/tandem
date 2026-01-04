@@ -26,6 +26,7 @@ sealed class WeekEvent {
     data object DetailSheetDismissed : WeekEvent()
     data class TaskTitleChanged(val title: String) : WeekEvent()
     data class TaskNotesChanged(val notes: String) : WeekEvent()
+    data class TaskGoalChanged(val goalId: String?) : WeekEvent()
     data object TaskSaveRequested : WeekEvent()
     data object TaskDeleteRequested : WeekEvent()
     data object TaskDeleteConfirmed : WeekEvent()

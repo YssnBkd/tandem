@@ -1,5 +1,6 @@
 package org.epoque.tandem.presentation.week
 
+import org.epoque.tandem.domain.model.Goal
 import org.epoque.tandem.presentation.week.model.Segment
 import org.epoque.tandem.presentation.week.model.TaskUiModel
 import org.epoque.tandem.presentation.week.model.WeekInfo
@@ -56,7 +57,10 @@ data class WeekUiState(
     // Review state
     val isReviewWindowOpen: Boolean = false,
     val isWeekReviewed: Boolean = false,
-    val currentStreak: Int = 0
+    val currentStreak: Int = 0,
+
+    // Goal linking (Feature 007)
+    val availableGoals: List<Goal> = emptyList()
 ) {
     /**
      * Whether the current segment allows task completion.
