@@ -49,7 +49,7 @@ Implement partner invitation, connection, and real-time synchronization between 
 ### Non-Negotiables Check
 
 - [x] NO tracking of partner's incomplete tasks - Only completed tasks shown in real-time
-- [~] NO notifications for partner's task completions (default off) - **VIOLATION DETECTED** (see Complexity Tracking)
+- [x] NO notifications for partner's task completions (default off) - FR-035/FR-036 updated to opt-in with default OFF
 - [x] NO assigning tasks without acceptance workflow - FR-025 requires explicit Accept/Decline
 - [x] NO shame language in UI copy - Positive framing throughout
 - [x] NO complex task hierarchies - Flat task model maintained
@@ -118,10 +118,10 @@ composeApp/src/androidMain/kotlin/org/epoque/tandem/
 
 | Violation | Why Needed | Resolution |
 |-----------|------------|------------|
-| FR-035: Push notification for task completions | Spec requests notifications for all partner actions | **MODIFIED**: Task completion notifications will be OFF by default (user can enable in settings). This aligns with constitution while preserving user choice. |
-| FR-036: Push notification for task edits | Same as above | **MODIFIED**: Task edit notifications will be OFF by default. |
+| ~~FR-035: Push notification for task completions~~ | ~~Spec requests notifications for all partner actions~~ | **RESOLVED**: spec.md updated - FR-035 now reads "opt-in (default OFF)" |
+| ~~FR-036: Push notification for task edits~~ | ~~Same as above~~ | **RESOLVED**: spec.md updated - FR-036 now reads "opt-in (default OFF)" |
 
-**Resolution Applied**: Update FR-035 and FR-036 to specify "opt-in" behavior with default OFF, satisfying the constitution's "default off" requirement while still providing the capability for users who want it.
+**Status**: All constitution violations resolved. Spec aligned with constitution.
 
 ## Integration Points
 

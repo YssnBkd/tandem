@@ -134,8 +134,7 @@ As a connected user, I see my partner's task completions and updates appear in r
 - **FR-002**: System MUST format invite links as `tandem.app/invite/[code]`
 - **FR-003**: System MUST open the native share sheet with the invite link when sharing
 - **FR-004**: System MUST expire invite codes after 7 days from creation
-- **FR-005**: System MUST allow only one active invite per user at a time
-- **FR-006**: System MUST invalidate previous invite when a new one is generated
+- **FR-005**: System MUST allow only one active invite per user at a time (return existing if present)
 
 #### Connection
 
@@ -147,7 +146,7 @@ As a connected user, I see my partner's task completions and updates appear in r
 - **FR-012**: System MUST mark invite as accepted after successful connection
 - **FR-013**: System MUST support Universal Links (iOS) and App Links (Android) for invite URLs
 - **FR-014**: System MUST open invite directly in app when app is installed
-- **FR-015**: System MUST fall back to web landing page when app is not installed
+- **FR-015**: System MUST fall back to web landing page when app is not installed *(Deployment scope - see deployment-notes.md)*
 
 #### Partnership Management
 
@@ -179,8 +178,8 @@ As a connected user, I see my partner's task completions and updates appear in r
 - **FR-032**: System MUST send push notification when partner accepts invite
 - **FR-033**: System MUST send push notification when partner sends a task request
 - **FR-034**: System MUST send push notification when partner accepts or declines a task request
-- **FR-035**: System MUST send push notification when partner completes a task
-- **FR-036**: System MUST send push notification when partner edits a task
+- **FR-035**: System MUST support opt-in push notification (default OFF) when partner completes a task
+- **FR-036**: System MUST support opt-in push notification (default OFF) when partner edits a task
 - **FR-037**: System MUST send push notification when partner disconnects
 
 ### Key Entities
@@ -199,7 +198,7 @@ As a connected user, I see my partner's task completions and updates appear in r
 - **SC-004**: Real-time task updates sync between partners within 2 seconds when both are online
 - **SC-005**: Offline changes sync within 10 seconds of reconnection
 - **SC-006**: 95% of users complete the partner connection flow on first attempt
-- **SC-007**: System supports 100,000 active partnerships without degradation
+- **SC-007**: System supports 100,000 active partnerships without degradation (p95 latency <500ms, error rate <0.1%)
 
 ## Clarifications
 
