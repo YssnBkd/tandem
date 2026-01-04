@@ -86,7 +86,14 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 - [ ] T020 [P] [US1] Create GoalsUiState data class (myGoals, partnerGoals, isViewingPartnerGoal) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsUiState.kt`
 - [ ] T021 [P] [US1] Create GoalsEvent sealed interface in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsEvent.kt`
 - [ ] T022 [P] [US1] Create GoalsSideEffect sealed interface in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsSideEffect.kt`
-- [ ] T023 [US1] Create GoalsViewModel with CRITICAL init sequence (wait for auth, observe own goals, check partner, observe partner goals) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
+- [ ] T023 [US1] Create GoalsViewModel in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
+  - **CRITICAL Init Sequence** (see plan.md "Initialization Sequence"):
+    1. Import `kotlinx.coroutines.flow.filterIsInstance` and `kotlinx.coroutines.flow.first`
+    2. Wait for auth: `val userId = authRepository.authState.filterIsInstance<AuthState.Authenticated>().first().user.id`
+    3. Launch coroutine to observe own goals: `goalRepository.observeMyGoals(userId).collect { ... }`
+    4. Launch coroutine to observe partner: `partnerRepository.observePartner(userId).collect { partner -> ... }`
+    5. Inside partner collector: if partner != null, observe `goalRepository.observePartnerGoals(partner.id)`
+    6. End init block with: `_uiState.update { it.copy(isLoading = false) }`
 
 ### UI Components for US1
 
@@ -121,10 +128,10 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### UI Components for US2
 
-- [ ] T034 [P] [US2] Create EmojiPicker composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/EmojiPicker.kt`
-- [ ] T035 [P] [US2] Create GoalTypeSelector composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalTypeSelector.kt`
-- [ ] T036 [P] [US2] Create DurationSelector composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/DurationSelector.kt`
-- [ ] T037 [US2] Create AddGoalSheet composable (name, icon picker, type, duration - no shared toggle) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/AddGoalSheet.kt`
+- [ ] T034 [P] [US2] Create EmojiPicker composable (48dp touch targets for emoji buttons) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/EmojiPicker.kt`
+- [ ] T035 [P] [US2] Create GoalTypeSelector composable (48dp touch targets for type options) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalTypeSelector.kt`
+- [ ] T036 [P] [US2] Create DurationSelector composable (48dp touch targets for duration options) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/DurationSelector.kt`
+- [ ] T037 [US2] Create AddGoalSheet composable (name, icon picker, type, duration - 48dp touch targets for Save/Cancel buttons) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/AddGoalSheet.kt`
 
 ### ViewModel Updates for US2
 
@@ -188,7 +195,7 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### Task Integration for US4
 
-- [ ] T054 [US4] Create GoalPicker composable (shows only user's own active goals) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalPicker.kt`
+- [ ] T054 [US4] Create GoalPicker composable (shows only user's own active goals, 48dp touch targets for goal options) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalPicker.kt`
 - [ ] T055 [US4] Update TaskDetailSheet to include GoalPicker in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskDetailSheet.kt`
 - [ ] T056 [US4] Create GoalBadge composable for task cards in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/components/GoalBadge.kt`
 - [ ] T057 [US4] Update TaskListItem to display GoalBadge when linkedGoalId exists in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskListItem.kt`
@@ -213,17 +220,17 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 **Independent Test**: Tap goal card -> Verify detail screen shows all info -> Verify progress history displays
 
+### Repository Updates for US5 (Query First)
+
+- [ ] T062 [US5] Add getTasksByLinkedGoalId query to Task.sq in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/Task.sq` (MUST be first - T063-T064 depend on this)
+- [ ] T063 [US5] Add observeLinkedTasks method to TaskRepository in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/TaskRepository.kt` (depends on T062)
+- [ ] T064 [US5] Implement observeLinkedTasks in TaskRepositoryImpl in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/TaskRepositoryImpl.kt` (depends on T062)
+
 ### UI Components for US5
 
-- [ ] T062 [P] [US5] Create ProgressHistoryChart composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/ProgressHistoryChart.kt`
-- [ ] T063 [P] [US5] Create LinkedTasksList composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/LinkedTasksList.kt`
-- [ ] T064 [US5] Create GoalDetailScreen composable (with canEdit flag for own vs partner goals) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalDetailScreen.kt`
-
-### Repository Updates for US5
-
-- [ ] T065 [US5] Add observeLinkedTasks method to TaskRepository in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/TaskRepository.kt`
-- [ ] T066 [US5] Implement observeLinkedTasks in TaskRepositoryImpl in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/TaskRepositoryImpl.kt`
-- [ ] T067 [US5] Add getTasksByLinkedGoalId query to Task.sq in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/Task.sq`
+- [ ] T065 [P] [US5] Create ProgressHistoryChart composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/ProgressHistoryChart.kt`
+- [ ] T066 [P] [US5] Create LinkedTasksList composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/LinkedTasksList.kt` (depends on T063-T064)
+- [ ] T067 [US5] Create GoalDetailScreen composable (with canEdit flag for own vs partner goals) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalDetailScreen.kt`
 
 ### ViewModel Updates for US5
 
@@ -240,6 +247,8 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 - [ ] T073 [US5] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
 - [ ] T074 [US5] Manual test: Tap own goal -> Verify detail screen with history and linked tasks. Tap partner goal -> Verify read-only view.
+
+**Note**: Task numbers T062-T067 were reordered from original to ensure query (T062) is created before repository methods (T063-T064) that depend on it.
 
 **Checkpoint**: User Story 5 complete - Goal detail view with history working (edit controls hidden for partner goals)
 
@@ -317,7 +326,7 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 ### Partner Goal Visibility Sync
 
 - [ ] T093 Implement syncPartnerGoals in GoalRepositoryImpl (fetch partner goals from Supabase to PartnerGoal table) in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/GoalRepositoryImpl.kt`
-- [ ] T094 Add partner goal sync to GoalsViewModel when partner changes in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
+- [ ] T094 Add partner goal sync to GoalsViewModel when partner changes (pass userId to `partnerRepository.observePartner(userId)`) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
 - [ ] T095 Create Supabase goals table migration (for partner goal visibility sync) in `supabase/migrations/`
 - [ ] T096 Setup Supabase Realtime subscription for partner goal changes in GoalsViewModel
 
@@ -333,6 +342,9 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 - [ ] T101 E2E Test: Create goal -> Appears in list with progress display
 - [ ] T102 E2E Test: Link task to goal -> Complete task -> Verify progress updates
 - [ ] T103 E2E Test: Partner creates goal -> Verify visible in "Partner's" segment (requires two test accounts)
+- [ ] T104 E2E Test: Attempt to create 11th active goal -> Verify limit error message shown
+- [ ] T105 E2E Test: Delete goal with linked tasks -> Verify tasks remain but lose goal badge (linkedGoalId cleared)
+- [ ] T106 E2E Test: Wait for goal duration to end -> Verify COMPLETED/EXPIRED status transition
 
 ---
 
