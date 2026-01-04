@@ -33,9 +33,14 @@ kotlin {
             // Supabase (use project.dependencies.platform for KT-58759 workaround)
             implementation(project.dependencies.platform(libs.supabase.bom))
             implementation(libs.supabase.auth)
+            implementation(libs.supabase.postgrest)
+            implementation(libs.supabase.realtime)
             implementation(libs.supabase.compose.auth)
             implementation(libs.supabase.compose.auth.ui)
             implementation(libs.ktor.client.android)
+
+            // SQLDelight (for repository implementations)
+            implementation(libs.sqldelight.coroutines)
 
             // Koin
             implementation(libs.koin.android)
