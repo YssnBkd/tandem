@@ -138,6 +138,12 @@ As a user, during week planning I see task suggestions based on my active goals 
 - What if a task linked to a goal is deleted?
   - Goal progress from that task's previous completions is preserved
   - Task deletion does not retroactively adjust goal progress
+- What happens when both partners edit a shared goal simultaneously?
+  - Last-write-wins: most recent save overwrites previous changes
+  - No merge conflict resolution or locking mechanism required
+- What happens when a user tries to create a goal but has 10 active goals?
+  - System prevents creation and displays message indicating the limit
+  - User must complete or delete an existing goal before creating a new one
 
 ## Requirements *(mandatory)*
 
@@ -150,6 +156,7 @@ As a user, during week planning I see task suggestions based on my active goals 
 - **FR-004**: System MUST allow goals to be marked as shared with a partner
 - **FR-005**: System MUST allow users to edit goal properties after creation
 - **FR-006**: System MUST allow users to delete goals with confirmation
+- **FR-006a**: System MUST limit users to a maximum of 10 active goals (completed/expired goals do not count toward this limit)
 
 **Goal Display**
 - **FR-007**: System MUST display goals in a dedicated Goals tab
@@ -207,6 +214,13 @@ As a user, during week planning I see task suggestions based on my active goals 
 - **SC-005**: Week-by-week progress history is accurately preserved for all active goals
 - **SC-006**: Shared goals are visible to both partners within 5 seconds of creation
 - **SC-007**: Goal-based suggestions appear in week planning view for users with active goals
+
+## Clarifications
+
+### Session 2026-01-04
+
+- Q: When both partners edit a shared goal, what happens with conflicting edits? → A: Last-write-wins; most recent save overwrites previous changes
+- Q: Should the system limit how many active goals a user can have? → A: Limit 10 active goals per user (completed goals don't count toward limit)
 
 ## Assumptions
 
