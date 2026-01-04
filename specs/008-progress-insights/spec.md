@@ -92,7 +92,7 @@ As a user, I want to tap a past week to see the full review details so that I ca
 
 - **FR-001**: System MUST calculate streak as consecutive weeks where both partners completed their weekly review.
 - **FR-002**: System MUST reset streak to 0 when either partner misses a weekly review (a week is missed if not completed before Monday 12:00 AM user's timezone).
-- **FR-003**: System MUST display milestone celebrations at streak counts of 5, 10, 20, and 50 weeks (shown once on first view after reaching milestone, auto-dismiss after a few seconds).
+- **FR-003**: System MUST display milestone celebrations at streak counts of 5, 10, 20, and 50 weeks (shown once on first view after reaching milestone, auto-dismiss after 3 seconds).
 - **FR-004**: System MUST query and display completion data for the past 8 weeks for trend visualization.
 - **FR-005**: System MUST calculate completion percentage per week as (completed tasks / total tasks) * 100.
 - **FR-006**: System MUST display completion comparison as horizontal bars with percentage labels for current month.
@@ -100,7 +100,7 @@ As a user, I want to tap a past week to see the full review details so that I ca
 - **FR-008**: System MUST display summary stats for each past week: date range, completion counts, and mood emojis.
 - **FR-009**: System MUST provide navigation from past week list item to detail view.
 - **FR-010**: System MUST display past week detail with side-by-side partner summaries, review notes, and task outcomes.
-- **FR-011**: System MUST persist streak data locally and sync when online.
+- **FR-011**: System MUST compute streak from locally persisted Week data (streak is derived, not stored separately); milestone celebration state MUST be persisted in DataStore.
 - **FR-012**: System MUST handle solo users (no partner) by showing individual streak and trends only.
 
 ### Key Entities
@@ -115,13 +115,33 @@ As a user, I want to tap a past week to see the full review details so that I ca
 ### Measurable Outcomes
 
 - **SC-001**: Users can view their current streak within 2 seconds of opening the Progress tab.
-- **SC-002**: Streak calculation is accurate to within 1 week of actual consecutive review history.
+- **SC-002**: Streak calculation MUST be exact for all completed weeks in local database (no tolerance for inaccuracy).
 - **SC-003**: Trend chart displays 8 weeks of data clearly readable on mobile screens.
 - **SC-004**: Past weeks list loads initial 10 items within 1 second.
 - **SC-005**: Users can load additional past weeks within 2 seconds per batch.
 - **SC-006**: 90% of users can successfully navigate to and understand their streak count on first visit.
 - **SC-007**: Past week detail view displays complete information within 1 second of tap.
 - **SC-008**: Progress tab functions with cached data when offline (read-only mode).
+
+## Integration Points
+
+| Method | Source | When Called | Preconditions |
+|--------|--------|-------------|---------------|
+| `authRepository.authState.filterIsInstance<AuthState.Authenticated>().first()` | Feature 001 | ViewModel init | User signed in |
+| `partnerRepository.getPartner(userId)` | Feature 006 | After auth | Partnership may not exist |
+| `weekRepository.getReviewedWeeks(userId)` | Feature 005 | Streak calculation | Week data exists |
+| `taskRepository.getTasksForWeek(weekId, userId)` | Feature 002 | Completion stats | Tasks exist |
+| `progressPreferences.lastCelebratedMilestone` | New (T008) | Milestone check | DataStore initialized |
+| `progressPreferences.setLastCelebratedMilestone()` | New (T008) | After celebration | DataStore initialized |
+
+## UI Affordance Requirements
+
+| Action | Component | Touch Target | Content Description |
+|--------|-----------|--------------|---------------------|
+| Navigate to week detail | PastWeekItem | ≥48dp height | "Week of {dateRange}" |
+| Dismiss milestone | MilestoneCelebration | ≥48dp IconButton | "Dismiss milestone celebration" |
+| Retry after error | ProgressErrorState | ≥48dp Button | "Retry loading" |
+| Navigate back from detail | PastWeekDetailScreen TopAppBar | ≥48dp | "Navigate back" |
 
 ## Assumptions
 

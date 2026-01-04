@@ -151,4 +151,4 @@ After completing Phase 1 design artifacts (research.md, data-model.md, contracts
 | Data Model | `specs/008-progress-insights/data-model.md` | ✅ Complete |
 | Contracts | `specs/008-progress-insights/contracts/` | ✅ Complete |
 | Quickstart | `specs/008-progress-insights/quickstart.md` | ✅ Complete |
-| Tasks | `specs/008-progress-insights/tasks.md` | ⏳ Pending `/speckit.tasks` |
+| Tasks | `specs/008-progress-insights/tasks.md` | ✅ Complete |
