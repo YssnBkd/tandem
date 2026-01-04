@@ -73,6 +73,8 @@ As a connected user, I can request my partner to do a task, which appears in the
 2. **Given** I am in the request modal, **When** I enter a task title and tap "Send Request", **Then** the task is created and assigned to my partner as pending acceptance
 3. **Given** I am a partner receiving a request, **When** I view my task list, **Then** I see the requested task marked as pending my acceptance
 4. **Given** I submit a request without a title, **When** I tap "Send Request", **Then** the system shows a validation error requiring a title
+5. **Given** I have a pending task request, **When** I tap "Accept", **Then** the task becomes a normal task in my list
+6. **Given** I have a pending task request, **When** I tap "Decline", **Then** the request is removed from my list and the requester is notified
 
 ---
 
@@ -143,28 +145,43 @@ As a connected user, I see my partner's task completions and updates appear in r
 - **FR-010**: System MUST automatically link accounts after both users are authenticated
 - **FR-011**: System MUST show inviter's name and task preview on the landing page
 - **FR-012**: System MUST mark invite as accepted after successful connection
+- **FR-013**: System MUST support Universal Links (iOS) and App Links (Android) for invite URLs
+- **FR-014**: System MUST open invite directly in app when app is installed
+- **FR-015**: System MUST fall back to web landing page when app is not installed
 
 #### Partnership Management
 
-- **FR-013**: System MUST display partner's name and connection status in settings
-- **FR-014**: System MUST require confirmation before disconnecting from partner
-- **FR-015**: System MUST dissolve partnership for both users when either disconnects
-- **FR-016**: System MUST prevent new partner invites while already connected
+- **FR-016**: System MUST display partner's name and connection status in settings
+- **FR-017**: System MUST require confirmation before disconnecting from partner
+- **FR-018**: System MUST dissolve partnership for both users when either disconnects
+- **FR-019**: System MUST prevent new partner invites while already connected
 
 #### Task Requests
 
-- **FR-017**: System MUST allow connected users to request tasks from their partner
-- **FR-018**: System MUST create requested tasks with a "pending acceptance" status
-- **FR-019**: System MUST assign the requested task to the partner as owner
-- **FR-020**: System MUST record the requester as the task creator
-- **FR-021**: System MUST support optional notes on task requests
+- **FR-020**: System MUST allow connected users to request tasks from their partner
+- **FR-021**: System MUST create requested tasks with a "pending acceptance" status
+- **FR-022**: System MUST assign the requested task to the partner as owner
+- **FR-023**: System MUST record the requester as the task creator
+- **FR-024**: System MUST support optional notes on task requests
+- **FR-025**: System MUST allow partner to explicitly Accept or Decline pending task requests
+- **FR-026**: System MUST change accepted requests to normal task status
+- **FR-027**: System MUST remove declined requests from both users' views
 
 #### Real-time Synchronization
 
-- **FR-022**: System MUST sync task changes between partners in real-time
-- **FR-023**: System MUST reflect task completions within 2 seconds when online
-- **FR-024**: System MUST queue changes made offline for sync when reconnected
-- **FR-025**: System MUST resolve sync conflicts using last-write-wins strategy
+- **FR-028**: System MUST sync task changes between partners in real-time
+- **FR-029**: System MUST reflect task completions within 2 seconds when online
+- **FR-030**: System MUST queue changes made offline for sync when reconnected
+- **FR-031**: System MUST resolve sync conflicts using last-write-wins strategy
+
+#### Push Notifications
+
+- **FR-032**: System MUST send push notification when partner accepts invite
+- **FR-033**: System MUST send push notification when partner sends a task request
+- **FR-034**: System MUST send push notification when partner accepts or declines a task request
+- **FR-035**: System MUST send push notification when partner completes a task
+- **FR-036**: System MUST send push notification when partner edits a task
+- **FR-037**: System MUST send push notification when partner disconnects
 
 ### Key Entities
 
@@ -183,6 +200,14 @@ As a connected user, I see my partner's task completions and updates appear in r
 - **SC-005**: Offline changes sync within 10 seconds of reconnection
 - **SC-006**: 95% of users complete the partner connection flow on first attempt
 - **SC-007**: System supports 100,000 active partnerships without degradation
+
+## Clarifications
+
+### Session 2026-01-04
+
+- Q: What happens after a partner sees a task request with PENDING_ACCEPTANCE status? → A: Partner must explicitly Accept or Decline; declined requests are removed
+- Q: How does the app handle invite links (tandem.app/invite/[code])? → A: Universal Links (iOS) / App Links (Android) - opens app if installed, web fallback otherwise
+- Q: How are users notified of partner actions when not actively viewing the app? → A: Push notifications for all partner actions (completions, edits, requests, etc.)
 
 ## Assumptions
 
