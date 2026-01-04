@@ -1,0 +1,41 @@
+import kotlinx.datetime.Instant;
+import org.epoque.tandem.domain.model.InviteStatus;
+
+CREATE TABLE Invite (
+    code TEXT NOT NULL PRIMARY KEY,
+    creator_id TEXT NOT NULL,
+    created_at INTEGER AS Instant NOT NULL,
+    expires_at INTEGER AS Instant NOT NULL,
+    accepted_by TEXT,
+    accepted_at INTEGER AS Instant,
+    status TEXT AS InviteStatus NOT NULL DEFAULT 'PENDING'
+);
+
+CREATE INDEX idx_invite_creator ON Invite(creator_id);
+CREATE INDEX idx_invite_status ON Invite(status);
+
+-- Insert or replace an invite
+upsertInvite:
+INSERT OR REPLACE INTO Invite (code, creator_id, created_at, expires_at, accepted_by, accepted_at, status)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+-- Get pending invite by creator
+getPendingInviteByCreator:
+SELECT * FROM Invite
+WHERE creator_id = ? AND status = 'PENDING';
+
+-- Get invite by code
+getInviteByCode:
+SELECT * FROM Invite WHERE code = ?;
+
+-- Update invite status
+updateInviteStatus:
+UPDATE Invite SET status = ?, accepted_by = ?, accepted_at = ? WHERE code = ?;
+
+-- Delete invite
+deleteInvite:
+DELETE FROM Invite WHERE code = ?;
+
+-- Delete all invites for creator
+deleteInvitesByCreator:
+DELETE FROM Invite WHERE creator_id = ?;

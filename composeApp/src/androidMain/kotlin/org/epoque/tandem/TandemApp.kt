@@ -3,6 +3,7 @@ package org.epoque.tandem
 import android.app.Application
 import org.epoque.tandem.di.appModule
 import org.epoque.tandem.di.authModule
+import org.epoque.tandem.di.partnerModule
 import org.epoque.tandem.di.planningModule
 import org.epoque.tandem.di.reviewModule
 import org.epoque.tandem.di.taskModule
@@ -31,7 +32,8 @@ class TandemApp : Application() {
                 taskModule,
                 weekModule,
                 planningModule,
-                reviewModule
+                reviewModule,
+                partnerModule
             )
         }
     }

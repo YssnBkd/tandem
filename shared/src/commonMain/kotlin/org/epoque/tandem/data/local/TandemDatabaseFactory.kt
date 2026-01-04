@@ -23,6 +23,16 @@ object TandemDatabaseFactory {
                 end_dateAdapter = localDateAdapter,
                 reviewed_atAdapter = instantAdapter,
                 planning_completed_atAdapter = instantAdapter
+            ),
+            InviteAdapter = Invite.Adapter(
+                created_atAdapter = instantAdapter,
+                expires_atAdapter = instantAdapter,
+                accepted_atAdapter = instantAdapter,
+                statusAdapter = EnumColumnAdapter()
+            ),
+            PartnershipAdapter = Partnership.Adapter(
+                created_atAdapter = instantAdapter,
+                statusAdapter = EnumColumnAdapter()
             )
         )
     }

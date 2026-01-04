@@ -6,6 +6,8 @@ import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.composeAuth
 import io.github.jan.supabase.compose.auth.googleNativeLogin
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.realtime.Realtime
 import org.epoque.tandem.BuildConfig
 import org.koin.dsl.module
 
@@ -25,6 +27,8 @@ val appModule = module {
             install(ComposeAuth) {
                 googleNativeLogin(serverClientId = BuildConfig.GOOGLE_WEB_CLIENT_ID)
             }
+            install(Postgrest)
+            install(Realtime)
         }
     }
 

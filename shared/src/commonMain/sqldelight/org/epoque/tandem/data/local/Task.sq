@@ -12,6 +12,7 @@ CREATE TABLE Task (
     week_id TEXT NOT NULL,
     status TEXT AS TaskStatus NOT NULL,
     created_by TEXT NOT NULL,
+    request_note TEXT,
     repeat_target INTEGER,
     repeat_completed INTEGER NOT NULL DEFAULT 0,
     linked_goal_id TEXT,
@@ -29,10 +30,10 @@ CREATE INDEX task_owner_type ON Task(owner_type);
 -- Insert or replace a task
 upsertTask:
 INSERT OR REPLACE INTO Task (
-    id, title, notes, owner_id, owner_type, week_id, status, created_by,
+    id, title, notes, owner_id, owner_type, week_id, status, created_by, request_note,
     repeat_target, repeat_completed, linked_goal_id, review_note, rolled_from_week_id,
     created_at, updated_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- Get all tasks
 getAllTasks:

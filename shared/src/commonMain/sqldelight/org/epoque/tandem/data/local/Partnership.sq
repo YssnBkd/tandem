@@ -1,0 +1,37 @@
+import kotlinx.datetime.Instant;
+import org.epoque.tandem.domain.model.PartnershipStatus;
+
+CREATE TABLE Partnership (
+    id TEXT NOT NULL PRIMARY KEY,
+    user1_id TEXT NOT NULL,
+    user2_id TEXT NOT NULL,
+    created_at INTEGER AS Instant NOT NULL,
+    status TEXT AS PartnershipStatus NOT NULL DEFAULT 'ACTIVE',
+    CONSTRAINT chk_user_order CHECK (user1_id < user2_id)
+);
+
+CREATE UNIQUE INDEX idx_partnership_users ON Partnership(user1_id, user2_id);
+CREATE INDEX idx_partnership_user1 ON Partnership(user1_id);
+CREATE INDEX idx_partnership_user2 ON Partnership(user2_id);
+
+-- Insert or replace a partnership
+upsertPartnership:
+INSERT OR REPLACE INTO Partnership (id, user1_id, user2_id, created_at, status)
+VALUES (?, ?, ?, ?, ?);
+
+-- Get active partnership for user
+getActivePartnership:
+SELECT * FROM Partnership
+WHERE (user1_id = ? OR user2_id = ?) AND status = 'ACTIVE';
+
+-- Get partnership by ID
+getPartnershipById:
+SELECT * FROM Partnership WHERE id = ?;
+
+-- Update partnership status
+updatePartnershipStatus:
+UPDATE Partnership SET status = ? WHERE id = ?;
+
+-- Delete partnership
+deletePartnership:
+DELETE FROM Partnership WHERE id = ?;

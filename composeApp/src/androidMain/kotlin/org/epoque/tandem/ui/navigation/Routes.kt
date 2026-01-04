@@ -82,4 +82,25 @@ sealed interface Routes {
         @Serializable
         data object Summary : Review
     }
+
+    /**
+     * Partner system routes.
+     */
+    sealed interface Partner : Routes {
+        /** Invite partner screen */
+        @Serializable
+        data object Invite : Partner
+
+        /** Accept invite screen (from deep link) */
+        @Serializable
+        data class AcceptInvite(val code: String) : Partner
+
+        /** Connection confirmation screen */
+        @Serializable
+        data object Confirmation : Partner
+
+        /** Partner settings screen */
+        @Serializable
+        data object Settings : Partner
+    }
 }
