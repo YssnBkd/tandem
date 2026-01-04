@@ -78,6 +78,7 @@ fun getWeekId(date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefau
 - `linkedGoalId` field already exists in Task model (Feature 002)
 - Completing a linked task automatically increments goal progress
 - No additional database schema changes needed
+- Tasks can only link to user's own goals (not partner's goals)
 
 **Alternatives Considered**:
 - Separate linking table: Over-engineering for 1:N relationship
@@ -95,10 +96,10 @@ suspend fun completeTask(taskId: String) {
     }
 }
 
-// In AddGoalSheet - goal picker for task editing
+// In AddGoalSheet - goal picker for task editing (own goals only)
 @Composable
 fun GoalPicker(
-    goals: List<Goal>,
+    goals: List<Goal>, // User's own active goals only
     selectedGoalId: String?,
     onGoalSelected: (String?) -> Unit
 )
@@ -106,37 +107,38 @@ fun GoalPicker(
 
 ---
 
-### 4. Shared Goals Synchronization
+### 4. Partner Goal Visibility
 
-**Decision**: Leverage existing Partner System (Feature 006) real-time infrastructure
+**Decision**: Leverage existing Partner System (Feature 006) infrastructure for read-only partner goal viewing
 
 **Rationale**:
-- Supabase Realtime already set up for partner task sync
+- Each user owns their goals exclusively
+- Partners can VIEW each other's goals (read-only)
+- No editing, deleting, or linking tasks to partner's goals
+- Supabase Realtime already set up for partner data sync
 - Goals can use same channel pattern with `goals` table filter
-- Consistent architecture with Feature 006
 
-**Alternatives Considered**:
-- Separate sync mechanism: Duplicates infrastructure
-- Polling: Doesn't meet <5s sync requirement
+**Key Points**:
+- Segment control: "Yours" (own goals) / "Partner's" (partner's goals, read-only)
+- Partner goals cached locally in `PartnerGoal` table
+- Real-time updates when partner modifies their goals
+- "Last synced" indicator when offline
 
 **Implementation Pattern**:
 ```kotlin
-// Extend existing partner sync to include goals
-private fun setupRealtimeSync(partnerId: String) {
-    // Existing task sync...
-
-    // Add goal sync channel
+// Subscribe to partner's goal changes for read-only visibility
+private fun setupPartnerGoalsSync(partnerId: String) {
     val goalChannel = supabase.channel("partner-goals-$partnerId")
     val goalChanges = goalChannel.postgresChangeFlow<PostgresAction>(schema = "public") {
         table = "goals"
-        filter = "is_shared=eq.true"
+        filter = "owner_id=eq.$partnerId"
     }
 
     goalChanges.onEach { action ->
         when (action) {
-            is PostgresAction.Insert -> handleGoalCreated(action.record)
-            is PostgresAction.Update -> handleGoalUpdated(action.record)
-            is PostgresAction.Delete -> handleGoalDeleted(action.oldRecord)
+            is PostgresAction.Insert -> cachePartnerGoal(action.record)
+            is PostgresAction.Update -> updatePartnerGoalCache(action.record)
+            is PostgresAction.Delete -> removeFromPartnerGoalCache(action.oldRecord)
         }
     }.launchIn(viewModelScope)
 }
@@ -164,6 +166,7 @@ CREATE TABLE Goal (
     id TEXT PRIMARY KEY,
     current_progress INTEGER NOT NULL DEFAULT 0,
     current_week_id TEXT NOT NULL,
+    owner_id TEXT NOT NULL,
     -- ... other fields
 );
 
@@ -177,6 +180,14 @@ CREATE TABLE GoalProgress (
     created_at INTEGER NOT NULL,
     UNIQUE(goal_id, week_id)
 );
+
+-- PartnerGoal caches partner's goals locally (read-only)
+CREATE TABLE PartnerGoal (
+    id TEXT PRIMARY KEY,
+    owner_id TEXT NOT NULL, -- Partner's ID
+    synced_at INTEGER NOT NULL,
+    -- Same fields as Goal
+);
 ```
 
 ---
@@ -188,14 +199,14 @@ CREATE TABLE GoalProgress (
 **Rationale**:
 - Spec clarification (Session 2026-01-04): Limit to 10 active goals
 - Active goals = not completed or expired
+- Limit applies only to user's own goals (not counting partner's goals)
 - Client-side check before creation dialog
 
 **Implementation**:
 ```kotlin
 // In GoalsViewModel
 fun onAddGoalTapped() {
-    val activeCount = _uiState.value.personalGoals.count { it.isActive } +
-                     _uiState.value.sharedGoals.count { it.isActive }
+    val activeCount = _uiState.value.myGoals.count { it.isActive }
 
     if (activeCount >= 10) {
         viewModelScope.launch {
@@ -262,10 +273,10 @@ fun checkGoalExpiration(goal: Goal): GoalStatus {
 |------|----------|-------------|
 | Goal Types | Three types (Weekly Habit, Recurring Task, Target Amount) | Cover common use cases with simple model |
 | Week Calculation | ISO 8601 with kotlinx.datetime | Consistent with existing Features 002-006 |
-| Task Linking | Use existing `linkedGoalId` field | No schema changes, automatic progress |
-| Shared Goals | Leverage Feature 006 Supabase Realtime | Consistent architecture, <5s sync |
+| Task Linking | Use existing `linkedGoalId` field (own goals only) | No schema changes, automatic progress |
+| Partner Visibility | View-only access to partner goals via Supabase sync | Awareness without control; respects autonomy |
 | Progress Storage | Current in Goal, history in GoalProgress | Fast reads + historical tracking |
-| Goal Limit | 10 active goals per user | Spec requirement, client-side validation |
+| Goal Limit | 10 active goals per user (own goals only) | Spec requirement, client-side validation |
 | Expiration | COMPLETED/EXPIRED based on target | Positive framing (no "Failed") |
 
 ## Dependencies
@@ -278,9 +289,9 @@ io.github.jan-tennert.supabase:realtime-kt
 
 ## Database Schema Changes
 
-1. **New Tables**: `Goal`, `GoalProgress`
+1. **New Tables**: `Goal`, `GoalProgress`, `PartnerGoal` (local cache)
 2. **No Modified Tables**: `Task.linkedGoalId` already exists
-3. **New Indexes**: For goal lookup by `owner_id`, `is_shared`, `status`
+3. **New Indexes**: For goal lookup by `owner_id`, `status`
 
 ## Next Steps
 

@@ -22,7 +22,6 @@ CREATE TABLE Goal (
     duration_weeks INTEGER,
     start_week_id TEXT NOT NULL,
     owner_id TEXT NOT NULL,
-    is_shared INTEGER NOT NULL DEFAULT 0,
     current_progress INTEGER NOT NULL DEFAULT 0,
     current_week_id TEXT NOT NULL,
     status TEXT AS GoalStatus NOT NULL DEFAULT 'ACTIVE',
@@ -32,27 +31,25 @@ CREATE TABLE Goal (
 
 CREATE INDEX idx_goals_owner ON Goal(owner_id);
 CREATE INDEX idx_goals_status ON Goal(status);
-CREATE INDEX idx_goals_shared ON Goal(is_shared) WHERE is_shared = 1;
 
 -- Insert or replace a goal
 upsertGoal:
 INSERT OR REPLACE INTO Goal (
     id, name, icon, type, target_per_week, target_total, duration_weeks,
-    start_week_id, owner_id, is_shared, current_progress, current_week_id,
+    start_week_id, owner_id, current_progress, current_week_id,
     status, created_at, updated_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
--- Get all goals for user (personal + shared where partner)
-getAllGoalsForUser:
+-- Get all goals owned by user
+getMyGoals:
 SELECT * FROM Goal
 WHERE owner_id = :userId
-   OR (is_shared = 1 AND owner_id = :partnerId)
 ORDER BY created_at DESC;
 
--- Get active goals for user
-getActiveGoalsForUser:
+-- Get active goals owned by user
+getMyActiveGoals:
 SELECT * FROM Goal
-WHERE (owner_id = :userId OR (is_shared = 1 AND owner_id = :partnerId))
+WHERE owner_id = :userId
   AND status = 'ACTIVE'
 ORDER BY created_at DESC;
 
@@ -63,13 +60,6 @@ SELECT * FROM Goal WHERE id = ?;
 -- Get goals by owner
 getGoalsByOwner:
 SELECT * FROM Goal WHERE owner_id = ? ORDER BY created_at DESC;
-
--- Get shared goals (visible to both partners)
-getSharedGoals:
-SELECT * FROM Goal
-WHERE is_shared = 1
-  AND (owner_id = :userId OR owner_id = :partnerId)
-ORDER BY created_at DESC;
 
 -- Count active goals for user (for limit check)
 countActiveGoalsForUser:
@@ -167,6 +157,74 @@ DELETE FROM GoalProgress WHERE goal_id = ?;
 
 ---
 
+### PartnerGoal.sq (Local cache for partner's goals)
+
+```sql
+import kotlinx.datetime.Instant;
+import org.epoque.tandem.domain.model.GoalType;
+import org.epoque.tandem.domain.model.GoalStatus;
+
+-- Separate table for caching partner's goals (read-only local copy)
+CREATE TABLE PartnerGoal (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    icon TEXT NOT NULL,
+    type TEXT AS GoalType NOT NULL,
+    target_per_week INTEGER,
+    target_total INTEGER,
+    duration_weeks INTEGER,
+    start_week_id TEXT NOT NULL,
+    owner_id TEXT NOT NULL,
+    current_progress INTEGER NOT NULL DEFAULT 0,
+    current_week_id TEXT NOT NULL,
+    status TEXT AS GoalStatus NOT NULL DEFAULT 'ACTIVE',
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL,
+    synced_at INTEGER AS Instant NOT NULL
+);
+
+CREATE INDEX idx_partner_goals_owner ON PartnerGoal(owner_id);
+
+-- Insert or replace partner goal (from sync)
+upsertPartnerGoal:
+INSERT OR REPLACE INTO PartnerGoal (
+    id, name, icon, type, target_per_week, target_total, duration_weeks,
+    start_week_id, owner_id, current_progress, current_week_id,
+    status, created_at, updated_at, synced_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Get all partner goals
+getPartnerGoals:
+SELECT * FROM PartnerGoal
+WHERE owner_id = :partnerId
+ORDER BY created_at DESC;
+
+-- Get active partner goals
+getActivePartnerGoals:
+SELECT * FROM PartnerGoal
+WHERE owner_id = :partnerId
+  AND status = 'ACTIVE'
+ORDER BY created_at DESC;
+
+-- Get partner goal by ID
+getPartnerGoalById:
+SELECT * FROM PartnerGoal WHERE id = ?;
+
+-- Delete partner goal (when partner deletes their goal)
+deletePartnerGoalById:
+DELETE FROM PartnerGoal WHERE id = ?;
+
+-- Clear all partner goals (on partner disconnect)
+clearPartnerGoals:
+DELETE FROM PartnerGoal WHERE owner_id = ?;
+
+-- Get last sync time for partner goals
+getLastSyncTime:
+SELECT MAX(synced_at) FROM PartnerGoal WHERE owner_id = ?;
+```
+
+---
+
 ## Repository Interface Contracts
 
 ### GoalRepository
@@ -182,28 +240,27 @@ import org.epoque.tandem.domain.model.GoalType
 
 /**
  * Repository for managing goals and progress tracking.
+ * Each user owns their goals exclusively. Partners can view each other's goals (read-only).
  */
 interface GoalRepository {
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // READ OPERATIONS (Reactive)
+    // READ OPERATIONS - Own Goals (Reactive)
     // ═══════════════════════════════════════════════════════════════════════════
 
     /**
-     * Observe all goals for user (personal + shared with partner).
+     * Observe all goals owned by the user.
      * @param userId Current user's ID
-     * @param partnerId Partner's ID (null if no partner)
-     * @return Flow of all accessible goals
+     * @return Flow of user's goals
      */
-    fun observeGoals(userId: String, partnerId: String?): Flow<List<Goal>>
+    fun observeMyGoals(userId: String): Flow<List<Goal>>
 
     /**
-     * Observe active goals only.
+     * Observe active goals owned by the user.
      * @param userId Current user's ID
-     * @param partnerId Partner's ID (null if no partner)
-     * @return Flow of active goals
+     * @return Flow of user's active goals
      */
-    fun observeActiveGoals(userId: String, partnerId: String?): Flow<List<Goal>>
+    fun observeMyActiveGoals(userId: String): Flow<List<Goal>>
 
     /**
      * Observe a single goal by ID.
@@ -220,11 +277,37 @@ interface GoalRepository {
     fun observeProgressHistory(goalId: String): Flow<List<GoalProgress>>
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // READ OPERATIONS - Partner Goals (Read-Only)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Observe partner's goals (read-only, from local cache).
+     * @param partnerId Partner's user ID
+     * @return Flow of partner's goals
+     */
+    fun observePartnerGoals(partnerId: String): Flow<List<Goal>>
+
+    /**
+     * Get a partner's goal by ID (read-only).
+     * @param goalId Goal ID
+     * @return Goal or null if not found
+     */
+    suspend fun getPartnerGoalById(goalId: String): Goal?
+
+    /**
+     * Get last sync time for partner goals.
+     * Used to show "Last updated" indicator when offline.
+     * @param partnerId Partner's user ID
+     * @return Last sync timestamp or null
+     */
+    suspend fun getPartnerGoalsLastSyncTime(partnerId: String): kotlinx.datetime.Instant?
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // READ OPERATIONS (One-shot)
     // ═══════════════════════════════════════════════════════════════════════════
 
     /**
-     * Get goal by ID.
+     * Get goal by ID (own goals only).
      * @param goalId Goal ID
      * @return Goal or null if not found
      */
@@ -238,15 +321,14 @@ interface GoalRepository {
     suspend fun getActiveGoalCount(userId: String): Int
 
     /**
-     * Get goals linked to a specific task.
-     * Used for displaying goal badge on task.
+     * Get goals by IDs (for task goal badges).
      * @param goalIds List of goal IDs
      * @return Map of goalId to Goal
      */
     suspend fun getGoalsById(goalIds: List<String>): Map<String, Goal>
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // WRITE OPERATIONS
+    // WRITE OPERATIONS (Own Goals Only)
     // ═══════════════════════════════════════════════════════════════════════════
 
     /**
@@ -259,7 +341,7 @@ interface GoalRepository {
     suspend fun createGoal(goal: Goal): Goal
 
     /**
-     * Update goal properties.
+     * Update goal properties (own goals only).
      * @param goalId Goal ID
      * @param name Updated name
      * @param icon Updated icon
@@ -268,7 +350,7 @@ interface GoalRepository {
     suspend fun updateGoal(goalId: String, name: String, icon: String): Goal?
 
     /**
-     * Increment goal progress.
+     * Increment goal progress (own goals only).
      * Called when linked task is completed.
      * @param goalId Goal ID
      * @param amount Amount to increment (default 1)
@@ -277,7 +359,7 @@ interface GoalRepository {
     suspend fun incrementProgress(goalId: String, amount: Int = 1): Goal?
 
     /**
-     * Update goal status.
+     * Update goal status (own goals only).
      * @param goalId Goal ID
      * @param status New status
      * @return Updated goal or null if not found
@@ -285,7 +367,7 @@ interface GoalRepository {
     suspend fun updateStatus(goalId: String, status: GoalStatus): Goal?
 
     /**
-     * Record weekly progress snapshot.
+     * Record weekly progress snapshot (own goals only).
      * Called at week boundary before reset.
      * @param goalId Goal ID
      * @param progressValue Progress achieved
@@ -300,7 +382,7 @@ interface GoalRepository {
     )
 
     /**
-     * Reset weekly progress for a goal.
+     * Reset weekly progress for a goal (own goals only).
      * Called at start of new week for WEEKLY_HABIT goals.
      * @param goalId Goal ID
      * @param newWeekId New week's ID
@@ -308,11 +390,28 @@ interface GoalRepository {
     suspend fun resetWeeklyProgress(goalId: String, newWeekId: String)
 
     /**
-     * Delete a goal.
+     * Delete a goal (own goals only).
      * @param goalId Goal ID
      * @return true if deleted, false if not found
      */
     suspend fun deleteGoal(goalId: String): Boolean
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SYNC OPERATIONS
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Sync partner's goals from Supabase to local cache.
+     * Called when partner changes or on app resume.
+     * @param partnerId Partner's user ID
+     */
+    suspend fun syncPartnerGoals(partnerId: String)
+
+    /**
+     * Clear partner goal cache (on partner disconnect).
+     * @param partnerId Partner's user ID
+     */
+    suspend fun clearPartnerGoalCache(partnerId: String)
 
     // ═══════════════════════════════════════════════════════════════════════════
     // MAINTENANCE OPERATIONS
@@ -340,12 +439,13 @@ sealed class GoalException(message: String) : Exception(message) {
     object LimitExceeded : GoalException("Maximum of 10 active goals reached")
     data class InvalidGoal(override val message: String) : GoalException(message)
     object NotFound : GoalException("Goal not found")
+    object NotOwner : GoalException("Cannot modify goals you don't own")
 }
 ```
 
 ---
 
-## Supabase Tables (for shared goals sync)
+## Supabase Tables (for partner goal visibility sync)
 
 ### goals
 
@@ -360,7 +460,6 @@ CREATE TABLE goals (
     duration_weeks INTEGER CHECK (duration_weeks IN (4, 8, 12) OR duration_weeks IS NULL),
     start_week_id TEXT NOT NULL,
     owner_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    is_shared BOOLEAN NOT NULL DEFAULT FALSE,
     current_progress INTEGER NOT NULL DEFAULT 0,
     current_week_id TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'COMPLETED', 'EXPIRED')),
@@ -377,7 +476,6 @@ CREATE TABLE goals (
 
 -- Indexes
 CREATE INDEX idx_goals_owner ON goals(owner_id);
-CREATE INDEX idx_goals_shared ON goals(is_shared) WHERE is_shared = true;
 CREATE INDEX idx_goals_status ON goals(status);
 
 -- Row Level Security
@@ -388,12 +486,11 @@ CREATE POLICY "Users can manage own goals"
 ON goals FOR ALL
 USING (auth.uid() = owner_id);
 
--- Partners can view shared goals
-CREATE POLICY "Partners can view shared goals"
+-- Partners can VIEW each other's goals (read-only)
+CREATE POLICY "Partners can view partner goals"
 ON goals FOR SELECT
 USING (
-    is_shared = true
-    AND EXISTS (
+    EXISTS (
         SELECT 1 FROM partnerships p
         WHERE p.status = 'ACTIVE'
         AND (
@@ -438,34 +535,31 @@ CREATE INDEX idx_goal_progress_week ON goal_progress(week_id);
 -- Row Level Security
 ALTER TABLE goal_progress ENABLE ROW LEVEL SECURITY;
 
--- Users can view progress for their goals
-CREATE POLICY "Users can view own goal progress"
+-- Users can manage progress for their own goals
+CREATE POLICY "Users can manage own goal progress"
+ON goal_progress FOR ALL
+USING (
+    EXISTS (
+        SELECT 1 FROM goals g
+        WHERE g.id = goal_id AND g.owner_id = auth.uid()
+    )
+);
+
+-- Partners can VIEW progress for partner's goals (read-only)
+CREATE POLICY "Partners can view partner goal progress"
 ON goal_progress FOR SELECT
 USING (
     EXISTS (
         SELECT 1 FROM goals g
         WHERE g.id = goal_id
-        AND (g.owner_id = auth.uid() OR (
-            g.is_shared = true
-            AND EXISTS (
-                SELECT 1 FROM partnerships p
-                WHERE p.status = 'ACTIVE'
-                AND (
-                    (p.user1_id = auth.uid() AND p.user2_id = g.owner_id)
-                    OR (p.user2_id = auth.uid() AND p.user1_id = g.owner_id)
-                )
+        AND EXISTS (
+            SELECT 1 FROM partnerships p
+            WHERE p.status = 'ACTIVE'
+            AND (
+                (p.user1_id = auth.uid() AND p.user2_id = g.owner_id)
+                OR (p.user2_id = auth.uid() AND p.user1_id = g.owner_id)
             )
-        ))
-    )
-);
-
--- Users can insert progress for their goals
-CREATE POLICY "Users can insert own goal progress"
-ON goal_progress FOR INSERT
-WITH CHECK (
-    EXISTS (
-        SELECT 1 FROM goals g
-        WHERE g.id = goal_id AND g.owner_id = auth.uid()
+        )
     )
 );
 ```
@@ -474,33 +568,24 @@ WITH CHECK (
 
 ## Realtime Subscriptions
 
-### Shared Goals Channel
+### Partner Goals Channel (Read-Only Sync)
 
 ```kotlin
-// Subscribe to shared goal changes from partner
-private fun setupSharedGoalsSync(partnerId: String, partnershipId: String) {
-    val channel = supabase.channel("shared-goals-$partnershipId")
+// Subscribe to partner's goal changes for read-only visibility
+private fun setupPartnerGoalsSync(partnerId: String, partnershipId: String) {
+    val channel = supabase.channel("partner-goals-$partnershipId")
 
     val changes = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
         table = "goals"
-        filter = "is_shared=eq.true"
+        filter = "owner_id=eq.$partnerId"
     }
 
     changes
-        .filter { action ->
-            // Only process partner's shared goals
-            when (action) {
-                is PostgresAction.Insert -> action.record.ownerId == partnerId
-                is PostgresAction.Update -> action.record.ownerId == partnerId
-                is PostgresAction.Delete -> action.oldRecord?.ownerId == partnerId
-                else -> false
-            }
-        }
         .onEach { action ->
             when (action) {
-                is PostgresAction.Insert -> handleGoalCreated(action.record)
-                is PostgresAction.Update -> handleGoalUpdated(action.record)
-                is PostgresAction.Delete -> handleGoalDeleted(action.oldRecord)
+                is PostgresAction.Insert -> handlePartnerGoalCreated(action.record)
+                is PostgresAction.Update -> handlePartnerGoalUpdated(action.record)
+                is PostgresAction.Delete -> handlePartnerGoalDeleted(action.oldRecord)
             }
         }
         .launchIn(viewModelScope)
@@ -508,6 +593,21 @@ private fun setupSharedGoalsSync(partnerId: String, partnershipId: String) {
     viewModelScope.launch {
         channel.subscribe()
     }
+}
+
+// Handle partner goal created - cache locally
+private suspend fun handlePartnerGoalCreated(record: GoalRecord) {
+    goalRepository.cachePartnerGoal(record.toGoal())
+}
+
+// Handle partner goal updated - update local cache
+private suspend fun handlePartnerGoalUpdated(record: GoalRecord) {
+    goalRepository.cachePartnerGoal(record.toGoal())
+}
+
+// Handle partner goal deleted - remove from local cache
+private suspend fun handlePartnerGoalDeleted(record: GoalRecord?) {
+    record?.id?.let { goalRepository.removePartnerGoalFromCache(it) }
 }
 ```
 

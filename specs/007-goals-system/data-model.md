@@ -6,10 +6,10 @@
 ## Entity Overview
 
 ```
-┌─────────────┐       ┌─────────────┐       ┌─────────────┐
-│    User     │───────│    Goal     │───────│    User     │
-│  (owner_id) │  N:1  │             │  N:1  │ (partner)   │
-└─────────────┘       └─────────────┘       └─────────────┘
+┌─────────────┐       ┌─────────────┐
+│    User     │───────│    Goal     │
+│  (owner_id) │  1:N  │             │
+└─────────────┘       └─────────────┘
                             │
                             │ 1:N
                             ▼
@@ -22,13 +22,15 @@
 │    Task     │───────│    Goal     │
 │(linkedGoalId│  N:1  │             │
 └─────────────┘       └─────────────┘
+
+Partner visibility: Users can view their partner's goals (read-only) via Supabase sync.
 ```
 
 ## Entities
 
 ### Goal
 
-Represents a user's long-term objective spanning multiple weeks.
+Represents a user's long-term objective spanning multiple weeks. Each goal belongs exclusively to one user.
 
 | Field | Type | Nullable | Description |
 |-------|------|----------|-------------|
@@ -40,8 +42,7 @@ Represents a user's long-term objective spanning multiple weeks.
 | `target_total` | Int | Yes | For TARGET_AMOUNT: cumulative target |
 | `duration_weeks` | Int | Yes | 4, 8, 12, or null (ongoing) |
 | `start_week_id` | String | No | ISO week when goal started (e.g., "2026-W01") |
-| `owner_id` | String (UUID) | No | User who created the goal (FK to auth.users) |
-| `is_shared` | Boolean | No | Whether goal is shared with partner |
+| `owner_id` | String (UUID) | No | User who created and owns the goal (FK to auth.users) |
 | `current_progress` | Int | No | Current progress count (reset weekly for WEEKLY_HABIT) |
 | `current_week_id` | String | No | Week ID of current progress |
 | `status` | GoalStatus | No | ACTIVE, COMPLETED, or EXPIRED |
@@ -68,7 +69,6 @@ Represents a user's long-term objective spanning multiple weeks.
 
 **Indexes**:
 - `idx_goals_owner` on `owner_id`
-- `idx_goals_shared` on `is_shared` WHERE `is_shared = true`
 - `idx_goals_status` on `status`
 
 ---
@@ -109,6 +109,7 @@ Extends existing Task entity with goal linking (field already exists).
 - When task is completed: If `linked_goal_id` is set, increment goal's `current_progress`
 - When task is deleted: Goal progress is NOT decremented (spec requirement)
 - When goal is deleted: `linked_goal_id` becomes orphaned (task remains, link broken)
+- Tasks can only be linked to the user's own goals (not partner's goals)
 
 ---
 
@@ -174,8 +175,7 @@ Extends existing Task entity with goal linking (field already exists).
    - RECURRING_TASK: No target fields needed
    - TARGET_AMOUNT: `target_total` required (1-9999)
 4. **Duration**: Must be 4, 8, 12, or null (ongoing)
-5. **Shared Goals**: Partner must exist when `is_shared = true`
-6. **Goal Limit**: User cannot exceed 10 active goals
+5. **Goal Limit**: User cannot exceed 10 active goals
 
 ### Progress Recording
 
@@ -199,7 +199,6 @@ CREATE TABLE Goal (
     duration_weeks INTEGER,
     start_week_id TEXT NOT NULL,
     owner_id TEXT NOT NULL,
-    is_shared INTEGER NOT NULL DEFAULT 0,
     current_progress INTEGER NOT NULL DEFAULT 0,
     current_week_id TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'ACTIVE',
@@ -209,7 +208,6 @@ CREATE TABLE Goal (
 
 CREATE INDEX idx_goals_owner ON Goal(owner_id);
 CREATE INDEX idx_goals_status ON Goal(status);
-CREATE INDEX idx_goals_shared ON Goal(is_shared) WHERE is_shared = 1;
 
 -- GoalProgress table (weekly history)
 CREATE TABLE GoalProgress (
@@ -241,7 +239,6 @@ data class Goal(
     val durationWeeks: Int?,
     val startWeekId: String,
     val ownerId: String,
-    val isShared: Boolean,
     val currentProgress: Int,
     val currentWeekId: String,
     val status: GoalStatus,
@@ -283,10 +280,11 @@ data class Goal(
 
 | From | To | Cardinality | Description |
 |------|-----|-------------|-------------|
-| Goal | User (owner) | N:1 | Goal is owned by user |
+| Goal | User (owner) | N:1 | Goal is owned exclusively by one user |
 | Goal | GoalProgress | 1:N | Goal has weekly progress history |
-| Task | Goal | N:1 | Tasks can be linked to goals |
-| Goal | Partner | N:0..1 | Shared goals visible to partner |
+| Task | Goal | N:1 | Tasks can be linked to user's own goals |
+
+**Partner Visibility**: Partners can view each other's goals via Supabase sync, but goals are NOT shared - each goal has exactly one owner who can edit/delete it.
 
 ---
 
@@ -295,17 +293,17 @@ data class Goal(
 ### Goal Deletion
 - Tasks with `linked_goal_id` pointing to deleted goal: Link becomes orphaned
 - GoalProgress records: CASCADE deleted with goal
-- Shared goals: Both partners can see deletion
 
 ### Partner Disconnection
-- Shared goals: Become personal goals owned by original creator
-- Partner loses visibility to goals they didn't create
+- User loses visibility to partner's goals in the "Partner's" segment
+- Own goals remain unaffected
 
 ### Week Boundary at Midnight
 - Use device timezone for consistency
 - Week changes at midnight Sunday → Monday (ISO 8601)
 - Check week boundary on app launch and resume
 
-### Concurrent Edits (Shared Goals)
-- Last-write-wins (spec clarification Session 2026-01-04)
-- No conflict resolution or locking
+### Partner Goal Visibility
+- Partner goals are synced via Supabase for read-only viewing
+- Partner goals are cached locally for offline access
+- When viewing partner's goals offline, show "Last updated" indicator

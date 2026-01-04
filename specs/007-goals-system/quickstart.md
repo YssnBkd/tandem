@@ -24,7 +24,6 @@ data class Goal(
     val durationWeeks: Int?,
     val startWeekId: String,
     val ownerId: String,
-    val isShared: Boolean,
     val currentProgress: Int,
     val currentWeekId: String,
     val status: GoalStatus,
@@ -118,13 +117,21 @@ import org.epoque.tandem.domain.model.GoalStatus
 interface GoalRepository {
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // READ OPERATIONS (Reactive)
+    // READ OPERATIONS - Own Goals (Reactive)
     // ═══════════════════════════════════════════════════════════════════════════
 
-    fun observeGoals(userId: String, partnerId: String?): Flow<List<Goal>>
-    fun observeActiveGoals(userId: String, partnerId: String?): Flow<List<Goal>>
+    fun observeMyGoals(userId: String): Flow<List<Goal>>
+    fun observeMyActiveGoals(userId: String): Flow<List<Goal>>
     fun observeGoal(goalId: String): Flow<Goal?>
     fun observeProgressHistory(goalId: String): Flow<List<GoalProgress>>
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // READ OPERATIONS - Partner Goals (Read-Only)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    fun observePartnerGoals(partnerId: String): Flow<List<Goal>>
+    suspend fun getPartnerGoalById(goalId: String): Goal?
+    suspend fun getPartnerGoalsLastSyncTime(partnerId: String): kotlinx.datetime.Instant?
 
     // ═══════════════════════════════════════════════════════════════════════════
     // READ OPERATIONS (One-shot)
@@ -135,7 +142,7 @@ interface GoalRepository {
     suspend fun getGoalsById(goalIds: List<String>): Map<String, Goal>
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // WRITE OPERATIONS
+    // WRITE OPERATIONS (Own Goals Only)
     // ═══════════════════════════════════════════════════════════════════════════
 
     suspend fun createGoal(goal: Goal): Goal
@@ -152,6 +159,13 @@ interface GoalRepository {
     suspend fun deleteGoal(goalId: String): Boolean
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // SYNC OPERATIONS
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    suspend fun syncPartnerGoals(partnerId: String)
+    suspend fun clearPartnerGoalCache(partnerId: String)
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // MAINTENANCE OPERATIONS
     // ═══════════════════════════════════════════════════════════════════════════
 
@@ -163,6 +177,7 @@ sealed class GoalException(message: String) : Exception(message) {
     object LimitExceeded : GoalException("Maximum of 10 active goals reached")
     data class InvalidGoal(override val message: String) : GoalException(message)
     object NotFound : GoalException("Goal not found")
+    object NotOwner : GoalException("Cannot modify goals you don't own")
 }
 ```
 
@@ -175,6 +190,7 @@ sealed class GoalException(message: String) : Exception(message) {
 // composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsUiState.kt
 package org.epoque.tandem.presentation.goals
 
+import kotlinx.datetime.Instant
 import org.epoque.tandem.domain.model.Goal
 import org.epoque.tandem.domain.model.GoalProgress
 import org.epoque.tandem.domain.model.GoalType
@@ -184,8 +200,8 @@ data class GoalsUiState(
     val error: String? = null,
 
     // Goal lists
-    val personalGoals: List<Goal> = emptyList(),
-    val sharedGoals: List<Goal> = emptyList(),
+    val myGoals: List<Goal> = emptyList(),
+    val partnerGoals: List<Goal> = emptyList(),
 
     // Segment selection
     val selectedSegment: GoalSegment = GoalSegment.YOURS,
@@ -196,7 +212,6 @@ data class GoalsUiState(
     val newGoalIcon: String = "🎯",
     val newGoalType: GoalType = GoalType.WeeklyHabit(3),
     val newGoalDuration: Int? = 4,
-    val newGoalIsShared: Boolean = false,
     val isCreatingGoal: Boolean = false,
 
     // Goal detail
@@ -204,6 +219,7 @@ data class GoalsUiState(
     val selectedGoal: Goal? = null,
     val selectedGoalProgress: List<GoalProgress> = emptyList(),
     val showGoalDetail: Boolean = false,
+    val isViewingPartnerGoal: Boolean = false,
 
     // Edit goal
     val isEditingGoal: Boolean = false,
@@ -211,35 +227,36 @@ data class GoalsUiState(
     val editGoalIcon: String = "",
 
     // Partner state
-    val hasPartner: Boolean = false
+    val hasPartner: Boolean = false,
+    val partnerGoalsLastSyncTime: Instant? = null
 ) {
     val displayedGoals: List<Goal> get() = when (selectedSegment) {
-        GoalSegment.YOURS -> personalGoals
-        GoalSegment.SHARED -> sharedGoals
+        GoalSegment.YOURS -> myGoals
+        GoalSegment.PARTNERS -> partnerGoals
     }
 
     val showEmptyState: Boolean get() = !isLoading && displayedGoals.isEmpty()
 
     val emptyStateMessage: String get() = when (selectedSegment) {
-        GoalSegment.YOURS -> "No personal goals yet.\nTap + to create your first goal!"
-        GoalSegment.SHARED -> if (hasPartner) {
-            "No shared goals yet.\nCreate a goal together!"
+        GoalSegment.YOURS -> "No goals yet.\nTap + to create your first goal!"
+        GoalSegment.PARTNERS -> if (hasPartner) {
+            "Your partner hasn't created any goals yet."
         } else {
-            "Connect with a partner to create shared goals."
+            "Connect with a partner to see their goals."
         }
     }
 
-    val canCreateSharedGoal: Boolean get() = hasPartner
-
-    val activeGoalCount: Int get() = personalGoals.count { it.isActive } +
-        sharedGoals.count { it.isActive }
+    val activeGoalCount: Int get() = myGoals.count { it.isActive }
 
     val canCreateNewGoal: Boolean get() = activeGoalCount < 10
+
+    /** Whether the currently selected goal can be edited (own goals only) */
+    val canEditSelectedGoal: Boolean get() = !isViewingPartnerGoal
 }
 
 enum class GoalSegment {
     YOURS,
-    SHARED
+    PARTNERS
 }
 ```
 
@@ -255,7 +272,7 @@ sealed interface GoalsEvent {
     data class SegmentSelected(val segment: GoalSegment) : GoalsEvent
 
     // Goal list
-    data class GoalTapped(val goalId: String) : GoalsEvent
+    data class GoalTapped(val goalId: String, val isPartnerGoal: Boolean = false) : GoalsEvent
     object AddGoalTapped : GoalsEvent
 
     // Add goal sheet
@@ -264,7 +281,6 @@ sealed interface GoalsEvent {
     data class NewGoalIconChanged(val icon: String) : GoalsEvent
     data class NewGoalTypeChanged(val type: GoalType) : GoalsEvent
     data class NewGoalDurationChanged(val weeks: Int?) : GoalsEvent
-    data class NewGoalSharedChanged(val isShared: Boolean) : GoalsEvent
     object CreateGoal : GoalsEvent
 
     // Goal detail
@@ -308,9 +324,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import org.epoque.tandem.domain.model.*
 import org.epoque.tandem.domain.repository.*
 import org.epoque.tandem.domain.util.WeekCalculator
@@ -341,26 +354,50 @@ class GoalsViewModel(
                     .first()
                     .user.id
 
-                // Check for partner
-                val partner = partnerRepository.getPartner(userId)
-                _uiState.update { it.copy(hasPartner = partner != null) }
-
                 // Process weekly resets
                 val currentWeekId = WeekCalculator.getWeekId()
                 goalRepository.processWeeklyResets(currentWeekId)
                 goalRepository.checkGoalExpirations(currentWeekId)
 
-                // Observe goals
-                goalRepository.observeGoals(userId, partner?.id)
-                    .collect { goals ->
-                        _uiState.update {
-                            it.copy(
-                                personalGoals = goals.filter { g -> !g.isShared },
-                                sharedGoals = goals.filter { g -> g.isShared },
-                                isLoading = false
-                            )
+                // Observe own goals
+                launch {
+                    goalRepository.observeMyGoals(userId)
+                        .collect { goals ->
+                            _uiState.update { it.copy(myGoals = goals, isLoading = false) }
                         }
-                    }
+                }
+
+                // Observe partner and their goals (read-only)
+                launch {
+                    partnerRepository.observePartner()
+                        .collect { partner ->
+                            if (partner != null) {
+                                _uiState.update { it.copy(hasPartner = true) }
+
+                                // Sync and observe partner goals
+                                goalRepository.syncPartnerGoals(partner.id)
+                                goalRepository.observePartnerGoals(partner.id)
+                                    .collect { partnerGoals ->
+                                        val lastSync = goalRepository.getPartnerGoalsLastSyncTime(partner.id)
+                                        _uiState.update {
+                                            it.copy(
+                                                partnerGoals = partnerGoals,
+                                                partnerGoalsLastSyncTime = lastSync
+                                            )
+                                        }
+                                    }
+                            } else {
+                                _uiState.update {
+                                    it.copy(
+                                        hasPartner = false,
+                                        partnerGoals = emptyList(),
+                                        partnerGoalsLastSyncTime = null
+                                    )
+                                }
+                            }
+                        }
+                }
+
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -372,7 +409,7 @@ class GoalsViewModel(
     fun onEvent(event: GoalsEvent) {
         when (event) {
             is GoalsEvent.SegmentSelected -> handleSegmentSelected(event.segment)
-            is GoalsEvent.GoalTapped -> handleGoalTapped(event.goalId)
+            is GoalsEvent.GoalTapped -> handleGoalTapped(event.goalId, event.isPartnerGoal)
             GoalsEvent.AddGoalTapped -> handleAddGoalTapped()
 
             GoalsEvent.DismissAddGoalSheet -> dismissAddGoalSheet()
@@ -380,7 +417,6 @@ class GoalsViewModel(
             is GoalsEvent.NewGoalIconChanged -> updateNewGoalIcon(event.icon)
             is GoalsEvent.NewGoalTypeChanged -> updateNewGoalType(event.type)
             is GoalsEvent.NewGoalDurationChanged -> updateNewGoalDuration(event.weeks)
-            is GoalsEvent.NewGoalSharedChanged -> updateNewGoalShared(event.isShared)
             GoalsEvent.CreateGoal -> createGoal()
 
             GoalsEvent.DismissGoalDetail -> dismissGoalDetail()
@@ -401,9 +437,14 @@ class GoalsViewModel(
         _uiState.update { it.copy(selectedSegment = segment) }
     }
 
-    private fun handleGoalTapped(goalId: String) {
+    private fun handleGoalTapped(goalId: String, isPartnerGoal: Boolean) {
         viewModelScope.launch {
-            val goal = goalRepository.getGoalById(goalId) ?: return@launch
+            val goal = if (isPartnerGoal) {
+                goalRepository.getPartnerGoalById(goalId)
+            } else {
+                goalRepository.getGoalById(goalId)
+            } ?: return@launch
+
             goalRepository.observeProgressHistory(goalId)
                 .take(1)
                 .collect { progress ->
@@ -412,7 +453,8 @@ class GoalsViewModel(
                             selectedGoalId = goalId,
                             selectedGoal = goal,
                             selectedGoalProgress = progress,
-                            showGoalDetail = true
+                            showGoalDetail = true,
+                            isViewingPartnerGoal = isPartnerGoal
                         )
                     }
                 }
@@ -437,8 +479,7 @@ class GoalsViewModel(
                 newGoalName = "",
                 newGoalIcon = "🎯",
                 newGoalType = GoalType.WeeklyHabit(3),
-                newGoalDuration = 4,
-                newGoalIsShared = false
+                newGoalDuration = 4
             )
         }
     }
@@ -469,7 +510,6 @@ class GoalsViewModel(
                     durationWeeks = state.newGoalDuration,
                     startWeekId = currentWeekId,
                     ownerId = userId,
-                    isShared = state.newGoalIsShared,
                     currentProgress = 0,
                     currentWeekId = currentWeekId,
                     status = GoalStatus.ACTIVE,
@@ -500,6 +540,14 @@ class GoalsViewModel(
     private fun deleteGoal() {
         val goalId = _uiState.value.selectedGoalId ?: return
 
+        // Cannot delete partner's goals
+        if (_uiState.value.isViewingPartnerGoal) {
+            viewModelScope.launch {
+                _sideEffects.send(GoalsSideEffect.ShowSnackbar("Cannot delete partner's goal"))
+            }
+            return
+        }
+
         viewModelScope.launch {
             try {
                 goalRepository.deleteGoal(goalId)
@@ -507,7 +555,8 @@ class GoalsViewModel(
                     it.copy(
                         showGoalDetail = false,
                         selectedGoalId = null,
-                        selectedGoal = null
+                        selectedGoal = null,
+                        isViewingPartnerGoal = false
                     )
                 }
                 _sideEffects.send(GoalsSideEffect.ShowSnackbar("Goal deleted"))
@@ -540,22 +589,27 @@ class GoalsViewModel(
         _uiState.update { it.copy(newGoalDuration = weeks) }
     }
 
-    private fun updateNewGoalShared(isShared: Boolean) {
-        _uiState.update { it.copy(newGoalIsShared = isShared) }
-    }
-
     private fun dismissGoalDetail() {
         _uiState.update {
             it.copy(
                 showGoalDetail = false,
                 selectedGoalId = null,
                 selectedGoal = null,
-                isEditingGoal = false
+                isEditingGoal = false,
+                isViewingPartnerGoal = false
             )
         }
     }
 
     private fun startEditGoal() {
+        // Cannot edit partner's goals
+        if (_uiState.value.isViewingPartnerGoal) {
+            viewModelScope.launch {
+                _sideEffects.send(GoalsSideEffect.ShowSnackbar("Cannot edit partner's goal"))
+            }
+            return
+        }
+
         val goal = _uiState.value.selectedGoal ?: return
         _uiState.update {
             it.copy(
@@ -641,7 +695,7 @@ fun GoalsScreen(
     emptyStateMessage: String,
     hasPartner: Boolean,
     onSegmentSelected: (GoalSegment) -> Unit,
-    onGoalTapped: (String) -> Unit,
+    onGoalTapped: (goalId: String, isPartnerGoal: Boolean) -> Unit,
     onAddGoal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -650,8 +704,11 @@ fun GoalsScreen(
             TopAppBar(
                 title = { Text("Goals") },
                 actions = {
-                    IconButton(onClick = onAddGoal) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Goal")
+                    // Only show Add button on "Yours" segment
+                    if (selectedSegment == GoalSegment.YOURS) {
+                        IconButton(onClick = onAddGoal) {
+                            Icon(Icons.Default.Add, contentDescription = "Add Goal")
+                        }
                     }
                 }
             )
@@ -686,7 +743,9 @@ fun GoalsScreen(
                     items(goals, key = { it.id }) { goal ->
                         GoalCard(
                             goal = goal,
-                            onClick = { onGoalTapped(goal.id) }
+                            onClick = {
+                                onGoalTapped(goal.id, selectedSegment == GoalSegment.PARTNERS)
+                            }
                         )
                     }
                 }
@@ -707,7 +766,7 @@ private fun SegmentedButtonRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         GoalSegment.entries.forEach { segment ->
-            val enabled = segment != GoalSegment.SHARED || hasPartner
+            val enabled = segment != GoalSegment.PARTNERS || hasPartner
 
             FilterChip(
                 selected = selectedSegment == segment,
@@ -716,7 +775,7 @@ private fun SegmentedButtonRow(
                     Text(
                         when (segment) {
                             GoalSegment.YOURS -> "Yours"
-                            GoalSegment.SHARED -> "Shared"
+                            GoalSegment.PARTNERS -> "Partner's"
                         }
                     )
                 },
@@ -823,7 +882,7 @@ fun GoalCard(
                     Text(
                         text = when (goal.type) {
                             is GoalType.WeeklyHabit -> "This week"
-                            is GoalType.RecurringTask -> if (goal.currentProgress > 0) "Done ✓" else "This week"
+                            is GoalType.RecurringTask -> if (goal.currentProgress > 0) "Done" else "This week"
                             is GoalType.TargetAmount -> "Total"
                         },
                         style = MaterialTheme.typography.bodySmall,
@@ -857,14 +916,11 @@ fun AddGoalSheet(
     icon: String,
     type: GoalType,
     durationWeeks: Int?,
-    isShared: Boolean,
-    canCreateShared: Boolean,
     isCreating: Boolean,
     onNameChange: (String) -> Unit,
     onIconChange: (String) -> Unit,
     onTypeChange: (GoalType) -> Unit,
     onDurationChange: (Int?) -> Unit,
-    onSharedChange: (Boolean) -> Unit,
     onCreate: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -916,20 +972,6 @@ fun AddGoalSheet(
                 selectedDuration = durationWeeks,
                 onDurationSelected = onDurationChange
             )
-
-            // Shared toggle
-            if (canCreateShared) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Share with partner")
-                    Switch(
-                        checked = isShared,
-                        onCheckedChange = onSharedChange
-                    )
-                }
-            }
 
             // Create button
             Button(
@@ -1077,6 +1119,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import org.epoque.tandem.presentation.goals.GoalSegment
 import org.epoque.tandem.presentation.goals.GoalsEvent
 import org.epoque.tandem.presentation.goals.GoalsSideEffect
 import org.epoque.tandem.presentation.goals.GoalsUiState
@@ -1101,7 +1144,9 @@ fun NavGraphBuilder.goalsNavGraph(
             emptyStateMessage = state.emptyStateMessage,
             hasPartner = state.hasPartner,
             onSegmentSelected = { onEvent(GoalsEvent.SegmentSelected(it)) },
-            onGoalTapped = { onEvent(GoalsEvent.GoalTapped(it)) },
+            onGoalTapped = { goalId, isPartnerGoal ->
+                onEvent(GoalsEvent.GoalTapped(goalId, isPartnerGoal))
+            },
             onAddGoal = { onEvent(GoalsEvent.AddGoalTapped) }
         )
 
@@ -1111,14 +1156,11 @@ fun NavGraphBuilder.goalsNavGraph(
                 icon = state.newGoalIcon,
                 type = state.newGoalType,
                 durationWeeks = state.newGoalDuration,
-                isShared = state.newGoalIsShared,
-                canCreateShared = state.canCreateSharedGoal,
                 isCreating = state.isCreatingGoal,
                 onNameChange = { onEvent(GoalsEvent.NewGoalNameChanged(it)) },
                 onIconChange = { onEvent(GoalsEvent.NewGoalIconChanged(it)) },
                 onTypeChange = { onEvent(GoalsEvent.NewGoalTypeChanged(it)) },
                 onDurationChange = { onEvent(GoalsEvent.NewGoalDurationChanged(it)) },
-                onSharedChange = { onEvent(GoalsEvent.NewGoalSharedChanged(it)) },
                 onCreate = { onEvent(GoalsEvent.CreateGoal) },
                 onDismiss = { onEvent(GoalsEvent.DismissAddGoalSheet) }
             )
@@ -1130,7 +1172,7 @@ fun NavGraphBuilder.goalsNavGraph(
         val state = stateProvider()
 
         LaunchedEffect(route.goalId) {
-            onEvent(GoalsEvent.GoalTapped(route.goalId))
+            onEvent(GoalsEvent.GoalTapped(route.goalId, route.isPartnerGoal))
         }
 
         state.selectedGoal?.let { goal ->
@@ -1138,6 +1180,7 @@ fun NavGraphBuilder.goalsNavGraph(
                 goal = goal,
                 progressHistory = state.selectedGoalProgress,
                 isEditing = state.isEditingGoal,
+                canEdit = state.canEditSelectedGoal,
                 editName = state.editGoalName,
                 editIcon = state.editGoalIcon,
                 onEditNameChange = { onEvent(GoalsEvent.EditGoalNameChanged(it)) },
@@ -1159,7 +1202,7 @@ sealed interface Goals : Routes {
     data object List : Goals
 
     @Serializable
-    data class Detail(val goalId: String) : Goals
+    data class Detail(val goalId: String, val isPartnerGoal: Boolean = false) : Goals
 }
 ```
 
@@ -1180,7 +1223,7 @@ import org.koin.dsl.module
 
 val goalsModule = module {
     // Repository
-    single<GoalRepository> { GoalRepositoryImpl(get()) }
+    single<GoalRepository> { GoalRepositoryImpl(get(), get()) }
 
     // ViewModel
     viewModel {
@@ -1199,11 +1242,18 @@ val goalsModule = module {
 
 This quickstart provides the essential code for:
 
-1. **Domain Models**: Goal, GoalType, GoalProgress, GoalStatus
-2. **Repository Interface**: GoalRepository with reactive and one-shot operations
-3. **ViewModel**: Complete MVI implementation with weekly reset handling
-4. **UI Screens**: GoalsScreen, GoalCard, AddGoalSheet, GoalDetailScreen
-5. **Navigation**: Type-safe routes with stateProvider pattern
+1. **Domain Models**: Goal, GoalType, GoalProgress, GoalStatus (no shared goals)
+2. **Repository Interface**: GoalRepository with separate own/partner goal operations
+3. **ViewModel**: Complete MVI implementation with partner goal visibility (read-only)
+4. **UI Screens**: GoalsScreen, GoalCard, AddGoalSheet with "Yours" / "Partner's" segments
+5. **Navigation**: Type-safe routes with partner goal flag
 6. **DI**: Koin module configuration
+
+**Key Changes from Original Design**:
+- Removed `isShared` field from Goal
+- Segment control changed from "Yours" / "Shared" to "Yours" / "Partner's"
+- Partner goals are read-only (no edit/delete/link tasks)
+- Removed shared goal toggle from AddGoalSheet
+- Added `isViewingPartnerGoal` state for detail screen behavior
 
 Refer to `data-model.md` for schema details and `contracts/goals-api.md` for SQLDelight setup.
