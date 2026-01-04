@@ -39,6 +39,8 @@ fun MainScreen(
     onSignOut: () -> Unit,
     onNavigateToPlanning: () -> Unit = {},
     onNavigateToReview: () -> Unit = {},
+    onNavigateToPartnerInvite: () -> Unit = {},
+    onNavigateToPartnerSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var selectedTab by rememberSaveable(stateSaver = NavigationTab.Saver) { mutableStateOf(NavigationTab.Week) }
@@ -114,7 +116,9 @@ fun MainScreen(
             when (selectedTab) {
                 NavigationTab.Week -> WeekScreen(
                     onNavigateToPlanning = onNavigateToPlanning,
-                    onNavigateToReview = onNavigateToReview
+                    onNavigateToReview = onNavigateToReview,
+                    onNavigateToPartnerInvite = onNavigateToPartnerInvite,
+                    onNavigateToPartnerSettings = onNavigateToPartnerSettings
                 )
                 NavigationTab.Progress -> ProgressScreen()
                 NavigationTab.Goals -> GoalsScreen()

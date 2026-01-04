@@ -15,7 +15,9 @@ import org.epoque.tandem.ui.main.MainScreen
  */
 fun NavGraphBuilder.mainNavGraph(
     navController: NavController,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    onNavigateToPartnerInvite: () -> Unit = {},
+    onNavigateToPartnerSettings: () -> Unit = {}
 ) {
     composable<Routes.Main.Home> {
         val uiState by authViewModel.uiState.collectAsState()
@@ -31,7 +33,9 @@ fun NavGraphBuilder.mainNavGraph(
             },
             onNavigateToReview = {
                 navController.navigate(Routes.Review.Start)
-            }
+            },
+            onNavigateToPartnerInvite = onNavigateToPartnerInvite,
+            onNavigateToPartnerSettings = onNavigateToPartnerSettings
         )
     }
 }

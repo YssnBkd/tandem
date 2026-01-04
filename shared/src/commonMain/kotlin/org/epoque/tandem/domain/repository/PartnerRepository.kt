@@ -29,4 +29,19 @@ interface PartnerRepository {
      * Check if user has active partnership.
      */
     suspend fun hasPartner(userId: String): Boolean
+
+    /**
+     * Start real-time sync for partner's tasks.
+     * Listens to remote changes and updates local cache.
+     *
+     * @param userId Current user's ID
+     * @param partnerId Partner's user ID
+     */
+    suspend fun startPartnerTaskSync(userId: String, partnerId: String)
+
+    /**
+     * Stop real-time sync for partner's tasks.
+     * Should be called when partnership ends or user signs out.
+     */
+    suspend fun stopPartnerTaskSync()
 }

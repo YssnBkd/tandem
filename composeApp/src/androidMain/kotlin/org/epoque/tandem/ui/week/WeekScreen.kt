@@ -41,6 +41,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun WeekScreen(
     onNavigateToPlanning: () -> Unit = {},
     onNavigateToReview: () -> Unit = {},
+    onNavigateToPartnerInvite: () -> Unit = {},
+    onNavigateToPartnerSettings: () -> Unit = {},
     viewModel: WeekViewModel = koinViewModel(),
     modifier: Modifier = Modifier
 ) {
@@ -72,10 +74,12 @@ fun WeekScreen(
                     )
                 }
                 is WeekSideEffect.NavigateToPartnerInvite -> {
-                    // TODO: Navigate to partner invite (future feature)
+                    onNavigateToPartnerInvite()
                 }
                 is WeekSideEffect.NavigateToRequestTask -> {
-                    // TODO: Navigate to request task (future feature)
+                    // Request task is handled via PartnerViewModel, but we can
+                    // navigate to partner invite screen as the entry point
+                    onNavigateToPartnerInvite()
                 }
                 is WeekSideEffect.ClearFocus -> {
                     // Keyboard focus is cleared automatically by QuickAddField

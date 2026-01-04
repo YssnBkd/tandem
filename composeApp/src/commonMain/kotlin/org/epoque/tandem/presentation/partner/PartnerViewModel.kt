@@ -125,9 +125,10 @@ class PartnerViewModel(
                     )
                 }
 
-                // If partner exists, observe pending requests
+                // If partner exists, observe pending requests and start realtime sync
                 if (partner != null) {
                     observePendingRequests(userId)
+                    partnerRepository.startPartnerTaskSync(userId, partner.id)
                 }
             } catch (e: CancellationException) {
                 throw e
@@ -236,9 +237,10 @@ class PartnerViewModel(
                     )
                 }
 
-                // Start observing pending requests
+                // Start observing pending requests and realtime sync
                 if (partner != null) {
                     observePendingRequests(userId)
+                    partnerRepository.startPartnerTaskSync(userId, partner.id)
                 }
 
                 _sideEffects.send(PartnerSideEffect.NavigateToConfirmation)
@@ -384,6 +386,10 @@ class PartnerViewModel(
             _uiState.update { it.copy(isDisconnecting = true) }
             try {
                 val userId = getCurrentUserId()
+
+                // Stop realtime sync before dissolving
+                partnerRepository.stopPartnerTaskSync()
+
                 partnerRepository.dissolvePartnership(userId)
 
                 currentPartner = null
@@ -433,5 +439,15 @@ class PartnerViewModel(
             .filterIsInstance<AuthState.Authenticated>()
             .first()
             .user.id
+    }
+
+    // Lifecycle
+
+    override fun onCleared() {
+        super.onCleared()
+        // Clean up realtime sync when ViewModel is destroyed
+        viewModelScope.launch {
+            partnerRepository.stopPartnerTaskSync()
+        }
     }
 }
