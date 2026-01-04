@@ -26,65 +26,67 @@ The following already exist in the codebase:
 ## Phase 0: Supabase Infrastructure
 *Backend tables, functions, and RLS policies must exist before client development*
 
+**MCP Tools Required**: Supabase MCP server must be configured for this phase.
+
 ### 0.1 Database Schema
 
 - [ ] **T-001**: Create `partnerships` table with RLS policies
-  - File: Supabase Migration
+  - **MCP**: `mcp__supabase__apply_migration` with name `create_partnerships_table`
   - Contract: `contracts/partner-api.md` lines 8-37
   - Columns: id, user1_id, user2_id, created_at, status
   - Constraints: chk_user_order (user1_id < user2_id), unique_partnership
   - RLS: Users can view/update own partnerships
 
 - [ ] **T-002**: Create `invites` table with RLS policies
-  - File: Supabase Migration
+  - **MCP**: `mcp__supabase__apply_migration` with name `create_invites_table`
   - Contract: `contracts/partner-api.md` lines 41-89
   - Columns: code, creator_id, created_at, expires_at, accepted_by, accepted_at, status
   - RLS: Users can create own invites, authenticated users can view pending by code
 
 - [ ] **T-003**: Create `notifications` table with RLS policies
-  - File: Supabase Migration
+  - **MCP**: `mcp__supabase__apply_migration` with name `create_notifications_table`
   - Contract: `contracts/partner-api.md` lines 113-150
   - Columns: id, user_id, title, body, action_type, action_data, created_at, sent_at, read_at
 
 - [ ] **T-004**: Extend `profiles` table with FCM and notification settings
-  - File: Supabase Migration
+  - **MCP**: `mcp__supabase__apply_migration` with name `extend_profiles_fcm`
   - Contract: `contracts/partner-api.md` lines 93-109
   - Columns: fcm_token, fcm_token_updated_at, notifications_enabled, notify_task_completed, notify_task_edited
   - **Critical**: notify_task_completed and notify_task_edited default to FALSE (constitution compliance)
 
 - [ ] **T-005**: Extend `Task` table with `request_note` column
-  - File: Supabase Migration
+  - **MCP**: `mcp__supabase__apply_migration` with name `extend_task_request_note`
   - Contract: `contracts/partner-api.md` lines 154-171
   - Note: `created_by` and `PENDING_ACCEPTANCE` status already exist
 
 ### 0.2 Database Functions
 
 - [ ] **T-006**: Create `generate_invite_code()` function
-  - File: Supabase Migration
+  - **MCP**: `mcp__supabase__apply_migration` with name `create_generate_invite_code_fn`
   - Contract: `contracts/partner-api.md` lines 177-191
   - Generates URL-safe 8-character Base64 code
 
 - [ ] **T-007**: Create `create_invite()` function
   - Depends on: T-001, T-002, T-006
-  - File: Supabase Migration
+  - **MCP**: `mcp__supabase__apply_migration` with name `create_invite_fn`
   - Contract: `contracts/partner-api.md` lines 195-237
   - Validates no existing partnership, returns existing pending or creates new
 
 - [ ] **T-008**: Create `accept_invite()` function
   - Depends on: T-001, T-002, T-003, T-006
-  - File: Supabase Migration
+  - **MCP**: `mcp__supabase__apply_migration` with name `create_accept_invite_fn`
   - Contract: `contracts/partner-api.md` lines 241-330
   - Validates invite, creates partnership, marks accepted, creates notification
 
 - [ ] **T-009**: Create `dissolve_partnership()` function
   - Depends on: T-001, T-003
-  - File: Supabase Migration
+  - **MCP**: `mcp__supabase__apply_migration` with name `create_dissolve_partnership_fn`
   - Contract: `contracts/partner-api.md` lines 334-377
   - Marks DISSOLVED, notifies partner
 
 - [ ] **T-010**: Create `get_partner()` function
   - Depends on: T-001
-  - File: Supabase Migration
+  - **MCP**: `mcp__supabase__apply_migration` with name `create_get_partner_fn`
   - Contract: `contracts/partner-api.md` lines 381-416
   - Returns partner details for user
 
@@ -92,7 +94,7 @@ The following already exist in the codebase:
 
 - [ ] **T-011**: Deploy `send-notification` Edge Function
   - Depends on: T-003, T-004
-  - File: Supabase Edge Function
+  - **MCP**: `mcp__supabase__deploy_edge_function` with name `send-notification`
   - Contract: `contracts/partner-api.md` lines 552-579
   - Trigger: Database webhook on `notifications` INSERT
   - Logic: Fetch FCM token, check preferences, send via FCM HTTP v1 API
@@ -101,7 +103,9 @@ The following already exist in the codebase:
 ### 0.4 Validation Checkpoint
 
 - [ ] **T-012**: Verify all tables and functions exist in Supabase
-  - Run: `mcp__supabase__list_tables` and `mcp__supabase__execute_sql`
+  - **MCP**: `mcp__supabase__list_tables` to verify tables
+  - **MCP**: `mcp__supabase__execute_sql` to test functions
+  - **MCP**: `mcp__supabase__get_advisors` with type `security` to check RLS
   - Test: create_invite, accept_invite, dissolve_partnership functions work
   - Test: RLS policies restrict access correctly
   - Test: Edge function triggers on notification insert
