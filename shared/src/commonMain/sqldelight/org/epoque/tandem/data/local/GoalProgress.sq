@@ -1,0 +1,42 @@
+import kotlinx.datetime.Instant;
+
+CREATE TABLE GoalProgress (
+    id TEXT NOT NULL PRIMARY KEY,
+    goal_id TEXT NOT NULL REFERENCES Goal(id) ON DELETE CASCADE,
+    week_id TEXT NOT NULL,
+    progress_value INTEGER NOT NULL,
+    target_value INTEGER NOT NULL,
+    created_at INTEGER AS Instant NOT NULL,
+    UNIQUE(goal_id, week_id)
+);
+
+CREATE INDEX idx_goal_progress_goal ON GoalProgress(goal_id);
+CREATE INDEX idx_goal_progress_week ON GoalProgress(week_id);
+
+-- Insert weekly progress snapshot
+insertProgress:
+INSERT OR REPLACE INTO GoalProgress (
+    id, goal_id, week_id, progress_value, target_value, created_at
+) VALUES (?, ?, ?, ?, ?, ?);
+
+-- Get progress history for goal
+getProgressForGoal:
+SELECT * FROM GoalProgress
+WHERE goal_id = ?
+ORDER BY week_id DESC;
+
+-- Get progress for specific week
+getProgressForWeek:
+SELECT * FROM GoalProgress
+WHERE goal_id = ? AND week_id = ?;
+
+-- Get recent progress (last N weeks)
+getRecentProgress:
+SELECT * FROM GoalProgress
+WHERE goal_id = ?
+ORDER BY week_id DESC
+LIMIT ?;
+
+-- Delete all progress for goal
+deleteProgressForGoal:
+DELETE FROM GoalProgress WHERE goal_id = ?;

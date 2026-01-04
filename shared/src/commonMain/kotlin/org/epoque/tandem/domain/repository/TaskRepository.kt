@@ -160,4 +160,33 @@ interface TaskRepository {
      * @return Number of tasks deleted
      */
     suspend fun deleteTasksForWeek(weekId: String): Int
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // GOAL LINKING OPERATIONS (Feature 007: Goals System)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Link a task to a goal.
+     *
+     * @param taskId The task ID
+     * @param goalId The goal ID to link to
+     * @return The updated task, or null if not found
+     */
+    suspend fun linkTaskToGoal(taskId: String, goalId: String): Task?
+
+    /**
+     * Unlink a task from its goal.
+     *
+     * @param taskId The task ID
+     * @return The updated task, or null if not found
+     */
+    suspend fun unlinkTaskFromGoal(taskId: String): Task?
+
+    /**
+     * Observe tasks linked to a specific goal.
+     *
+     * @param goalId The goal ID
+     * @return Flow of tasks linked to this goal
+     */
+    fun observeTasksForGoal(goalId: String): Flow<List<Task>>
 }

@@ -1,5 +1,6 @@
 package org.epoque.tandem.presentation.planning
 
+import org.epoque.tandem.domain.model.Goal
 import org.epoque.tandem.domain.model.Week
 import org.epoque.tandem.presentation.week.model.TaskUiModel
 
@@ -20,6 +21,10 @@ data class PlanningUiState(
     val newTaskText: String = "",
     val newTaskError: String? = null,
     val addedTasks: List<TaskUiModel> = emptyList(),
+
+    // Goal-Based Suggestions (Feature 007: Goals System)
+    val goalSuggestions: List<Goal> = emptyList(),
+    val selectedGoalForNewTask: Goal? = null,
 
     // Partner Requests Step (Step 3)
     val partnerRequests: List<TaskUiModel> = emptyList(),

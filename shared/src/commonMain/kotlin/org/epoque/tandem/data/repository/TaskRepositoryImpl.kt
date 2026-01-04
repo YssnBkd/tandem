@@ -256,4 +256,29 @@ class TaskRepositoryImpl(
         queries.deleteTasksByWeekId(weekId)
         count
     }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // GOAL LINKING OPERATIONS (Feature 007: Goals System)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    override suspend fun linkTaskToGoal(taskId: String, goalId: String): Task? =
+        withContext(Dispatchers.IO) {
+            val now = Clock.System.now()
+            queries.updateLinkedGoalId(goalId, now, taskId)
+            queries.getTaskById(taskId).executeAsOneOrNull()?.toDomain()
+        }
+
+    override suspend fun unlinkTaskFromGoal(taskId: String): Task? =
+        withContext(Dispatchers.IO) {
+            val now = Clock.System.now()
+            queries.updateLinkedGoalId(null, now, taskId)
+            queries.getTaskById(taskId).executeAsOneOrNull()?.toDomain()
+        }
+
+    override fun observeTasksForGoal(goalId: String): Flow<List<Task>> {
+        return queries.getTasksByLinkedGoalId(goalId)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { tasks -> tasks.map { it.toDomain() } }
+    }
 }

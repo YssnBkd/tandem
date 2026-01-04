@@ -2,6 +2,8 @@ package org.epoque.tandem.data.local
 
 import app.cash.sqldelight.db.SqlDriver
 import org.epoque.tandem.data.local.adapter.EnumColumnAdapter
+import org.epoque.tandem.data.local.adapter.GoalStatusAdapter
+import org.epoque.tandem.data.local.adapter.GoalTypeAdapter
 import org.epoque.tandem.data.local.adapter.instantAdapter
 import org.epoque.tandem.data.local.adapter.localDateAdapter
 
@@ -33,6 +35,22 @@ object TandemDatabaseFactory {
             PartnershipAdapter = Partnership.Adapter(
                 created_atAdapter = instantAdapter,
                 statusAdapter = EnumColumnAdapter()
+            ),
+            GoalAdapter = Goal.Adapter(
+                typeAdapter = GoalTypeAdapter,
+                statusAdapter = GoalStatusAdapter,
+                created_atAdapter = instantAdapter,
+                updated_atAdapter = instantAdapter
+            ),
+            GoalProgressAdapter = GoalProgress.Adapter(
+                created_atAdapter = instantAdapter
+            ),
+            PartnerGoalAdapter = PartnerGoal.Adapter(
+                typeAdapter = GoalTypeAdapter,
+                statusAdapter = GoalStatusAdapter,
+                created_atAdapter = instantAdapter,
+                updated_atAdapter = instantAdapter,
+                synced_atAdapter = instantAdapter
             )
         )
     }

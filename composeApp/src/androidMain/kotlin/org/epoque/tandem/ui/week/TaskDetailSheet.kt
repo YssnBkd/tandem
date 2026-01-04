@@ -14,8 +14,10 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.epoque.tandem.domain.model.Goal
 import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.presentation.week.model.TaskUiModel
+import org.epoque.tandem.ui.goals.components.GoalPicker
 
 /**
  * Modal bottom sheet for viewing and editing task details.
@@ -35,9 +37,12 @@ import org.epoque.tandem.presentation.week.model.TaskUiModel
 fun TaskDetailSheet(
     task: TaskUiModel?,
     isReadOnly: Boolean,
+    availableGoals: List<Goal>,
+    selectedGoalId: String?,
     onDismiss: () -> Unit,
     onTitleChange: (String) -> Unit,
     onNotesChange: (String) -> Unit,
+    onGoalChanged: (String?) -> Unit,
     onSaveRequested: () -> Unit,
     onMarkCompleteRequested: () -> Unit,
     onDeleteRequested: () -> Unit,
@@ -126,6 +131,33 @@ fun TaskDetailSheet(
                     disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             )
+
+            // Goal picker (only for editable tasks)
+            if (!isReadOnly && availableGoals.isNotEmpty()) {
+                GoalPicker(
+                    availableGoals = availableGoals,
+                    selectedGoalId = selectedGoalId,
+                    onGoalSelected = onGoalChanged,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else if (task?.linkedGoalId != null && task.linkedGoalName != null) {
+                // Read-only goal display
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Linked Goal",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "${task.linkedGoalIcon ?: ""} ${task.linkedGoalName}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
 
             // Task metadata section
             if (task != null) {

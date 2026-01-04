@@ -176,11 +176,19 @@ fun PlanningScreen(
                                 taskText = uiState.newTaskText,
                                 taskError = uiState.newTaskError,
                                 addedTasks = uiState.addedTasks,
+                                goalSuggestions = uiState.goalSuggestions,
+                                selectedGoal = uiState.selectedGoalForNewTask,
                                 onTextChange = { text ->
                                     viewModel.onEvent(PlanningEvent.NewTaskTextChanged(text))
                                 },
                                 onAddTask = {
                                     viewModel.onEvent(PlanningEvent.NewTaskSubmitted)
+                                },
+                                onGoalSelected = { goal ->
+                                    viewModel.onEvent(PlanningEvent.GoalSuggestionSelected(goal.id))
+                                },
+                                onClearGoal = {
+                                    viewModel.onEvent(PlanningEvent.ClearSelectedGoal)
                                 },
                                 onDone = {
                                     viewModel.onEvent(PlanningEvent.DoneAddingTasks)

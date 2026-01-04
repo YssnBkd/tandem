@@ -282,6 +282,8 @@ fun WeekScreen(
             TaskDetailSheet(
                 task = uiState.selectedTask,
                 isReadOnly = uiState.isReadOnly,
+                availableGoals = uiState.availableGoals,
+                selectedGoalId = viewModel.getEditedGoalId(),
                 onDismiss = {
                     viewModel.onEvent(WeekEvent.DetailSheetDismissed)
                 },
@@ -290,6 +292,9 @@ fun WeekScreen(
                 },
                 onNotesChange = { notes ->
                     viewModel.onEvent(WeekEvent.TaskNotesChanged(notes))
+                },
+                onGoalChanged = { goalId ->
+                    viewModel.onEvent(WeekEvent.TaskGoalChanged(goalId))
                 },
                 onSaveRequested = {
                     viewModel.onEvent(WeekEvent.TaskSaveRequested)
