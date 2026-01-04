@@ -1,0 +1,61 @@
+import kotlinx.datetime.Instant;
+import org.epoque.tandem.domain.model.GoalType;
+import org.epoque.tandem.domain.model.GoalStatus;
+
+-- Separate table for caching partner's goals (read-only local copy)
+CREATE TABLE PartnerGoal (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    icon TEXT NOT NULL,
+    type TEXT AS GoalType NOT NULL,
+    target_per_week INTEGER,
+    target_total INTEGER,
+    duration_weeks INTEGER,
+    start_week_id TEXT NOT NULL,
+    owner_id TEXT NOT NULL,
+    current_progress INTEGER NOT NULL DEFAULT 0,
+    current_week_id TEXT NOT NULL,
+    status TEXT AS GoalStatus NOT NULL DEFAULT 'ACTIVE',
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL,
+    synced_at INTEGER AS Instant NOT NULL
+);
+
+CREATE INDEX idx_partner_goals_owner ON PartnerGoal(owner_id);
+
+-- Insert or replace partner goal (from sync)
+upsertPartnerGoal:
+INSERT OR REPLACE INTO PartnerGoal (
+    id, name, icon, type, target_per_week, target_total, duration_weeks,
+    start_week_id, owner_id, current_progress, current_week_id,
+    status, created_at, updated_at, synced_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Get all partner goals
+getPartnerGoals:
+SELECT * FROM PartnerGoal
+WHERE owner_id = :partnerId
+ORDER BY created_at DESC;
+
+-- Get active partner goals
+getActivePartnerGoals:
+SELECT * FROM PartnerGoal
+WHERE owner_id = :partnerId
+  AND status = 'ACTIVE'
+ORDER BY created_at DESC;
+
+-- Get partner goal by ID
+getPartnerGoalById:
+SELECT * FROM PartnerGoal WHERE id = ?;
+
+-- Delete partner goal (when partner deletes their goal)
+deletePartnerGoalById:
+DELETE FROM PartnerGoal WHERE id = ?;
+
+-- Clear all partner goals (on partner disconnect)
+clearPartnerGoals:
+DELETE FROM PartnerGoal WHERE owner_id = ?;
+
+-- Get last sync time for partner goals
+getLastSyncTime:
+SELECT MAX(synced_at) FROM PartnerGoal WHERE owner_id = ?;

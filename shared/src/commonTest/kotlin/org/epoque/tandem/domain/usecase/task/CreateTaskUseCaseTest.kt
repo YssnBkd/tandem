@@ -52,6 +52,7 @@ class CreateTaskUseCaseTest {
             weekId = weekId,
             status = TaskStatus.PENDING,
             createdBy = testUserId,
+            requestNote = null,
             repeatTarget = null,
             repeatCompleted = 0,
             linkedGoalId = null,

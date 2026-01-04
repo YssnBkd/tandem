@@ -46,6 +46,7 @@ val planningModule = module {
             taskRepository = get(),
             weekRepository = get(),
             authRepository = get(),
+            goalRepository = get(),
             planningProgress = get()
         )
     }

@@ -97,3 +97,17 @@ SELECT * FROM Task
 WHERE status = ?
   AND owner_id = ?
 ORDER BY created_at DESC;
+
+-- Get tasks linked to a goal (Feature 007: Goals System)
+getTasksByLinkedGoalId:
+SELECT * FROM Task
+WHERE linked_goal_id = ?
+ORDER BY created_at DESC;
+
+-- Update linked goal ID for a task (Feature 007: Goals System)
+updateLinkedGoalId:
+UPDATE Task SET linked_goal_id = ?, updated_at = ? WHERE id = ?;
+
+-- Clear linked goal ID for all tasks linked to a specific goal (on goal deletion)
+clearLinkedGoalIdForGoal:
+UPDATE Task SET linked_goal_id = NULL, updated_at = ? WHERE linked_goal_id = ?;

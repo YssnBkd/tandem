@@ -13,12 +13,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import org.epoque.tandem.domain.model.Goal
 import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.Task
 import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.domain.model.Week
 import org.epoque.tandem.domain.repository.AuthRepository
 import org.epoque.tandem.domain.repository.AuthState
+import org.epoque.tandem.domain.repository.GoalRepository
 import org.epoque.tandem.domain.repository.TaskRepository
 import org.epoque.tandem.domain.repository.WeekRepository
 import org.epoque.tandem.presentation.planning.preferences.PlanningProgress
@@ -40,6 +42,7 @@ class PlanningViewModel(
     private val taskRepository: TaskRepository,
     private val weekRepository: WeekRepository,
     private val authRepository: AuthRepository,
+    private val goalRepository: GoalRepository,
     private val planningProgress: PlanningProgress
 ) : ViewModel() {
 
@@ -69,6 +72,8 @@ class PlanningViewModel(
             is PlanningEvent.NewTaskTextChanged -> handleNewTaskTextChanged(event.text)
             is PlanningEvent.NewTaskSubmitted -> handleNewTaskSubmitted()
             is PlanningEvent.DoneAddingTasks -> handleDoneAddingTasks()
+            is PlanningEvent.GoalSuggestionSelected -> handleGoalSuggestionSelected(event.goalId)
+            is PlanningEvent.ClearSelectedGoal -> handleClearSelectedGoal()
             is PlanningEvent.PartnerRequestAccepted -> handlePartnerRequestAccepted(event.taskId)
             is PlanningEvent.PartnerRequestDiscussed -> handlePartnerRequestDiscussed(event.taskId)
             is PlanningEvent.PartnerRequestsStepComplete -> handlePartnerRequestsStepComplete()
@@ -115,10 +120,13 @@ class PlanningViewModel(
                     .observeTasksByStatus(TaskStatus.PENDING_ACCEPTANCE, userId)
                     .first()
 
-                // 7. Determine initial step (skip steps with no data)
+                // 7. Load goal suggestions for Add Tasks step (Feature 007)
+                val goalSuggestions = goalRepository.getActiveGoalsForSuggestions(userId)
+
+                // 8. Determine initial step (skip steps with no data)
                 val initialStep = getInitialStep(rolloverTasks.isNotEmpty(), partnerRequests.isNotEmpty())
 
-                // 8. Initialize UI state with all collected data
+                // 9. Initialize UI state with all collected data
                 _uiState.update {
                     it.copy(
                         currentStep = initialStep,
@@ -129,6 +137,7 @@ class PlanningViewModel(
                         partnerRequests = partnerRequests.map { task ->
                             TaskUiModel.fromTask(task, userId, null)
                         },
+                        goalSuggestions = goalSuggestions,
                         isLoading = false,
                         error = null
                     )
@@ -271,7 +280,9 @@ class PlanningViewModel(
             try {
                 val userId = currentUserId ?: return@launch
                 val currentWeekId = weekRepository.getCurrentWeekId()
-                val title = _uiState.value.newTaskText.trim()
+                val state = _uiState.value
+                val title = state.newTaskText.trim()
+                val selectedGoal = state.selectedGoalForNewTask
 
                 if (title.isEmpty()) {
                     _uiState.update { it.copy(newTaskError = "Task title cannot be empty") }
@@ -290,7 +301,7 @@ class PlanningViewModel(
                     requestNote = null,
                     repeatTarget = null,
                     repeatCompleted = 0,
-                    linkedGoalId = null,
+                    linkedGoalId = selectedGoal?.id,
                     reviewNote = null,
                     rolledFromWeekId = null,
                     createdAt = Clock.System.now(),
@@ -299,13 +310,14 @@ class PlanningViewModel(
 
                 val createdTask = taskRepository.createTask(newTask)
 
-                _uiState.update { state ->
-                    state.copy(
+                _uiState.update { uiState ->
+                    uiState.copy(
                         newTaskText = "",
                         newTaskError = null,
-                        addedTasks = state.addedTasks + TaskUiModel.fromTask(createdTask, userId, null),
-                        newTasksCreated = state.newTasksCreated + 1,
-                        totalTasksPlanned = state.totalTasksPlanned + 1
+                        selectedGoalForNewTask = null,
+                        addedTasks = uiState.addedTasks + TaskUiModel.fromTask(createdTask, userId, null),
+                        newTasksCreated = uiState.newTasksCreated + 1,
+                        totalTasksPlanned = uiState.totalTasksPlanned + 1
                     )
                 }
 
@@ -326,6 +338,21 @@ class PlanningViewModel(
             saveProgress()
             _sideEffects.send(PlanningSideEffect.NavigateToStep(nextStep))
         }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // GOAL SUGGESTION EVENT HANDLERS (Feature 007: Goals System)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    private fun handleGoalSuggestionSelected(goalId: String) {
+        val goal = _uiState.value.goalSuggestions.find { it.id == goalId }
+        if (goal != null) {
+            _uiState.update { it.copy(selectedGoalForNewTask = goal) }
+        }
+    }
+
+    private fun handleClearSelectedGoal() {
+        _uiState.update { it.copy(selectedGoalForNewTask = null) }
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

@@ -56,6 +56,7 @@ class TaskRepositoryTest {
             weekId = weekId,
             status = status,
             createdBy = testUserId,
+            requestNote = null,
             repeatTarget = null,
             repeatCompleted = 0,
             linkedGoalId = null,

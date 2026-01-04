@@ -15,6 +15,10 @@ sealed class PlanningEvent {
     data object NewTaskSubmitted : PlanningEvent()
     data object DoneAddingTasks : PlanningEvent()
 
+    // Goal Suggestion Events (Feature 007: Goals System)
+    data class GoalSuggestionSelected(val goalId: String) : PlanningEvent()
+    data object ClearSelectedGoal : PlanningEvent()
+
     // Partner Requests Step Events
     data class PartnerRequestAccepted(val taskId: String) : PlanningEvent()
     data class PartnerRequestDiscussed(val taskId: String) : PlanningEvent()

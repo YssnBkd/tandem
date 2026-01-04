@@ -26,11 +26,11 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 **Purpose**: Project initialization and SQLDelight schema setup
 
-- [ ] T001 Create Goal.sq SQLDelight schema in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/Goal.sq`
-- [ ] T002 [P] Create GoalProgress.sq SQLDelight schema in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/GoalProgress.sq`
-- [ ] T003 [P] Create PartnerGoal.sq SQLDelight schema (for caching partner goals) in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/PartnerGoal.sq`
-- [ ] T004 Verify `Task.linkedGoalId` exists in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/Task.sq` (already present)
-- [ ] T005 Run `./gradlew :shared:generateCommonMainTandemDatabaseInterface` to generate SQLDelight code
+- [X] T001 Create Goal.sq SQLDelight schema in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/Goal.sq`
+- [X] T002 [P] Create GoalProgress.sq SQLDelight schema in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/GoalProgress.sq`
+- [X] T003 [P] Create PartnerGoal.sq SQLDelight schema (for caching partner goals) in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/PartnerGoal.sq`
+- [X] T004 Verify `Task.linkedGoalId` exists in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/Task.sq` (already present)
+- [X] T005 Run `./gradlew :shared:generateCommonMainTandemDatabaseInterface` to generate SQLDelight code
 
 **Checkpoint**: SQLDelight schemas compile successfully
 
@@ -44,31 +44,31 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### Domain Models
 
-- [ ] T006 [P] Create GoalType sealed class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/GoalType.kt`
-- [ ] T007 [P] Create GoalStatus enum in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/GoalStatus.kt`
-- [ ] T008 [P] Create Goal data class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/Goal.kt`
-- [ ] T009 [P] Create GoalProgress data class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/GoalProgress.kt`
-- [ ] T010 Create WeekCalculator utility in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/util/WeekCalculator.kt`
+- [X] T006 [P] Create GoalType sealed class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/GoalType.kt`
+- [X] T007 [P] Create GoalStatus enum in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/GoalStatus.kt`
+- [X] T008 [P] Create Goal data class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/Goal.kt`
+- [X] T009 [P] Create GoalProgress data class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/GoalProgress.kt`
+- [X] T010 Create WeekCalculator utility in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/util/WeekCalculator.kt`
 
 ### Repository Interface
 
-- [ ] T011 Create GoalRepository interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/GoalRepository.kt`
-- [ ] T012 Create GoalException sealed class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/GoalException.kt`
+- [X] T011 Create GoalRepository interface in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/GoalRepository.kt`
+- [X] T012 Create GoalException sealed class in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/GoalException.kt`
 
 ### Repository Implementation
 
-- [ ] T013 Create GoalRepositoryImpl in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/GoalRepositoryImpl.kt`
-- [ ] T014 Add SQLDelight type adapters for GoalType and GoalStatus in `shared/src/commonMain/kotlin/org/epoque/tandem/data/local/adapter/GoalTypeAdapter.kt`
-- [ ] T015 Register Goal tables in TandemDatabaseFactory in `shared/src/commonMain/kotlin/org/epoque/tandem/data/local/TandemDatabaseFactory.kt`
+- [X] T013 Create GoalRepositoryImpl in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/GoalRepositoryImpl.kt`
+- [X] T014 Add SQLDelight type adapters for GoalType and GoalStatus in `shared/src/commonMain/kotlin/org/epoque/tandem/data/local/adapter/GoalTypeAdapter.kt`
+- [X] T015 Register Goal tables in TandemDatabaseFactory in `shared/src/commonMain/kotlin/org/epoque/tandem/data/local/TandemDatabaseFactory.kt`
 
 ### DI Module
 
-- [ ] T016 Create GoalsModule for Koin in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/GoalsModule.kt`
-- [ ] T017 Register GoalsModule in AppModule in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/AppModule.kt`
+- [X] T016 Create GoalsModule for Koin in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/GoalsModule.kt`
+- [X] T017 Register GoalsModule in AppModule in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/AppModule.kt`
 
 ### Build Verification
 
-- [ ] T018 Run `./gradlew :composeApp:compileDebugKotlinAndroid` to verify foundation compiles
+- [X] T018 Run `./gradlew :composeApp:compileDebugKotlinAndroid` to verify foundation compiles
 
 **Checkpoint**: Foundation ready - repository can create, read, update, delete goals. User story implementation can now begin.
 
@@ -82,11 +82,11 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### Presentation Layer for US1
 
-- [ ] T019 [P] [US1] Create GoalSegment enum (YOURS, PARTNERS) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalSegment.kt`
-- [ ] T020 [P] [US1] Create GoalsUiState data class (myGoals, partnerGoals, isViewingPartnerGoal) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsUiState.kt`
-- [ ] T021 [P] [US1] Create GoalsEvent sealed interface in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsEvent.kt`
-- [ ] T022 [P] [US1] Create GoalsSideEffect sealed interface in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsSideEffect.kt`
-- [ ] T023 [US1] Create GoalsViewModel in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
+- [X] T019 [P] [US1] Create GoalSegment enum (YOURS, PARTNERS) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalSegment.kt`
+- [X] T020 [P] [US1] Create GoalsUiState data class (myGoals, partnerGoals, isViewingPartnerGoal) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsUiState.kt`
+- [X] T021 [P] [US1] Create GoalsEvent sealed interface in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsEvent.kt`
+- [X] T022 [P] [US1] Create GoalsSideEffect sealed interface in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsSideEffect.kt`
+- [X] T023 [US1] Create GoalsViewModel in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
   - **CRITICAL Init Sequence** (see plan.md "Initialization Sequence"):
     1. Import `kotlinx.coroutines.flow.filterIsInstance` and `kotlinx.coroutines.flow.first`
     2. Wait for auth: `val userId = authRepository.authState.filterIsInstance<AuthState.Authenticated>().first().user.id`
@@ -97,24 +97,24 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### UI Components for US1
 
-- [ ] T024 [P] [US1] Create GoalProgressBar composable (48dp touch target) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalProgressBar.kt`
-- [ ] T025 [P] [US1] Create GoalCard composable (icon, title, progress bar, progress text) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalCard.kt`
-- [ ] T026 [P] [US1] Create EmptyGoalsState composable (different messages for own vs partner) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/EmptyGoalsState.kt`
-- [ ] T027 [US1] Create GoalsScreen composable (segment control with "Yours"/"Partner's", goal list, empty state) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalsScreen.kt`
-- [ ] T027a [P] [US1] Create GoalStatusBadge composable (ACTIVE/COMPLETED/EXPIRED indicator) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalStatusBadge.kt`
-- [ ] T027b [US1] Add status filter toggle to GoalsScreen (Active only / All) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalsScreen.kt`
+- [X] T024 [P] [US1] Create GoalProgressBar composable (48dp touch target) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalProgressBar.kt`
+- [X] T025 [P] [US1] Create GoalCard composable (icon, title, progress bar, progress text) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalCard.kt`
+- [X] T026 [P] [US1] Create EmptyGoalsState composable (different messages for own vs partner) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/EmptyGoalsState.kt`
+- [X] T027 [US1] Create GoalsScreen composable (segment control with "Yours"/"Partner's", goal list, empty state) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalsScreen.kt`
+- [X] T027a [P] [US1] Create GoalStatusBadge composable (ACTIVE/COMPLETED/EXPIRED indicator) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalStatusBadge.kt`
+- [X] T027b [US1] Add status filter toggle to GoalsScreen (Active only / All) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalsScreen.kt`
 
 ### Navigation for US1
 
-- [ ] T028 [US1] Create Goals routes in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/Routes.kt`
-- [ ] T029 [US1] Create GoalsNavGraph with stateProvider pattern in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/GoalsNavGraph.kt`
-- [ ] T030 [US1] Integrate GoalsNavGraph into TandemNavHost in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/TandemNavHost.kt`
-- [ ] T031 [US1] Update MainScreen to replace placeholder GoalsScreen in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/MainScreen.kt`
+- [X] T028 [US1] Create Goals routes in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/Routes.kt`
+- [X] T029 [US1] Create GoalsNavGraph with stateProvider pattern in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/GoalsNavGraph.kt`
+- [X] T030 [US1] Integrate GoalsNavGraph into TandemNavHost in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/TandemNavHost.kt`
+- [X] T031 [US1] Update MainScreen to replace placeholder GoalsScreen in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/main/MainScreen.kt`
 
 ### Verification for US1
 
-- [ ] T032 [US1] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
-- [ ] T033 [US1] Manual test: Navigate to Goals tab -> Verify segment control displays -> Verify empty state shows
+- [X] T032 [US1] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
+- [X] T033 [US1] Manual test: Navigate to Goals tab -> Verify segment control displays -> Verify empty state shows
 
 **Checkpoint**: User Story 1 complete - Users can view Goals tab with segment control and empty state
 
@@ -128,25 +128,25 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### UI Components for US2
 
-- [ ] T034 [P] [US2] Create EmojiPicker composable (48dp touch targets for emoji buttons) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/EmojiPicker.kt`
-- [ ] T035 [P] [US2] Create GoalTypeSelector composable (48dp touch targets for type options) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalTypeSelector.kt`
-- [ ] T036 [P] [US2] Create DurationSelector composable (48dp touch targets for duration options) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/DurationSelector.kt`
-- [ ] T037 [US2] Create AddGoalSheet composable (name, icon picker, type, duration - 48dp touch targets for Save/Cancel buttons) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/AddGoalSheet.kt`
+- [X] T034 [P] [US2] Create EmojiPicker composable (48dp touch targets for emoji buttons) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/EmojiPicker.kt`
+- [X] T035 [P] [US2] Create GoalTypeSelector composable (48dp touch targets for type options) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalTypeSelector.kt`
+- [X] T036 [P] [US2] Create DurationSelector composable (48dp touch targets for duration options) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/DurationSelector.kt`
+- [X] T037 [US2] Create AddGoalSheet composable (name, icon picker, type, duration - 48dp touch targets for Save/Cancel buttons) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/AddGoalSheet.kt`
 
 ### ViewModel Updates for US2
 
-- [ ] T038 [US2] Add goal creation events to GoalsEvent in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsEvent.kt`
-- [ ] T039 [US2] Add goal creation state to GoalsUiState in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsUiState.kt`
-- [ ] T040 [US2] Implement createGoal handler with 10-goal limit check in GoalsViewModel in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
+- [X] T038 [US2] Add goal creation events to GoalsEvent in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsEvent.kt`
+- [X] T039 [US2] Add goal creation state to GoalsUiState in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsUiState.kt`
+- [X] T040 [US2] Implement createGoal handler with 10-goal limit check in GoalsViewModel in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
 
 ### Screen Integration for US2
 
-- [ ] T041 [US2] Update GoalsScreen to show Add button (48dp touch target, only on "Yours" segment) and AddGoalSheet in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalsScreen.kt`
+- [X] T041 [US2] Update GoalsScreen to show Add button (48dp touch target, only on "Yours" segment) and AddGoalSheet in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalsScreen.kt`
 
 ### Verification for US2
 
-- [ ] T042 [US2] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
-- [ ] T043 [US2] Manual test: Create Weekly Habit goal -> Verify appears in list with correct progress display
+- [X] T042 [US2] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
+- [X] T043 [US2] Manual test: Create Weekly Habit goal -> Verify appears in list with correct progress display
 
 **Checkpoint**: User Story 2 complete - Users can create goals of all three types
 
@@ -160,23 +160,23 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### Progress Calculation
 
-- [ ] T044 [US3] Implement calculateProgress methods in Goal model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/Goal.kt`
-- [ ] T045 [US3] Implement weekly reset logic in GoalRepositoryImpl (processWeeklyResets) in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/GoalRepositoryImpl.kt`
+- [X] T044 [US3] Implement calculateProgress methods in Goal model in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/model/Goal.kt`
+- [X] T045 [US3] Implement weekly reset logic in GoalRepositoryImpl (processWeeklyResets) in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/GoalRepositoryImpl.kt`
 
 ### UI Updates for US3
 
-- [ ] T046 [US3] Update GoalCard to show type-specific progress indicators in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalCard.kt`
-- [ ] T047 [US3] Add "This week" indicator for Weekly Habit and Recurring Task goals in GoalCard
+- [X] T046 [US3] Update GoalCard to show type-specific progress indicators in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalCard.kt`
+- [X] T047 [US3] Add "This week" indicator for Weekly Habit and Recurring Task goals in GoalCard
 
 ### ViewModel Updates for US3
 
-- [ ] T048 [US3] Call processWeeklyResets on GoalsViewModel init in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
-- [ ] T049 [US3] Call checkGoalExpirations on GoalsViewModel init for status transitions
+- [X] T048 [US3] Call processWeeklyResets on GoalsViewModel init in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
+- [X] T049 [US3] Call checkGoalExpirations on GoalsViewModel init for status transitions
 
 ### Verification for US3
 
-- [ ] T050 [US3] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
-- [ ] T051 [US3] Manual test: Create goal -> Verify progress bar and text display correctly
+- [X] T050 [US3] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
+- [X] T051 [US3] Manual test: Create goal -> Verify progress bar and text display correctly
 
 **Checkpoint**: User Story 3 complete - Progress visualization working for all goal types
 
@@ -190,25 +190,25 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### Repository Updates for US4
 
-- [ ] T052 [US4] Add observeMyActiveGoals method to GoalRepository in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/GoalRepository.kt`
-- [ ] T053 [US4] Implement observeMyActiveGoals in GoalRepositoryImpl in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/GoalRepositoryImpl.kt`
+- [X] T052 [US4] Add observeMyActiveGoals method to GoalRepository in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/GoalRepository.kt`
+- [X] T053 [US4] Implement observeMyActiveGoals in GoalRepositoryImpl in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/GoalRepositoryImpl.kt`
 
 ### Task Integration for US4
 
-- [ ] T054 [US4] Create GoalPicker composable (shows only user's own active goals, 48dp touch targets for goal options) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalPicker.kt`
-- [ ] T055 [US4] Update TaskDetailSheet to include GoalPicker in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskDetailSheet.kt`
-- [ ] T056 [US4] Create GoalBadge composable for task cards in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/components/GoalBadge.kt`
-- [ ] T057 [US4] Update TaskListItem to display GoalBadge when linkedGoalId exists in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskListItem.kt`
+- [X] T054 [US4] Create GoalPicker composable (shows only user's own active goals, 48dp touch targets for goal options) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/GoalPicker.kt`
+- [X] T055 [US4] Update TaskDetailSheet to include GoalPicker in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskDetailSheet.kt`
+- [X] T056 [US4] Create GoalBadge composable for task cards in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/components/GoalBadge.kt`
+- [X] T057 [US4] Update TaskListItem to display GoalBadge when linkedGoalId exists in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/week/TaskListItem.kt`
 
 ### Progress Auto-Update for US4
 
-- [ ] T058 [US4] Update WeekViewModel handleTaskCheckboxTapped to increment goal progress in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekViewModel.kt`
-- [ ] T059 [US4] Add goalRepository dependency to WeekViewModel and update DI in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/WeekModule.kt`
+- [X] T058 [US4] Update WeekViewModel handleTaskCheckboxTapped to increment goal progress in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/week/WeekViewModel.kt`
+- [X] T059 [US4] Add goalRepository dependency to WeekViewModel and update DI in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/WeekModule.kt`
 
 ### Verification for US4
 
-- [ ] T060 [US4] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
-- [ ] T061 [US4] Manual test: Link task to goal -> Complete task -> Verify goal progress updates
+- [X] T060 [US4] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
+- [X] T061 [US4] Manual test: Link task to goal -> Complete task -> Verify goal progress updates
 
 **Checkpoint**: User Story 4 complete - Task-goal linking and automatic progress tracking working
 
@@ -222,31 +222,31 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### Repository Updates for US5 (Query First)
 
-- [ ] T062 [US5] Add getTasksByLinkedGoalId query to Task.sq in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/Task.sq` (MUST be first - T063-T064 depend on this)
-- [ ] T063 [US5] Add observeLinkedTasks method to TaskRepository in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/TaskRepository.kt` (depends on T062)
-- [ ] T064 [US5] Implement observeLinkedTasks in TaskRepositoryImpl in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/TaskRepositoryImpl.kt` (depends on T062)
+- [X] T062 [US5] Add getTasksByLinkedGoalId query to Task.sq in `shared/src/commonMain/sqldelight/org/epoque/tandem/data/local/Task.sq` (MUST be first - T063-T064 depend on this)
+- [X] T063 [US5] Add observeLinkedTasks method to TaskRepository in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/TaskRepository.kt` (depends on T062)
+- [X] T064 [US5] Implement observeLinkedTasks in TaskRepositoryImpl in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/TaskRepositoryImpl.kt` (depends on T062)
 
 ### UI Components for US5
 
-- [ ] T065 [P] [US5] Create ProgressHistoryChart composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/ProgressHistoryChart.kt`
-- [ ] T066 [P] [US5] Create LinkedTasksList composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/LinkedTasksList.kt` (depends on T063-T064)
-- [ ] T067 [US5] Create GoalDetailScreen composable (with canEdit flag for own vs partner goals) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalDetailScreen.kt`
+- [X] T065 [P] [US5] Create ProgressHistoryChart composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/ProgressHistoryChart.kt`
+- [X] T066 [P] [US5] Create LinkedTasksList composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/LinkedTasksList.kt` (depends on T063-T064)
+- [X] T067 [US5] Create GoalDetailScreen composable (with canEdit flag for own vs partner goals) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalDetailScreen.kt`
 
 ### ViewModel Updates for US5
 
-- [ ] T068 [US5] Add goal detail state (isViewingPartnerGoal, canEditSelectedGoal) to GoalsUiState in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsUiState.kt`
-- [ ] T069 [US5] Add goal detail events to GoalsEvent in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsEvent.kt`
-- [ ] T070 [US5] Implement handleGoalTapped to load detail with progress history and linked tasks in GoalsViewModel
+- [X] T068 [US5] Add goal detail state (isViewingPartnerGoal, canEditSelectedGoal) to GoalsUiState in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsUiState.kt`
+- [X] T069 [US5] Add goal detail events to GoalsEvent in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsEvent.kt`
+- [X] T070 [US5] Implement handleGoalTapped to load detail with progress history and linked tasks in GoalsViewModel
 
 ### Navigation for US5
 
-- [ ] T071 [US5] Add Goals.Detail route (with isPartnerGoal flag) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/Routes.kt`
-- [ ] T072 [US5] Add GoalDetailScreen to GoalsNavGraph in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/GoalsNavGraph.kt`
+- [X] T071 [US5] Add Goals.Detail route (with isPartnerGoal flag) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/Routes.kt`
+- [X] T072 [US5] Add GoalDetailScreen to GoalsNavGraph in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/navigation/GoalsNavGraph.kt`
 
 ### Verification for US5
 
-- [ ] T073 [US5] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
-- [ ] T074 [US5] Manual test: Tap own goal -> Verify detail screen with history and linked tasks. Tap partner goal -> Verify read-only view.
+- [X] T073 [US5] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
+- [X] T074 [US5] Manual test: Tap own goal -> Verify detail screen with history and linked tasks. Tap partner goal -> Verify read-only view.
 
 **Note**: Task numbers T062-T067 were reordered from original to ensure query (T062) is created before repository methods (T063-T064) that depend on it.
 
@@ -262,24 +262,24 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### UI Components for US6
 
-- [ ] T075 [US6] Create EditGoalSheet composable (name, icon editable) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/EditGoalSheet.kt`
-- [ ] T076 [US6] Create DeleteGoalDialog composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/DeleteGoalDialog.kt`
+- [X] T075 [US6] Create EditGoalSheet composable (name, icon editable) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/EditGoalSheet.kt`
+- [X] T076 [US6] Create DeleteGoalDialog composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/components/DeleteGoalDialog.kt`
 
 ### ViewModel Updates for US6
 
-- [ ] T077 [US6] Add edit/delete events to GoalsEvent in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsEvent.kt`
-- [ ] T078 [US6] Add edit state to GoalsUiState in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsUiState.kt`
-- [ ] T079 [US6] Implement edit and delete handlers in GoalsViewModel (with ownership check) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
+- [X] T077 [US6] Add edit/delete events to GoalsEvent in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsEvent.kt`
+- [X] T078 [US6] Add edit state to GoalsUiState in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsUiState.kt`
+- [X] T079 [US6] Implement edit and delete handlers in GoalsViewModel (with ownership check) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
 
 ### Screen Integration for US6
 
-- [ ] T080 [US6] Add Edit and Delete buttons (48dp touch targets, only visible when canEditSelectedGoal) to GoalDetailScreen in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalDetailScreen.kt`
-- [ ] T081 [US6] Integrate EditGoalSheet and DeleteGoalDialog into GoalDetailScreen
+- [X] T080 [US6] Add Edit and Delete buttons (48dp touch targets, only visible when canEditSelectedGoal) to GoalDetailScreen in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/goals/GoalDetailScreen.kt`
+- [X] T081 [US6] Integrate EditGoalSheet and DeleteGoalDialog into GoalDetailScreen
 
 ### Verification for US6
 
-- [ ] T082 [US6] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
-- [ ] T083 [US6] Manual test: Edit own goal name -> Verify update. Delete own goal -> Verify removal. View partner goal -> Verify no edit/delete buttons.
+- [X] T082 [US6] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
+- [X] T083 [US6] Manual test: Edit own goal name -> Verify update. Delete own goal -> Verify removal. View partner goal -> Verify no edit/delete buttons.
 
 **Checkpoint**: User Story 6 complete - Full CRUD operations for own goals, read-only for partner goals
 
@@ -293,27 +293,27 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### Repository Updates for US7
 
-- [ ] T084 [US7] Add getActiveGoalsForSuggestions method to GoalRepository in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/GoalRepository.kt`
-- [ ] T085 [US7] Implement getActiveGoalsForSuggestions in GoalRepositoryImpl in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/GoalRepositoryImpl.kt`
+- [X] T084 [US7] Add getActiveGoalsForSuggestions method to GoalRepository in `shared/src/commonMain/kotlin/org/epoque/tandem/domain/repository/GoalRepository.kt`
+- [X] T085 [US7] Implement getActiveGoalsForSuggestions in GoalRepositoryImpl in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/GoalRepositoryImpl.kt`
 
 ### UI Components for US7
 
-- [ ] T086 [US7] Create GoalSuggestionsCard composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/components/GoalSuggestionsCard.kt`
+- [X] T086 [US7] Create GoalSuggestionsCard composable in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/components/GoalSuggestionsCard.kt`
 
 ### ViewModel Updates for US7
 
-- [ ] T087 [US7] Add goal suggestions state to PlanningUiState in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningUiState.kt`
-- [ ] T088 [US7] Add goalRepository dependency to PlanningViewModel and load suggestions in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningViewModel.kt`
-- [ ] T089 [US7] Update PlanningModule to inject goalRepository in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/PlanningModule.kt`
+- [X] T087 [US7] Add goal suggestions state to PlanningUiState in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningUiState.kt`
+- [X] T088 [US7] Add goalRepository dependency to PlanningViewModel and load suggestions in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/planning/PlanningViewModel.kt`
+- [X] T089 [US7] Update PlanningModule to inject goalRepository in `composeApp/src/androidMain/kotlin/org/epoque/tandem/di/PlanningModule.kt`
 
 ### Screen Integration for US7
 
-- [ ] T090 [US7] Add GoalSuggestionsCard to AddTasksStepScreen in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/AddTasksStepScreen.kt`
+- [X] T090 [US7] Add GoalSuggestionsCard to AddTasksStepScreen in `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/planning/AddTasksStepScreen.kt`
 
 ### Verification for US7
 
-- [ ] T091 [US7] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
-- [ ] T092 [US7] Manual test: Enter planning with active goals -> Verify suggestions appear
+- [X] T091 [US7] Run `./gradlew :composeApp:compileDebugKotlinAndroid` and verify build succeeds
+- [X] T092 [US7] Manual test: Enter planning with active goals -> Verify suggestions appear
 
 **Checkpoint**: User Story 7 complete - Goal-based suggestions in planning
 
@@ -325,20 +325,20 @@ shared/src/commonMain/sqldelight/org/epoque/tandem/       # SQLDelight schemas
 
 ### Partner Goal Visibility Sync
 
-- [ ] T093 Implement syncPartnerGoals in GoalRepositoryImpl (fetch partner goals from Supabase to PartnerGoal table) in `shared/src/commonMain/kotlin/org/epoque/tandem/data/repository/GoalRepositoryImpl.kt`
-- [ ] T094 Add partner goal sync to GoalsViewModel when partner changes (pass userId to `partnerRepository.observePartner(userId)`) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
-- [ ] T095 Create Supabase goals table migration (for partner goal visibility sync) in `supabase/migrations/`
-- [ ] T096 Setup Supabase Realtime subscription for partner goal changes in GoalsViewModel
+- [X] T093 Implement syncPartnerGoals in GoalRepositoryAndroidImpl (fetch partner goals from Supabase to PartnerGoal table) in `composeApp/src/androidMain/kotlin/org/epoque/tandem/data/repository/GoalRepositoryAndroidImpl.kt`
+- [X] T094 Add partner goal sync to GoalsViewModel when partner changes (pass userId to `partnerRepository.observePartner(userId)`) in `composeApp/src/commonMain/kotlin/org/epoque/tandem/presentation/goals/GoalsViewModel.kt`
+- [X] T095 Create Supabase goals table migration (for partner goal visibility sync) in `supabase/migrations/`
+- [X] T096 Setup Supabase Realtime subscription for partner goal changes in GoalRepositoryAndroidImpl (startPartnerGoalSync/stopPartnerGoalSync methods)
 
 ### Edge Cases
 
-- [ ] T097 Implement goal expiration check (COMPLETED/EXPIRED status) in GoalRepositoryImpl
-- [ ] T098 Handle partner disconnection: Clear partner goals cache in GoalRepositoryImpl
-- [ ] T099 Clear linkedGoalId when goal is deleted in GoalRepositoryImpl
+- [X] T097 Implement goal expiration check (COMPLETED/EXPIRED status) in GoalRepositoryImpl (checkGoalExpirations method)
+- [X] T098 Handle partner disconnection: Clear partner goals cache in GoalRepositoryImpl (clearPartnerGoalCache method)
+- [X] T099 Clear linkedGoalId when goal is deleted in GoalRepositoryImpl (clearLinkedGoalFromTasks called from deleteGoal)
 
 ### Final Verification
 
-- [ ] T100 Run full build: `./gradlew :composeApp:compileDebugKotlinAndroid`
+- [X] T100 Run full build: `./gradlew :composeApp:compileDebugKotlinAndroid`
 - [ ] T101 E2E Test: Create goal -> Appears in list with progress display
 - [ ] T102 E2E Test: Link task to goal -> Complete task -> Verify progress updates
 - [ ] T103 E2E Test: Partner creates goal -> Verify visible in "Partner's" segment (requires two test accounts)
