@@ -6,6 +6,7 @@ import org.epoque.tandem.di.authModule
 import org.epoque.tandem.di.goalsModule
 import org.epoque.tandem.di.partnerModule
 import org.epoque.tandem.di.planningModule
+import org.epoque.tandem.di.progressModule
 import org.epoque.tandem.di.reviewModule
 import org.epoque.tandem.di.taskModule
 import org.epoque.tandem.di.weekModule
@@ -35,7 +36,8 @@ class TandemApp : Application() {
                 planningModule,
                 reviewModule,
                 partnerModule,
-                goalsModule
+                goalsModule,
+                progressModule
             )
         }
     }
