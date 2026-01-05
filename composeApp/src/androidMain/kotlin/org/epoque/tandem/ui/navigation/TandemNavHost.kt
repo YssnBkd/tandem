@@ -19,11 +19,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
+import org.epoque.tandem.BuildConfig
+import org.epoque.tandem.data.seed.MockDataSeeder
 import org.epoque.tandem.presentation.auth.AuthUiState
 import org.epoque.tandem.presentation.auth.AuthViewModel
 import org.epoque.tandem.presentation.partner.PartnerViewModel
 import org.epoque.tandem.ui.planning.PlanningScreen
 import org.epoque.tandem.ui.review.ReviewScreen
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -79,6 +82,15 @@ fun TandemNavHost(
             // Navigate to accept invite screen
             navController.navigate(Routes.Partner.AcceptInvite(pendingInviteCode))
             onInviteCodeConsumed()
+        }
+    }
+
+    // DEBUG only: Seed mock data on first authenticated launch
+    if (BuildConfig.DEBUG) {
+        val mockDataSeeder: MockDataSeeder = koinInject()
+        LaunchedEffect(uiState) {
+            val authenticatedState = uiState as? AuthUiState.Authenticated ?: return@LaunchedEffect
+            mockDataSeeder.seedIfNeeded(authenticatedState.user.id)
         }
     }
 

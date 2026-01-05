@@ -8,6 +8,7 @@ import org.epoque.tandem.di.partnerModule
 import org.epoque.tandem.di.planningModule
 import org.epoque.tandem.di.progressModule
 import org.epoque.tandem.di.reviewModule
+import org.epoque.tandem.di.seedModule
 import org.epoque.tandem.di.taskModule
 import org.epoque.tandem.di.weekModule
 import org.koin.android.ext.koin.androidContext
@@ -29,15 +30,19 @@ class TandemApp : Application() {
             androidLogger(Level.ERROR)
             androidContext(this@TandemApp)
             modules(
-                appModule,
-                authModule,
-                taskModule,
-                weekModule,
-                planningModule,
-                reviewModule,
-                partnerModule,
-                goalsModule,
-                progressModule
+                listOfNotNull(
+                    appModule,
+                    authModule,
+                    taskModule,
+                    weekModule,
+                    planningModule,
+                    reviewModule,
+                    partnerModule,
+                    goalsModule,
+                    progressModule,
+                    // DEBUG only: Mock data seeder module
+                    if (BuildConfig.DEBUG) seedModule else null
+                )
             )
         }
     }
