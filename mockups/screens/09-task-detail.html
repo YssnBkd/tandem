@@ -8,6 +8,11 @@
   <link rel="stylesheet" href="../styles/components.css">
   <link rel="stylesheet" href="../styles/animations.css">
   <style>
+    /* ========================================
+       TODOIST-STYLE TASK DETAIL
+       Bottom sheet with expandable content
+       ======================================== */
+
     .task-detail-screen {
       display: flex;
       flex-direction: column;
@@ -15,310 +20,580 @@
       background: var(--color-background);
     }
 
-    /* Background overlay */
-    .sheet-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.3);
-      animation: fadeIn var(--duration-fast) var(--ease-out);
+    /* Background content (dimmed) */
+    .background-content {
+      flex: 1;
+      padding: calc(var(--status-bar-height) + var(--space-4)) var(--space-4);
+      filter: blur(2px);
+      opacity: 0.4;
     }
 
-    /* Bottom Sheet */
+    .task-preview-bg {
+      height: 60px;
+      background: var(--color-surface-variant);
+      border-radius: var(--radius-xl);
+      margin-bottom: var(--space-3);
+    }
+
+    /* ========================================
+       OVERLAY & BOTTOM SHEET
+       ======================================== */
+
+    .sheet-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+
     .task-detail-sheet {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
       background: var(--color-surface);
-      border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
-      max-height: 75%;
-      overflow-y: auto;
-      animation: slideInFromBottom var(--duration-normal) var(--ease-out);
-      padding-bottom: var(--home-indicator-height);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+      max-height: 70%;
+      display: flex;
+      flex-direction: column;
+      transition: max-height 0.3s ease;
+      z-index: 20;
+      overflow: hidden;
     }
 
-    .sheet-handle {
-      width: 32px;
+    .task-detail-sheet.expanded {
+      max-height: 95%;
+      border-radius: 0;
+    }
+
+    .drag-handle {
+      width: 36px;
       height: 4px;
       background: var(--color-outline-variant);
       border-radius: var(--radius-full);
-      margin: var(--space-3) auto var(--space-4);
+      margin: var(--space-3) auto var(--space-2);
+      cursor: grab;
+      flex-shrink: 0;
     }
 
-    .sheet-content {
-      padding: 0 var(--space-5) var(--space-5);
+    .sheet-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 var(--space-4) var(--space-4);
     }
 
-    /* Task Header */
-    .task-header {
+    /* ========================================
+       HEADER ROW (Project + More)
+       ======================================== */
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 0 var(--space-3);
+    }
+
+    .project-selector {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      color: var(--color-on-surface-variant);
+      font-size: var(--text-sm);
+      cursor: pointer;
+    }
+
+    .project-selector svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .project-selector-chevron {
+      width: 12px;
+      height: 12px;
+      opacity: 0.6;
+    }
+
+    .more-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-full);
+      color: var(--color-on-surface-variant);
+      cursor: pointer;
+    }
+
+    .more-btn:hover {
+      background: var(--color-surface-variant);
+    }
+
+    /* ========================================
+       TASK TITLE ROW
+       ======================================== */
+
+    .task-title-row {
       display: flex;
       align-items: flex-start;
       gap: var(--space-3);
-      margin-bottom: var(--space-4);
+      padding: var(--space-2) 0;
     }
 
-    .task-checkbox-large {
-      width: 32px;
-      height: 32px;
+    .task-checkbox {
+      width: 24px;
+      height: 24px;
       border-radius: var(--radius-full);
-      border: 2px solid var(--color-primary);
+      border: 2px solid #d1453b;
       flex-shrink: 0;
       cursor: pointer;
+      margin-top: 2px;
       transition: all var(--duration-fast) var(--ease-in-out);
     }
 
-    .task-checkbox-large:hover {
-      background: var(--color-primary-light);
+    .task-checkbox:hover {
+      background: rgba(209, 69, 59, 0.1);
     }
 
-    .task-title-large {
-      font-size: var(--text-xl);
-      font-weight: var(--font-semibold);
+    .task-checkbox.priority-1 { border-color: #d1453b; }
+    .task-checkbox.priority-2 { border-color: #eb8909; }
+    .task-checkbox.priority-3 { border-color: #246fe0; }
+    .task-checkbox.priority-4 { border-color: var(--color-outline); }
+
+    .task-title {
+      font-size: var(--text-lg);
+      font-weight: var(--font-medium);
       color: var(--color-on-surface);
+      line-height: var(--leading-snug);
       flex: 1;
-      line-height: var(--leading-tight);
     }
 
-    /* Status Badge */
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-1);
-      padding: var(--space-1) var(--space-3);
-      border-radius: var(--radius-full);
-      font-size: var(--text-sm);
-      font-weight: var(--font-medium);
-    }
+    /* ========================================
+       DETAIL ROWS (Description, Date, etc.)
+       ======================================== */
 
-    .status-badge.pending {
-      background: var(--color-warning-light);
-      color: var(--color-warning-dark);
-    }
-
-    .status-badge.completed {
-      background: var(--color-success-light);
-      color: var(--color-success-dark);
-    }
-
-    .status-badge.tried {
-      background: var(--color-secondary-light);
-      color: var(--color-secondary-dark);
-    }
-
-    .status-badge.skipped {
-      background: var(--color-surface-variant);
-      color: var(--color-muted);
-    }
-
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: var(--radius-full);
-      background: currentColor;
-    }
-
-    /* Goal Link */
-    .goal-link {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-2);
-      padding: var(--space-2) var(--space-3);
-      background: var(--color-primary-light);
-      border-radius: var(--radius-full);
-      color: var(--color-primary-dark);
-      font-size: var(--text-sm);
-      font-weight: var(--font-medium);
-      margin-bottom: var(--space-4);
+    .detail-row {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
       cursor: pointer;
-      transition: all var(--duration-fast) var(--ease-in-out);
+      transition: background var(--duration-fast) var(--ease-in-out);
+      margin: 0 calc(-1 * var(--space-4));
+      padding-left: var(--space-4);
+      padding-right: var(--space-4);
     }
 
-    .goal-link:hover {
-      background: var(--color-primary-lighter);
-    }
-
-    .goal-link-icon {
-      font-size: var(--text-base);
-    }
-
-    /* Notes Section */
-    .notes-section {
-      margin-bottom: var(--space-5);
-    }
-
-    .section-label {
-      font-size: var(--text-sm);
-      font-weight: var(--font-semibold);
-      color: var(--color-muted);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-wide);
-      margin-bottom: var(--space-2);
-    }
-
-    .notes-card {
-      padding: var(--space-4);
+    .detail-row:hover {
       background: var(--color-surface-variant);
-      border-radius: var(--radius-lg);
-      color: var(--color-on-surface);
+    }
+
+    .detail-row-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-on-surface-variant);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .detail-row-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .detail-row-content {
+      flex: 1;
       font-size: var(--text-base);
+      color: var(--color-on-surface);
       line-height: var(--leading-relaxed);
     }
 
-    .notes-placeholder {
+    .detail-row-content.placeholder {
       color: var(--color-placeholder);
-      cursor: pointer;
     }
 
-    .notes-placeholder:hover {
-      color: var(--color-muted);
+    /* Priority row with color */
+    .detail-row.priority .detail-row-icon {
+      color: #d1453b;
     }
 
-    /* Metadata */
-    .task-metadata {
+    .detail-row.priority-2 .detail-row-icon { color: #eb8909; }
+    .detail-row.priority-3 .detail-row-icon { color: #246fe0; }
+
+    /* Label chips */
+    .label-chips {
       display: flex;
       flex-wrap: wrap;
       gap: var(--space-2);
-      margin-bottom: var(--space-5);
     }
 
-    .meta-badge {
+    .label-chip {
       display: inline-flex;
       align-items: center;
-      gap: var(--space-1);
-      padding: var(--space-1) var(--space-2);
+      gap: 4px;
+      padding: var(--space-1) var(--space-3);
       background: var(--color-surface-variant);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      color: var(--color-on-surface);
+    }
+
+    .label-chip-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+    }
+
+    /* ========================================
+       GOAL PROGRESS ROW (Tandem-specific)
+       ======================================== */
+
+    .goal-progress-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      cursor: pointer;
+      margin: 0 calc(-1 * var(--space-4));
+      padding-left: var(--space-4);
+      padding-right: var(--space-4);
+    }
+
+    .goal-progress-row:hover {
+      background: var(--color-surface-variant);
+    }
+
+    .goal-emoji {
+      font-size: 18px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .goal-info {
+      flex: 1;
+    }
+
+    .goal-name {
+      font-size: var(--text-base);
+      color: var(--color-on-surface);
+      font-weight: var(--font-medium);
+    }
+
+    .goal-progress-label {
       font-size: var(--text-xs);
       color: var(--color-muted);
     }
 
-    .meta-badge svg {
-      width: 12px;
-      height: 12px;
+    /* Progress dots indicator */
+    .progress-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
     }
 
-    .rollover-badge {
-      background: var(--color-warning-light);
-      color: var(--color-warning-dark);
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: var(--radius-full);
+      background: var(--color-outline-variant);
+      transition: all var(--duration-fast) var(--ease-in-out);
     }
 
-    /* Repeat Progress */
-    .repeat-section {
-      padding: var(--space-4);
+    .progress-dot.filled {
+      background: var(--color-primary);
+    }
+
+    .progress-dot.current {
+      background: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.2);
+    }
+
+    .goal-chevron {
+      width: 16px;
+      height: 16px;
+      color: var(--color-muted);
+    }
+
+    /* ========================================
+       ADDITIONAL OPTIONS ROW (Scrollable)
+       ======================================== */
+
+    .options-scroll {
+      display: flex;
+      gap: var(--space-2);
+      overflow-x: auto;
+      padding: var(--space-3) var(--space-4);
+      margin: 0 calc(-1 * var(--space-4));
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      border-top: 1px solid var(--color-divider);
+    }
+
+    .options-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .option-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: var(--space-2) var(--space-3);
       background: var(--color-surface-variant);
-      border-radius: var(--radius-lg);
-      margin-bottom: var(--space-5);
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-family: inherit;
+      color: var(--color-on-surface-variant);
+      white-space: nowrap;
+      cursor: pointer;
+      flex-shrink: 0;
     }
 
-    .repeat-header {
+    .option-chip:hover {
+      background: var(--color-primary-light);
+    }
+
+    .option-chip svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .option-chip .pro-badge {
+      font-size: 9px;
+      font-weight: var(--font-bold);
+      color: var(--color-warning-dark);
+      background: var(--color-warning-light);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    /* ========================================
+       SUBTASKS SECTION (Revealed on expand)
+       ======================================== */
+
+    .subtasks-section {
+      border-top: 1px solid var(--color-divider);
+      padding-top: var(--space-4);
+      margin-top: var(--space-2);
+    }
+
+    .subtasks-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: var(--space-3);
     }
 
-    .repeat-title {
-      font-size: var(--text-sm);
-      font-weight: var(--font-medium);
+    .subtasks-title {
+      font-size: var(--text-base);
+      font-weight: var(--font-semibold);
       color: var(--color-on-surface);
     }
 
-    .repeat-count {
+    .subtasks-count {
       font-size: var(--text-sm);
+      color: var(--color-muted);
+      font-weight: normal;
+      margin-left: var(--space-2);
+    }
+
+    .subtasks-collapse {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: var(--color-muted);
+      cursor: pointer;
+    }
+
+    .subtask-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+    }
+
+    .subtask-checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--color-outline);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .subtask-checkbox.completed {
+      background: var(--color-success);
+      border-color: var(--color-success);
+    }
+
+    .subtask-title {
+      font-size: var(--text-base);
+      color: var(--color-on-surface);
+      flex: 1;
+    }
+
+    .subtask-title.completed {
+      text-decoration: line-through;
       color: var(--color-muted);
     }
 
-    .repeat-dots-large {
+    .add-subtask {
       display: flex;
-      gap: var(--space-2);
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      color: var(--color-primary);
+      font-size: var(--text-base);
+      cursor: pointer;
     }
 
-    .repeat-dot-large {
-      width: 32px;
-      height: 32px;
-      border-radius: var(--radius-full);
-      border: 2px solid var(--color-primary);
+    .add-subtask:hover {
+      color: var(--color-primary-dark);
+    }
+
+    .add-subtask-icon {
+      width: 20px;
+      height: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .repeat-dot-large.filled {
-      background: var(--color-primary);
-      color: white;
+    /* ========================================
+       COMMENT INPUT
+       ======================================== */
+
+    .comment-section {
+      margin-top: auto;
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--color-divider);
     }
 
-    /* Action Buttons */
-    .action-buttons {
+    .comment-input {
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: var(--space-3);
-      margin-bottom: var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-variant);
+      border-radius: var(--radius-xl);
     }
 
-    .btn-success {
-      background: linear-gradient(135deg, var(--color-success) 0%, #66BB6A 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-    }
-
-    .btn-success:hover {
-      background: linear-gradient(135deg, #43A047 0%, var(--color-success) 100%);
-    }
-
-    .outcome-buttons {
-      display: flex;
-      gap: var(--space-3);
-    }
-
-    .btn-outcome {
+    .comment-input input {
       flex: 1;
-      padding: var(--space-3);
-      border-radius: var(--radius-lg);
-      font-size: var(--text-sm);
-      font-weight: var(--font-medium);
+      background: none;
       border: none;
+      font-size: var(--text-base);
+      font-family: inherit;
+      color: var(--color-on-surface);
+      outline: none;
+    }
+
+    .comment-input input::placeholder {
+      color: var(--color-placeholder);
+    }
+
+    .comment-attach {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-muted);
+      cursor: pointer;
+    }
+
+    /* ========================================
+       ACTION BUTTONS (Initially visible)
+       ======================================== */
+
+    .action-row {
+      display: flex;
+      gap: var(--space-3);
+      padding: var(--space-4) 0;
+      border-top: 1px solid var(--color-divider);
+      margin-top: var(--space-2);
+    }
+
+    .btn-complete {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-3);
+      background: var(--color-success);
+      color: white;
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: var(--text-base);
+      font-weight: var(--font-semibold);
+      font-family: inherit;
       cursor: pointer;
       transition: all var(--duration-fast) var(--ease-in-out);
     }
 
-    .btn-outcome.tried {
-      background: var(--color-warning-light);
-      color: var(--color-warning-dark);
+    .btn-complete:hover {
+      background: #43A047;
     }
 
-    .btn-outcome.tried:hover {
-      background: var(--color-warning);
-      color: white;
+    .btn-complete svg {
+      width: 20px;
+      height: 20px;
     }
 
-    .btn-outcome.skip {
+    .btn-secondary-action {
+      padding: var(--space-3) var(--space-4);
       background: var(--color-surface-variant);
-      color: var(--color-muted);
-    }
-
-    .btn-outcome.skip:hover {
-      background: var(--color-outline-variant);
       color: var(--color-on-surface-variant);
-    }
-
-    /* Danger Zone */
-    .danger-zone {
-      padding-top: var(--space-4);
-      border-top: 1px solid var(--color-divider);
-      text-align: center;
-    }
-
-    .delete-link {
-      color: var(--color-error);
+      border: none;
+      border-radius: var(--radius-lg);
       font-size: var(--text-sm);
-      opacity: 0.7;
+      font-weight: var(--font-medium);
+      font-family: inherit;
       cursor: pointer;
-      transition: opacity var(--duration-fast) var(--ease-in-out);
     }
 
-    .delete-link:hover {
-      opacity: 1;
+    .btn-secondary-action:hover {
+      background: var(--color-outline-variant);
+    }
+
+    /* Owner indicator */
+    .owner-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      cursor: pointer;
+      margin: 0 calc(-1 * var(--space-4));
+      padding-left: var(--space-4);
+      padding-right: var(--space-4);
+    }
+
+    .owner-row:hover {
+      background: var(--color-surface-variant);
+    }
+
+    .owner-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-full);
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
     }
   </style>
 </head>
@@ -347,107 +622,209 @@
 
       <div class="phone-screen">
         <div class="task-detail-screen">
-          <!-- Background with tasks list preview (faded) -->
-          <div style="flex: 1; padding: calc(var(--status-bar-height) + var(--space-4)) var(--space-4); opacity: 0.3;">
-            <div style="height: 60px; background: var(--color-surface-variant); border-radius: var(--radius-xl); margin-bottom: var(--space-3);"></div>
-            <div style="height: 60px; background: var(--color-surface-variant); border-radius: var(--radius-xl); margin-bottom: var(--space-3);"></div>
-            <div style="height: 60px; background: var(--color-surface-variant); border-radius: var(--radius-xl);"></div>
+          <!-- Background Content (Dimmed) -->
+          <div class="background-content">
+            <div class="task-preview-bg"></div>
+            <div class="task-preview-bg"></div>
+            <div class="task-preview-bg"></div>
           </div>
 
-          <!-- Overlay -->
-          <div class="sheet-overlay"></div>
+          <!-- Sheet Overlay -->
+          <div class="sheet-overlay" data-nav="01-week-view-v2.html"></div>
 
           <!-- Task Detail Bottom Sheet -->
-          <div class="task-detail-sheet">
-            <div class="sheet-handle"></div>
-            <div class="sheet-content">
-              <!-- Task Header -->
-              <div class="task-header">
-                <div class="task-checkbox-large"></div>
-                <h2 class="task-title-large">Morning workout routine</h2>
-              </div>
+          <div class="task-detail-sheet" id="taskDetailSheet">
+            <div class="drag-handle"></div>
 
-              <!-- Status & Goal -->
-              <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4);">
-                <span class="status-badge pending">
-                  <span class="status-dot"></span>
-                  Pending
-                </span>
-                <div class="goal-link" data-nav="16-goal-detail.html">
-                  <span class="goal-link-icon">💪</span>
-                  <span>Fitness</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="sheet-scroll">
+              <!-- Header: Project + More -->
+              <div class="detail-header">
+                <div class="project-selector">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+                  </svg>
+                  <span>This Week</span>
+                  <svg class="project-selector-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 18l6-6-6-6"/>
                   </svg>
                 </div>
+                <button class="more-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="2"/>
+                    <circle cx="12" cy="12" r="2"/>
+                    <circle cx="12" cy="19" r="2"/>
+                  </svg>
+                </button>
               </div>
 
-              <!-- Repeat Progress -->
-              <div class="repeat-section">
-                <div class="repeat-header">
-                  <span class="repeat-title">Weekly Progress</span>
-                  <span class="repeat-count">2 of 3 this week</span>
+              <!-- Task Title Row -->
+              <div class="task-title-row">
+                <div class="task-checkbox priority-1"></div>
+                <h2 class="task-title">Morning workout routine</h2>
+              </div>
+
+              <!-- Description Row -->
+              <div class="detail-row">
+                <div class="detail-row-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="15" y2="18"/>
+                  </svg>
                 </div>
-                <div class="repeat-dots-large">
-                  <div class="repeat-dot-large filled">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                      <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
+                <div class="detail-row-content">
+                  30 minutes cardio + 15 minutes stretching. Remember to warm up properly!
+                </div>
+              </div>
+
+              <!-- Owner Row (Tandem-specific) -->
+              <div class="owner-row">
+                <div class="owner-avatar">👤</div>
+                <div class="detail-row-content">Me</div>
+              </div>
+
+              <!-- Date Row -->
+              <div class="detail-row">
+                <div class="detail-row-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>
+                  </svg>
+                </div>
+                <div class="detail-row-content">Today</div>
+              </div>
+
+              <!-- Priority Row -->
+              <div class="detail-row priority">
+                <div class="detail-row-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+                  </svg>
+                </div>
+                <div class="detail-row-content">Priority 1</div>
+              </div>
+
+              <!-- Label Row -->
+              <div class="detail-row">
+                <div class="detail-row-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/>
+                  </svg>
+                </div>
+                <div class="detail-row-content">
+                  <div class="label-chips">
+                    <span class="label-chip">
+                      <span class="label-chip-dot" style="background: #d1453b;"></span>
+                      Health
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Goal Progress Row (Tandem-specific) -->
+              <div class="goal-progress-row" data-nav="16-goal-detail.html">
+                <span class="goal-emoji">💪</span>
+                <div class="goal-info">
+                  <div class="goal-name">Get fit together</div>
+                  <div class="goal-progress-label">Weekly: 2 of 3</div>
+                </div>
+                <div class="progress-dots">
+                  <div class="progress-dot filled"></div>
+                  <div class="progress-dot filled"></div>
+                  <div class="progress-dot current"></div>
+                </div>
+                <svg class="goal-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </div>
+
+              <!-- Additional Options (Scrollable) -->
+              <div class="options-scroll">
+                <button class="option-chip">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                  </svg>
+                  Deadline
+                </button>
+                <button class="option-chip">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                  </svg>
+                  Reminders
+                </button>
+                <button class="option-chip">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                  Location
+                </button>
+                <button class="option-chip">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M1 4v6h6M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2" fill="none"/>
+                  </svg>
+                  Repeat
+                </button>
+              </div>
+
+              <!-- Sub-tasks Section (Revealed on expand) -->
+              <div class="subtasks-section">
+                <div class="subtasks-header">
+                  <div>
+                    <span class="subtasks-title">Sub-tasks</span>
+                    <span class="subtasks-count">1/2</span>
+                  </div>
+                  <button class="subtasks-collapse">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M18 15l-6-6-6 6"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="subtask-item">
+                  <div class="subtask-checkbox completed">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="white" style="margin: 2px;">
+                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                     </svg>
                   </div>
-                  <div class="repeat-dot-large filled">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                      <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
+                  <span class="subtask-title completed">Warm up (5 min)</span>
+                </div>
+
+                <div class="subtask-item">
+                  <div class="subtask-checkbox"></div>
+                  <span class="subtask-title">Cardio session</span>
+                </div>
+
+                <div class="add-subtask" data-nav="02-add-task.html">
+                  <div class="add-subtask-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="5" x2="12" y2="19"/>
+                      <line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
                   </div>
-                  <div class="repeat-dot-large"></div>
+                  <span>Add sub-task</span>
                 </div>
               </div>
 
-              <!-- Notes -->
-              <div class="notes-section">
-                <div class="section-label">Notes</div>
-                <div class="notes-card">
-                  <span class="notes-placeholder">+ Add notes...</span>
+              <!-- Comment Section -->
+              <div class="comment-section">
+                <div class="comment-input">
+                  <input type="text" placeholder="Add a comment">
+                  <div class="comment-attach">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+                    </svg>
+                  </div>
                 </div>
-              </div>
-
-              <!-- Metadata -->
-              <div class="task-metadata">
-                <span class="meta-badge">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                  </svg>
-                  Created Jan 5
-                </span>
-                <span class="meta-badge rollover-badge">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 4v6h6"/>
-                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
-                  </svg>
-                  Rolled over from last week
-                </span>
               </div>
 
               <!-- Action Buttons -->
-              <div class="action-buttons">
-                <button class="btn btn-success btn-full btn-lg" data-nav="01-week-view.html">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <div class="action-row">
+                <button class="btn-complete" data-nav="01-week-view-v2.html">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <polyline points="20 6 9 17 4 12"/>
                   </svg>
-                  Mark Complete
+                  Complete
                 </button>
-                <div class="outcome-buttons">
-                  <button class="btn-outcome tried">Tried</button>
-                  <button class="btn-outcome skip">Skip</button>
-                </div>
-              </div>
-
-              <!-- Danger Zone -->
-              <div class="danger-zone">
-                <span class="delete-link" data-nav="01-week-view.html">Delete task</span>
+                <button class="btn-secondary-action">Skip</button>
               </div>
             </div>
           </div>
@@ -457,6 +834,79 @@
       <div class="phone-home-indicator"></div>
     </div>
   </div>
+
   <script src="../scripts/navigation.js"></script>
+  <script>
+    // ========================================
+    // TASK DETAIL INTERACTIONS
+    // ========================================
+
+    const sheet = document.getElementById('taskDetailSheet');
+    const dragHandle = sheet.querySelector('.drag-handle');
+    let startY, isDragging = false;
+
+    // Drag to expand/collapse
+    dragHandle.addEventListener('mousedown', startDrag);
+    dragHandle.addEventListener('touchstart', startDrag);
+
+    function startDrag(e) {
+      e.preventDefault();
+      isDragging = true;
+      startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+
+      document.addEventListener('mousemove', doDrag);
+      document.addEventListener('touchmove', doDrag);
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('touchend', endDrag);
+    }
+
+    function doDrag(e) {
+      if (!isDragging) return;
+      const currentY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+      const delta = startY - currentY;
+
+      if (delta > 50) {
+        sheet.classList.add('expanded');
+      } else if (delta < -50) {
+        sheet.classList.remove('expanded');
+      }
+    }
+
+    function endDrag() {
+      isDragging = false;
+      document.removeEventListener('mousemove', doDrag);
+      document.removeEventListener('touchmove', doDrag);
+      document.removeEventListener('mouseup', endDrag);
+      document.removeEventListener('touchend', endDrag);
+    }
+
+    // Task checkbox interaction
+    const taskCheckbox = document.querySelector('.task-checkbox');
+    taskCheckbox.addEventListener('click', () => {
+      taskCheckbox.style.background = '#4CAF50';
+      taskCheckbox.style.borderColor = '#4CAF50';
+      taskCheckbox.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white" style="margin: 3px;">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      `;
+      setTimeout(() => {
+        // Would navigate back
+      }, 500);
+    });
+
+    // Subtask checkbox interaction
+    document.querySelectorAll('.subtask-checkbox:not(.completed)').forEach(checkbox => {
+      checkbox.addEventListener('click', () => {
+        checkbox.classList.add('completed');
+        checkbox.innerHTML = `
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="white" style="margin: 2px;">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
+        `;
+        checkbox.nextElementSibling.classList.add('completed');
+      });
+    });
+  </script>
 </body>
 </html>
