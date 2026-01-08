@@ -200,13 +200,13 @@
                 </svg>
                 You
               </button>
-              <button class="segment-item">Partner</button>
-              <button class="segment-item">Together</button>
+              <button class="segment-item" data-nav="07-week-view-partner.html">Partner</button>
+              <button class="segment-item" data-nav="08-week-view-together.html">Together</button>
             </div>
           </div>
 
           <!-- Planning Banner -->
-          <div class="planning-banner animate-slide-up">
+          <div class="planning-banner animate-slide-up" data-nav="10-planning-start.html">
             <div class="planning-banner-icon">
               <span>🌅</span>
             </div>
@@ -218,11 +218,11 @@
           </div>
 
           <!-- Quick Add -->
-          <div class="quick-add">
+          <div class="quick-add" data-nav="02-add-task.html">
             <svg class="quick-add-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14"/>
             </svg>
-            <input type="text" class="quick-add-input" placeholder="Add a task for this week...">
+            <input type="text" class="quick-add-input" placeholder="Add a task for this week..." data-nav="02-add-task.html">
             <button class="quick-add-submit">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -234,7 +234,7 @@
           <div class="tasks-section">
             <!-- Active Tasks -->
             <div class="task-list">
-              <div class="task-item animate-card-1">
+              <div class="task-item animate-card-1" data-nav="09-task-detail.html">
                 <div class="checkbox">
                   <!-- Empty checkbox -->
                 </div>
@@ -254,7 +254,7 @@
                 </div>
               </div>
 
-              <div class="task-item animate-card-2">
+              <div class="task-item animate-card-2" data-nav="09-task-detail.html">
                 <div class="checkbox">
                   <!-- Empty checkbox -->
                 </div>
@@ -269,7 +269,7 @@
 
             <!-- Completed Tasks -->
             <div class="task-list">
-              <div class="task-item completed animate-card-3">
+              <div class="task-item completed animate-card-3" data-nav="09-task-detail.html">
                 <div class="checkbox checked">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
                     <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
@@ -280,7 +280,7 @@
                 </div>
               </div>
 
-              <div class="task-item completed animate-card-4">
+              <div class="task-item completed animate-card-4" data-nav="09-task-detail.html">
                 <div class="checkbox checked">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
                     <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
@@ -291,7 +291,7 @@
                 </div>
               </div>
 
-              <div class="task-item completed animate-card-5">
+              <div class="task-item completed animate-card-5" data-nav="09-task-detail.html">
                 <div class="checkbox checked">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
                     <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
@@ -302,7 +302,7 @@
                 </div>
               </div>
 
-              <div class="task-item completed animate-card-6">
+              <div class="task-item completed animate-card-6" data-nav="09-task-detail.html">
                 <div class="checkbox checked">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
                     <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
@@ -313,7 +313,7 @@
                 </div>
               </div>
 
-              <div class="task-item completed" style="animation: cardEnter var(--duration-normal) var(--ease-out) 300ms both;">
+              <div class="task-item completed" style="animation: cardEnter var(--duration-normal) var(--ease-out) 300ms both;" data-nav="09-task-detail.html">
                 <div class="checkbox checked">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
                     <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/>
@@ -365,5 +365,6 @@
       <div class="phone-home-indicator"></div>
     </div>
   </div>
+  <script src="../scripts/navigation.js"></script>
 </body>
 </html>

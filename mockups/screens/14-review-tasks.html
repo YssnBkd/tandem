@@ -317,7 +317,7 @@
         <div class="review-tasks-screen">
           <!-- Header -->
           <div class="review-header">
-            <button class="back-btn">
+            <button class="back-btn" data-nav="06-review-rate.html">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
               </svg>
@@ -365,15 +365,15 @@
 
               <!-- Outcome Buttons -->
               <div class="outcome-buttons">
-                <button class="outcome-btn done">
+                <button class="outcome-btn done" data-nav="15-review-complete.html">
                   <div class="outcome-icon">✓</div>
                   <span class="outcome-label">Done</span>
                 </button>
-                <button class="outcome-btn tried">
+                <button class="outcome-btn tried" data-nav="15-review-complete.html">
                   <div class="outcome-icon">~</div>
                   <span class="outcome-label">Tried</span>
                 </button>
-                <button class="outcome-btn skipped">
+                <button class="outcome-btn skipped" data-nav="15-review-complete.html">
                   <div class="outcome-icon">—</div>
                   <span class="outcome-label">Skipped</span>
                 </button>
@@ -409,5 +409,6 @@
       <div class="phone-home-indicator"></div>
     </div>
   </div>
+  <script src="../scripts/navigation.js"></script>
 </body>
 </html>
