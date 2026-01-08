@@ -14,15 +14,143 @@
       padding: var(--space-4) var(--space-4) var(--space-5);
     }
 
+    .week-selector {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-2);
+    }
+
+    .week-selector-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-in-out);
+      color: var(--color-on-surface-variant);
+    }
+
+    .week-selector-btn:hover {
+      background: rgba(255, 255, 255, 0.6);
+      color: var(--color-primary);
+    }
+
+    .week-selector-btn:active {
+      transform: scale(0.9);
+    }
+
+    .week-selector-btn.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .week-selector-btn.disabled:hover {
+      background: transparent;
+      color: var(--color-on-surface-variant);
+    }
+
+    .week-selector-center {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .week-selector-label {
+      font-size: var(--text-base);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .week-selector-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: var(--radius-full);
+      background: var(--color-on-surface-variant);
+    }
+
+    .week-selector-dates {
+      font-size: var(--text-sm);
+      color: var(--color-on-surface-variant);
+    }
+
+    /* Day strip */
+    .day-strip {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 var(--space-1);
+      margin-bottom: var(--space-3);
+    }
+
+    .day-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      flex: 1;
+    }
+
+    .day-name {
+      font-size: 10px;
+      font-weight: var(--font-medium);
+      color: var(--color-muted);
+      text-transform: uppercase;
+    }
+
+    .day-number {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-on-surface-variant);
+      transition: all var(--duration-fast) var(--ease-in-out);
+    }
+
+    .day-item.today .day-name {
+      color: var(--color-primary);
+    }
+
+    .day-item.today .day-number {
+      background: var(--gradient-primary);
+      color: white;
+      font-weight: var(--font-bold);
+    }
+
+    .day-item.past .day-number {
+      color: var(--color-muted);
+    }
+
+    .day-item.has-tasks .day-number::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      width: 4px;
+      height: 4px;
+      border-radius: var(--radius-full);
+      background: var(--color-primary);
+    }
+
+    .day-item .day-number {
+      position: relative;
+    }
+
     .week-header-top {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: var(--space-4);
+      align-items: center;
+      margin-bottom: var(--space-3);
     }
 
     .week-title {
-      font-size: var(--text-2xl);
+      font-size: var(--text-xl);
       font-weight: var(--font-bold);
       color: var(--color-on-surface);
     }
@@ -157,10 +285,60 @@
 
           <!-- Week Header -->
           <div class="week-header" style="padding-top: calc(var(--status-bar-height) + var(--space-2));">
+            <!-- Week Selector -->
+            <div class="week-selector">
+              <button class="week-selector-btn" aria-label="Previous week">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+              </button>
+              <div class="week-selector-center">
+                <span class="week-selector-label">This Week</span>
+                <span class="week-selector-dot"></span>
+                <span class="week-selector-dates">Jan 5 - 11</span>
+              </div>
+              <button class="week-selector-btn disabled" aria-label="Next week" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Day Strip -->
+            <div class="day-strip">
+              <div class="day-item past">
+                <span class="day-name">S</span>
+                <span class="day-number">5</span>
+              </div>
+              <div class="day-item past">
+                <span class="day-name">M</span>
+                <span class="day-number">6</span>
+              </div>
+              <div class="day-item past">
+                <span class="day-name">T</span>
+                <span class="day-number">7</span>
+              </div>
+              <div class="day-item today">
+                <span class="day-name">W</span>
+                <span class="day-number">8</span>
+              </div>
+              <div class="day-item">
+                <span class="day-name">T</span>
+                <span class="day-number">9</span>
+              </div>
+              <div class="day-item">
+                <span class="day-name">F</span>
+                <span class="day-number">10</span>
+              </div>
+              <div class="day-item">
+                <span class="day-name">S</span>
+                <span class="day-number">11</span>
+              </div>
+            </div>
+
             <div class="week-header-top">
               <div>
-                <h1 class="week-title">This Week</h1>
-                <p class="week-dates">Jan 5 - 11</p>
+                <h1 class="week-title">Tasks</h1>
               </div>
 
               <!-- Progress Ring -->

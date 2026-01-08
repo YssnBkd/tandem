@@ -78,6 +78,123 @@
       font-weight: var(--font-medium);
     }
 
+    /* This Week Card - CTA for review */
+    .this-week-card {
+      margin: 0 var(--space-4) var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-in-out);
+    }
+
+    .this-week-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .this-week-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-3);
+    }
+
+    .this-week-title {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .this-week-dates {
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+    }
+
+    .this-week-progress {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    .this-week-ring {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+    }
+
+    .this-week-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .this-week-ring-bg {
+      fill: none;
+      stroke: var(--color-surface-variant);
+      stroke-width: 6;
+    }
+
+    .this-week-ring-fill {
+      fill: none;
+      stroke: var(--color-secondary);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 163.36;
+      stroke-dashoffset: 40.84;
+    }
+
+    .this-week-ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-lg);
+      font-weight: var(--font-bold);
+      color: var(--color-on-surface);
+    }
+
+    .this-week-stats {
+      flex: 1;
+    }
+
+    .this-week-stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+      margin-bottom: var(--space-1);
+    }
+
+    .this-week-stat-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .this-week-stat-value {
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .this-week-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-3);
+      background: var(--gradient-streak);
+      border-radius: var(--radius-lg);
+      color: white;
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+    }
+
+    .this-week-cta svg {
+      width: 16px;
+      height: 16px;
+    }
+
     /* This Month Card */
     .month-card {
       margin: 0 var(--space-4) var(--space-4);
@@ -406,8 +523,45 @@
             </div>
           </div>
 
+          <!-- This Week Card - Entry point for Review -->
+          <div class="this-week-card animate-card-2" data-nav="13-review-start.html">
+            <div class="this-week-header">
+              <span class="this-week-title">This Week</span>
+              <span class="this-week-dates">Jan 5 - 11</span>
+            </div>
+            <div class="this-week-progress">
+              <div class="this-week-ring">
+                <svg width="64" height="64" viewBox="0 0 64 64">
+                  <circle class="this-week-ring-bg" cx="32" cy="32" r="26"/>
+                  <circle class="this-week-ring-fill" cx="32" cy="32" r="26"/>
+                </svg>
+                <span class="this-week-ring-center">75%</span>
+              </div>
+              <div class="this-week-stats">
+                <div class="this-week-stat-row">
+                  <span>Completed</span>
+                  <span class="this-week-stat-value">6 / 8</span>
+                </div>
+                <div class="this-week-stat-row">
+                  <span>Remaining</span>
+                  <span class="this-week-stat-value">2 tasks</span>
+                </div>
+                <div class="this-week-stat-row">
+                  <span>Days left</span>
+                  <span class="this-week-stat-value">2 days</span>
+                </div>
+              </div>
+            </div>
+            <div class="this-week-cta">
+              🌇 Review Your Week
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </div>
+
           <!-- This Month Comparison -->
-          <div class="month-card animate-card-2">
+          <div class="month-card animate-card-3">
             <div class="month-card-header">
               <span class="month-card-title">This Month</span>
               <span class="month-card-period">January</span>
@@ -441,7 +595,7 @@
           </div>
 
           <!-- Completion Trends -->
-          <div class="trends-card animate-card-3">
+          <div class="trends-card animate-card-4">
             <h3 class="trends-title">Completion Trends</h3>
             <div class="chart-container">
               <svg class="chart-svg" viewBox="0 0 300 100" preserveAspectRatio="none">
@@ -496,7 +650,7 @@
               <a href="#" class="past-weeks-link">See all</a>
             </div>
 
-            <div class="past-week-card animate-card-4">
+            <div class="past-week-card animate-card-5">
               <div class="past-week-dates">
                 <div class="past-week-range">Dec 29 - Jan 4</div>
                 <div class="past-week-stats">5/6 · 4/5</div>
@@ -521,7 +675,7 @@
               </div>
             </div>
 
-            <div class="past-week-card animate-card-5">
+            <div class="past-week-card animate-card-6">
               <div class="past-week-dates">
                 <div class="past-week-range">Dec 22 - 28</div>
                 <div class="past-week-stats">6/7 · 5/6</div>
@@ -548,9 +702,9 @@
           </div>
         </div>
 
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav">
-          <a href="01-week-view.html" class="nav-item">
+        <!-- Bottom Navigation - 4 tabs -->
+        <nav class="bottom-nav" style="display: flex; justify-content: space-around;">
+          <a href="01-week-view-v2.html" class="nav-item" style="flex: 1;">
             <div class="nav-icon-bg">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>
@@ -558,7 +712,7 @@
             </div>
             <span class="nav-label">Week</span>
           </a>
-          <a href="#" class="nav-item active">
+          <a href="#" class="nav-item active" style="flex: 1;">
             <div class="nav-icon-bg">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3.5 18.5l6-6 4 4L22 6.92 20.59 5.5l-7.09 8-4-4L2 17l1.5 1.5z"/>
@@ -566,13 +720,21 @@
             </div>
             <span class="nav-label">Progress</span>
           </a>
-          <a href="04-goals.html" class="nav-item">
+          <a href="04-goals.html" class="nav-item" style="flex: 1;">
             <div class="nav-icon-bg">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
               </svg>
             </div>
             <span class="nav-label">Goals</span>
+          </a>
+          <a href="21-seasons-list.html" class="nav-item" style="flex: 1;">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Seasons</span>
           </a>
         </nav>
       </div>
