@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>From Last Week - Tandem</title>
+  <title>Partner Suggestions - Tandem</title>
   <link rel="stylesheet" href="../styles/design-system.css">
   <link rel="stylesheet" href="../styles/components.css">
   <link rel="stylesheet" href="../styles/animations.css">
   <style>
-    .rollover-screen {
+    .suggestions-screen {
       min-height: 100%;
       background: var(--color-background);
       display: flex;
@@ -16,7 +16,7 @@
     }
 
     /* Header */
-    .rollover-header {
+    .suggestions-header {
       display: flex;
       align-items: center;
       gap: var(--space-3);
@@ -37,7 +37,7 @@
       box-shadow: var(--shadow-sm);
     }
 
-    .rollover-header-title {
+    .suggestions-header-title {
       flex: 1;
       font-size: var(--text-lg);
       font-weight: var(--font-semibold);
@@ -70,7 +70,7 @@
     }
 
     /* Main Content */
-    .rollover-content {
+    .suggestions-content {
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -78,11 +78,36 @@
       padding: var(--space-6);
     }
 
-    /* Task Progress */
-    .task-progress-indicator {
+    /* Partner Attribution */
+    .partner-attribution {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+      animation: fadeIn var(--duration-normal) var(--ease-out);
+    }
+
+    .partner-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      background: var(--color-tertiary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--font-bold);
+      font-size: var(--text-lg);
+    }
+
+    .partner-message {
       font-size: var(--text-sm);
       color: var(--color-muted);
-      margin-bottom: var(--space-4);
+    }
+
+    .partner-name {
+      font-weight: var(--font-semibold);
+      color: var(--color-tertiary-dark);
     }
 
     /* Task Card Stack */
@@ -127,12 +152,13 @@
       display: flex;
       flex-direction: column;
       animation: cardEnter var(--duration-normal) var(--ease-out);
+      border: 2px solid var(--color-tertiary-light);
     }
 
     .task-card-icon {
       width: 56px;
       height: 56px;
-      background: var(--color-warning-light);
+      background: var(--color-tertiary-light);
       border-radius: var(--radius-xl);
       display: flex;
       align-items: center;
@@ -150,7 +176,7 @@
 
     .task-card-subtitle {
       font-size: var(--text-sm);
-      color: var(--color-warning-dark);
+      color: var(--color-tertiary-dark);
       margin-bottom: var(--space-4);
     }
 
@@ -166,39 +192,46 @@
       align-self: flex-start;
     }
 
-    .task-card-notes {
+    .task-card-note {
       margin-top: auto;
       padding: var(--space-3);
-      background: var(--color-surface-variant);
+      background: var(--color-tertiary-light);
       border-radius: var(--radius-lg);
       font-size: var(--text-sm);
-      color: var(--color-muted);
-      font-style: italic;
+      color: var(--color-tertiary-dark);
+    }
+
+    .task-card-note-label {
+      font-weight: var(--font-semibold);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      margin-bottom: var(--space-1);
     }
 
     /* Action Buttons */
-    .rollover-actions {
+    .suggestions-actions {
       display: flex;
       gap: var(--space-3);
       width: 100%;
       max-width: 320px;
     }
 
-    .btn-add-week {
+    .btn-accept {
       flex: 1;
       background: var(--gradient-primary);
       color: white;
       box-shadow: var(--shadow-primary);
     }
 
-    .btn-let-go {
+    .btn-decline {
       flex: 1;
       background: var(--color-surface);
       color: var(--color-on-surface);
       border: 2px solid var(--color-outline-variant);
     }
 
-    .btn-let-go:hover {
+    .btn-decline:hover {
       background: var(--color-surface-variant);
       border-color: var(--color-outline);
     }
@@ -219,46 +252,24 @@
     }
 
     .task-dot.active {
-      background: var(--color-primary);
+      background: var(--color-tertiary);
     }
 
     .task-dot.done {
       background: var(--color-success);
     }
 
-    /* All Caught Up State */
-    .caught-up-state {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: var(--space-6);
-    }
-
-    .caught-up-icon {
-      width: 120px;
-      height: 120px;
-      background: var(--color-success-light);
-      border-radius: var(--radius-full);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 56px;
-      margin-bottom: var(--space-6);
-    }
-
-    .caught-up-title {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-bold);
-      color: var(--color-on-surface);
-      margin-bottom: var(--space-2);
-    }
-
-    .caught-up-subtitle {
-      font-size: var(--text-base);
+    /* Skip Link */
+    .skip-link {
+      margin-top: var(--space-4);
+      font-size: var(--text-sm);
       color: var(--color-muted);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .skip-link:hover {
+      color: var(--color-on-surface-variant);
     }
   </style>
 </head>
@@ -286,64 +297,74 @@
       </div>
 
       <div class="phone-screen">
-        <div class="rollover-screen">
+        <div class="suggestions-screen">
           <!-- Header -->
-          <div class="rollover-header">
-            <button class="back-btn" data-nav="10-planning-start.html">
+          <div class="suggestions-header">
+            <button class="back-btn" data-nav="12-planning-add-tasks.html">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
               </svg>
             </button>
-            <span class="rollover-header-title">From Last Week</span>
+            <span class="suggestions-header-title">From Alex</span>
             <div style="width: 40px;"></div>
           </div>
 
           <!-- Progress Dots -->
           <div class="progress-dots">
             <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
             <div class="progress-dot active"></div>
-            <div class="progress-dot"></div>
-            <div class="progress-dot"></div>
             <div class="progress-dot"></div>
           </div>
 
           <!-- Main Content -->
-          <div class="rollover-content">
-            <span class="task-progress-indicator">3 of 5 tasks to review</span>
+          <div class="suggestions-content">
+            <!-- Partner Attribution -->
+            <div class="partner-attribution">
+              <div class="partner-avatar">A</div>
+              <span class="partner-message"><span class="partner-name">Alex</span> suggested 2 tasks for you</span>
+            </div>
 
             <!-- Task Card Stack -->
             <div class="task-card-stack">
               <div class="task-card-bg"></div>
-              <div class="task-card-bg"></div>
               <div class="task-card-main">
-                <div class="task-card-icon">📝</div>
-                <h2 class="task-card-title">Finish quarterly report</h2>
-                <p class="task-card-subtitle">You didn't complete this last week</p>
+                <div class="task-card-icon">🍽️</div>
+                <h2 class="task-card-title">Book restaurant for anniversary</h2>
+                <p class="task-card-subtitle">Suggested by Alex</p>
                 <span class="task-card-goal">
-                  <span>💼</span>
-                  Work Projects
+                  <span>❤️</span>
+                  Relationship
                 </span>
+                <div class="task-card-note">
+                  <div class="task-card-note-label">
+                    <span>💬</span>
+                    Alex's note:
+                  </div>
+                  "Our anniversary is next Saturday!"
+                </div>
               </div>
             </div>
 
             <!-- Action Buttons -->
-            <div class="rollover-actions">
-              <button class="btn btn-add-week btn-lg" data-nav="12-planning-add-tasks.html">
-                Add to This Week
+            <div class="suggestions-actions">
+              <button class="btn btn-accept btn-lg" data-nav="05-planning-complete.html">
+                Accept
               </button>
-              <button class="btn btn-let-go btn-lg" data-nav="12-planning-add-tasks.html">
-                Let It Go
+              <button class="btn btn-decline btn-lg" data-nav="05-planning-complete.html">
+                Decline
               </button>
             </div>
 
             <!-- Task Dots -->
             <div class="task-dots">
-              <div class="task-dot done"></div>
-              <div class="task-dot done"></div>
               <div class="task-dot active"></div>
               <div class="task-dot"></div>
-              <div class="task-dot"></div>
             </div>
+
+            <!-- Skip Link -->
+            <a class="skip-link" data-nav="05-planning-complete.html">Skip all suggestions</a>
           </div>
         </div>
       </div>
