@@ -1,0 +1,221 @@
+/* ==========================================================================
+   Tandem Design System - CSS Custom Properties
+   ========================================================================== */
+
+:root {
+  /* -------------------------------------------------------------------------
+     Colors - Warm & Friendly Palette
+     ------------------------------------------------------------------------- */
+
+  /* Primary - Warm Purple */
+  --color-primary: #6750A4;
+  --color-primary-hover: #7B61C4;
+  --color-primary-light: #EADDFF;
+  --color-primary-lighter: #F6F2FF;
+  --color-primary-dark: #4F378B;
+  --color-on-primary: #FFFFFF;
+  --color-on-primary-light: #4F378B;
+
+  /* Secondary - Coral (for warmth and celebrations) */
+  --color-secondary: #E07A5F;
+  --color-secondary-hover: #E8967F;
+  --color-secondary-light: #FFE5DE;
+  --color-secondary-lighter: #FFF5F2;
+  --color-secondary-dark: #C45D42;
+  --color-on-secondary: #FFFFFF;
+  --color-on-secondary-light: #8B3A24;
+
+  /* Tertiary - Teal (for partner elements) */
+  --color-tertiary: #3D8B8B;
+  --color-tertiary-hover: #52A3A3;
+  --color-tertiary-light: #D4F0F0;
+  --color-tertiary-lighter: #EDFAFA;
+  --color-tertiary-dark: #2A6363;
+  --color-on-tertiary: #FFFFFF;
+  --color-on-tertiary-light: #1D4545;
+
+  /* Surfaces */
+  --color-background: #FDFBFF;
+  --color-surface: #FFFFFF;
+  --color-surface-variant: #F3EFF4;
+  --color-surface-elevated: #FFFFFF;
+  --color-scrim: rgba(0, 0, 0, 0.32);
+
+  /* Text */
+  --color-on-surface: #1C1B1F;
+  --color-on-surface-variant: #49454F;
+  --color-muted: #79747E;
+  --color-placeholder: #A9A5AE;
+
+  /* Status Colors */
+  --color-success: #4CAF50;
+  --color-success-light: #E8F5E9;
+  --color-on-success: #FFFFFF;
+
+  --color-warning: #FF9800;
+  --color-warning-light: #FFF3E0;
+  --color-on-warning: #FFFFFF;
+
+  --color-error: #B3261E;
+  --color-error-light: #F9DEDC;
+  --color-on-error: #FFFFFF;
+
+  /* Borders & Outlines */
+  --color-outline: #79747E;
+  --color-outline-variant: #CAC4D0;
+  --color-divider: #E7E0EC;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #6750A4 0%, #9747FF 100%);
+  --gradient-primary-soft: linear-gradient(180deg, #F6F2FF 0%, #FDFBFF 100%);
+  --gradient-warm: linear-gradient(135deg, #E07A5F 0%, #F4A261 100%);
+  --gradient-celebration: linear-gradient(135deg, #6750A4 0%, #E07A5F 100%);
+  --gradient-streak: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+
+  /* -------------------------------------------------------------------------
+     Typography
+     ------------------------------------------------------------------------- */
+
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Font Sizes */
+  --text-xs: 0.6875rem;   /* 11px */
+  --text-sm: 0.75rem;     /* 12px */
+  --text-base: 0.875rem;  /* 14px */
+  --text-md: 1rem;        /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+  --text-5xl: 3rem;       /* 48px */
+  --text-6xl: 3.75rem;    /* 60px */
+
+  /* Font Weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Line Heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* Letter Spacing */
+  --tracking-tighter: -0.025em;
+  --tracking-tight: -0.0125em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.025em;
+
+  /* -------------------------------------------------------------------------
+     Spacing (8px grid)
+     ------------------------------------------------------------------------- */
+
+  --space-0: 0;
+  --space-px: 1px;
+  --space-0-5: 0.125rem;  /* 2px */
+  --space-1: 0.25rem;     /* 4px */
+  --space-1-5: 0.375rem;  /* 6px */
+  --space-2: 0.5rem;      /* 8px */
+  --space-2-5: 0.625rem;  /* 10px */
+  --space-3: 0.75rem;     /* 12px */
+  --space-3-5: 0.875rem;  /* 14px */
+  --space-4: 1rem;        /* 16px */
+  --space-5: 1.25rem;     /* 20px */
+  --space-6: 1.5rem;      /* 24px */
+  --space-7: 1.75rem;     /* 28px */
+  --space-8: 2rem;        /* 32px */
+  --space-9: 2.25rem;     /* 36px */
+  --space-10: 2.5rem;     /* 40px */
+  --space-11: 2.75rem;    /* 44px */
+  --space-12: 3rem;       /* 48px */
+  --space-14: 3.5rem;     /* 56px */
+  --space-16: 4rem;       /* 64px */
+  --space-20: 5rem;       /* 80px */
+
+  /* -------------------------------------------------------------------------
+     Border Radius
+     ------------------------------------------------------------------------- */
+
+  --radius-none: 0;
+  --radius-sm: 0.375rem;   /* 6px */
+  --radius-md: 0.5rem;     /* 8px */
+  --radius-lg: 0.75rem;    /* 12px */
+  --radius-xl: 1rem;       /* 16px */
+  --radius-2xl: 1.25rem;   /* 20px */
+  --radius-3xl: 1.5rem;    /* 24px */
+  --radius-full: 9999px;
+
+  /* -------------------------------------------------------------------------
+     Shadows
+     ------------------------------------------------------------------------- */
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+
+  /* Colored Shadows */
+  --shadow-primary: 0 4px 14px -2px rgba(103, 80, 164, 0.25);
+  --shadow-secondary: 0 4px 14px -2px rgba(224, 122, 95, 0.25);
+
+  /* -------------------------------------------------------------------------
+     Transitions
+     ------------------------------------------------------------------------- */
+
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
+
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* -------------------------------------------------------------------------
+     Z-Index Scale
+     ------------------------------------------------------------------------- */
+
+  --z-below: -1;
+  --z-base: 0;
+  --z-above: 1;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-fixed: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-popover: 60;
+  --z-tooltip: 70;
+
+  /* -------------------------------------------------------------------------
+     Phone Frame Dimensions
+     ------------------------------------------------------------------------- */
+
+  --phone-width: 390px;
+  --phone-height: 844px;
+  --phone-border-radius: 44px;
+  --phone-bezel: 8px;
+  --status-bar-height: 44px;
+  --home-indicator-height: 34px;
+  --bottom-nav-height: 80px;
+}
+
+/* Dark mode overrides (optional - can be enabled later) */
+@media (prefers-color-scheme: dark) {
+  :root.dark-mode {
+    --color-background: #1C1B1F;
+    --color-surface: #2B2930;
+    --color-surface-variant: #49454F;
+    --color-on-surface: #E6E1E5;
+    --color-on-surface-variant: #CAC4D0;
+    --color-muted: #938F99;
+    --color-divider: #49454F;
+  }
+}

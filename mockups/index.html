@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tandem UI Mockups</title>
+  <link rel="stylesheet" href="styles/design-system.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <style>
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: var(--space-8);
+    }
+
+    .mockups-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .mockups-header {
+      text-align: center;
+      color: white;
+      margin-bottom: var(--space-8);
+    }
+
+    .mockups-header h1 {
+      font-size: var(--text-4xl);
+      font-weight: var(--font-bold);
+      margin-bottom: var(--space-2);
+    }
+
+    .mockups-header p {
+      font-size: var(--text-lg);
+      opacity: 0.9;
+    }
+
+    .mockups-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-6);
+    }
+
+    .mockup-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-lg);
+      transition: all var(--duration-normal) var(--ease-in-out);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .mockup-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-2xl);
+    }
+
+    .mockup-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: var(--gradient-primary);
+      color: white;
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-weight: var(--font-bold);
+      margin-bottom: var(--space-3);
+    }
+
+    .mockup-title {
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+      margin-bottom: var(--space-2);
+    }
+
+    .mockup-description {
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+      line-height: var(--leading-relaxed);
+    }
+
+    .mockup-status {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      margin-top: var(--space-3);
+      padding: var(--space-1) var(--space-2);
+      background: var(--color-success-light);
+      color: var(--color-success);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: var(--font-medium);
+    }
+
+    .mockup-status.pending {
+      background: var(--color-surface-variant);
+      color: var(--color-muted);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: currentColor;
+      border-radius: var(--radius-full);
+    }
+
+    .section-title {
+      color: white;
+      font-size: var(--text-xl);
+      font-weight: var(--font-semibold);
+      margin-top: var(--space-10);
+      margin-bottom: var(--space-4);
+      opacity: 0.9;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      margin: var(--space-8) 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="mockups-container">
+    <header class="mockups-header">
+      <h1>Tandem UI Mockups</h1>
+      <p>Warm & Friendly Design System - 19 Screens Complete</p>
+    </header>
+
+    <h2 class="section-title">Core Screens</h2>
+    <div class="mockups-grid">
+      <a href="screens/01-week-view.html" class="mockup-card">
+        <div class="mockup-number">1</div>
+        <h3 class="mockup-title">Week View</h3>
+        <p class="mockup-description">Main task list with progress ring, segment switcher, and quick add. The hero screen of the app.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/02-add-task.html" class="mockup-card">
+        <div class="mockup-number">2</div>
+        <h3 class="mockup-title">Add Task</h3>
+        <p class="mockup-description">Bottom sheet for quick task creation with title, notes, and goal linking.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/03-progress.html" class="mockup-card">
+        <div class="mockup-number">3</div>
+        <h3 class="mockup-title">Progress</h3>
+        <p class="mockup-description">Streak card, completion trends chart, and partner comparison bars.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/04-goals.html" class="mockup-card">
+        <div class="mockup-number">4</div>
+        <h3 class="mockup-title">Goals</h3>
+        <p class="mockup-description">Goal list with progress cards, emoji icons, and status indicators.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/05-planning-complete.html" class="mockup-card">
+        <div class="mockup-number">5</div>
+        <h3 class="mockup-title">Planning Complete</h3>
+        <p class="mockup-description">Celebration screen with confetti animation and weekly summary.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/06-review-rate.html" class="mockup-card">
+        <div class="mockup-number">6</div>
+        <h3 class="mockup-title">Review - Rate Week</h3>
+        <p class="mockup-description">Emoji rating selector for weekly mood reflection.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+    </div>
+
+    <hr class="divider">
+
+    <h2 class="section-title">Week View Variants (Phase 2)</h2>
+    <div class="mockups-grid">
+      <a href="screens/07-week-view-partner.html" class="mockup-card">
+        <div class="mockup-number">7</div>
+        <h3 class="mockup-title">Week View - Partner</h3>
+        <p class="mockup-description">Partner's tasks view with read-only state and teal-tinted cards.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/08-week-view-together.html" class="mockup-card">
+        <div class="mockup-number">8</div>
+        <h3 class="mockup-title">Week View - Together</h3>
+        <p class="mockup-description">Shared tasks that either partner can complete.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+    </div>
+
+    <h2 class="section-title">Task & Goal Details (Phase 2)</h2>
+    <div class="mockups-grid">
+      <a href="screens/09-task-detail.html" class="mockup-card">
+        <div class="mockup-number">9</div>
+        <h3 class="mockup-title">Task Detail</h3>
+        <p class="mockup-description">Bottom sheet with edit capabilities, notes, and outcome selection.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/16-goal-detail.html" class="mockup-card">
+        <div class="mockup-number">16</div>
+        <h3 class="mockup-title">Goal Detail</h3>
+        <p class="mockup-description">Full goal view with progress ring and weekly history chart.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/17-create-goal.html" class="mockup-card">
+        <div class="mockup-number">17</div>
+        <h3 class="mockup-title">Create Goal</h3>
+        <p class="mockup-description">Goal creation form with icon picker, type selector, and duration.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+    </div>
+
+    <h2 class="section-title">Planning Flow (Phase 2)</h2>
+    <div class="mockups-grid">
+      <a href="screens/10-planning-start.html" class="mockup-card">
+        <div class="mockup-number">10</div>
+        <h3 class="mockup-title">Planning Start</h3>
+        <p class="mockup-description">Entry point for Sunday planning ritual with warm illustration.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/11-planning-rollover.html" class="mockup-card">
+        <div class="mockup-number">11</div>
+        <h3 class="mockup-title">Planning Rollover</h3>
+        <p class="mockup-description">Review incomplete tasks: "Add to This Week" or "Let It Go".</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/12-planning-add-tasks.html" class="mockup-card">
+        <div class="mockup-number">12</div>
+        <h3 class="mockup-title">Planning Add Tasks</h3>
+        <p class="mockup-description">Add new tasks with goal suggestions and quick input.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+    </div>
+
+    <h2 class="section-title">Review Flow (Phase 2)</h2>
+    <div class="mockups-grid">
+      <a href="screens/13-review-start.html" class="mockup-card">
+        <div class="mockup-number">13</div>
+        <h3 class="mockup-title">Review Start</h3>
+        <p class="mockup-description">Entry point with Solo or Together mode selection.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/14-review-tasks.html" class="mockup-card">
+        <div class="mockup-number">14</div>
+        <h3 class="mockup-title">Review Tasks</h3>
+        <p class="mockup-description">Task-by-task review with Done, Tried, and Skipped outcomes.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/15-review-complete.html" class="mockup-card">
+        <div class="mockup-number">15</div>
+        <h3 class="mockup-title">Review Complete</h3>
+        <p class="mockup-description">Celebration with stats breakdown and streak celebration.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+    </div>
+
+    <h2 class="section-title">Settings & Partner (Phase 2)</h2>
+    <div class="mockups-grid">
+      <a href="screens/18-settings.html" class="mockup-card">
+        <div class="mockup-number">18</div>
+        <h3 class="mockup-title">Settings</h3>
+        <p class="mockup-description">Account settings with profile, partner connection, and preferences.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+
+      <a href="screens/19-partner-invite.html" class="mockup-card">
+        <div class="mockup-number">19</div>
+        <h3 class="mockup-title">Partner Invite</h3>
+        <p class="mockup-description">Generate and share invite code with your partner.</p>
+        <span class="mockup-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

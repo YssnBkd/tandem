@@ -1,0 +1,458 @@
+/* ==========================================================================
+   Tandem Animations - Keyframes & Animation Classes
+   ========================================================================== */
+
+/* -------------------------------------------------------------------------
+   Keyframe Definitions
+   ------------------------------------------------------------------------- */
+
+/* Fade In */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Fade Out */
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Slide Up */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide Down */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide In From Bottom (for bottom sheets) */
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Scale In */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Pop In (bouncy) */
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Checkmark Pop (for task completion) */
+@keyframes checkmarkPop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Checkmark Draw (SVG stroke animation) */
+@keyframes checkmarkDraw {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Task Fade Complete */
+@keyframes taskFadeComplete {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0.6;
+    transform: translateX(0);
+  }
+}
+
+/* Progress Ring Fill */
+@keyframes ringFill {
+  from {
+    stroke-dashoffset: var(--circumference, 283);
+  }
+  to {
+    stroke-dashoffset: var(--progress-offset, 0);
+  }
+}
+
+/* Pulse (for attention) */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Shake (for errors) */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+/* Float (subtle up/down) */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Bounce */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(-15px);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+/* Spin */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Confetti Fall */
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Confetti Piece Variations */
+@keyframes confetti1 {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(600px) rotate(720deg) translateX(100px);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti2 {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(600px) rotate(-540deg) translateX(-80px);
+    opacity: 0;
+  }
+}
+
+@keyframes confetti3 {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(600px) rotate(450deg) translateX(50px);
+    opacity: 0;
+  }
+}
+
+/* Streak Fire Flicker */
+@keyframes fireFlicker {
+  0%, 100% {
+    transform: scale(1) rotate(-2deg);
+  }
+  25% {
+    transform: scale(1.05) rotate(1deg);
+  }
+  50% {
+    transform: scale(0.98) rotate(-1deg);
+  }
+  75% {
+    transform: scale(1.02) rotate(2deg);
+  }
+}
+
+/* Celebration Burst */
+@keyframes celebrationBurst {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Card Enter Stagger */
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Shimmer Loading */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Emoji Bounce Select */
+@keyframes emojiSelect {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.4);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  70% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1.25);
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Animation Utility Classes
+   ------------------------------------------------------------------------- */
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-normal) var(--ease-out);
+}
+
+.animate-fade-out {
+  animation: fadeOut var(--duration-normal) var(--ease-in);
+}
+
+.animate-slide-up {
+  animation: slideUp var(--duration-normal) var(--ease-out);
+}
+
+.animate-slide-down {
+  animation: slideDown var(--duration-normal) var(--ease-out);
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom var(--duration-slow) var(--ease-out);
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--duration-normal) var(--ease-out);
+}
+
+.animate-pop-in {
+  animation: popIn var(--duration-slow) var(--ease-spring);
+}
+
+.animate-checkmark {
+  animation: checkmarkPop var(--duration-slow) var(--ease-spring);
+}
+
+.animate-pulse {
+  animation: pulse 2s var(--ease-in-out) infinite;
+}
+
+.animate-shake {
+  animation: shake 0.5s var(--ease-in-out);
+}
+
+.animate-float {
+  animation: float 3s var(--ease-in-out) infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.animate-fire {
+  animation: fireFlicker 0.5s var(--ease-in-out) infinite;
+}
+
+/* Staggered card animations */
+.animate-card-1 { animation: cardEnter var(--duration-normal) var(--ease-out) 0ms both; }
+.animate-card-2 { animation: cardEnter var(--duration-normal) var(--ease-out) 50ms both; }
+.animate-card-3 { animation: cardEnter var(--duration-normal) var(--ease-out) 100ms both; }
+.animate-card-4 { animation: cardEnter var(--duration-normal) var(--ease-out) 150ms both; }
+.animate-card-5 { animation: cardEnter var(--duration-normal) var(--ease-out) 200ms both; }
+.animate-card-6 { animation: cardEnter var(--duration-normal) var(--ease-out) 250ms both; }
+
+/* Shimmer loading effect */
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-variant) 25%,
+    var(--color-surface) 50%,
+    var(--color-surface-variant) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* -------------------------------------------------------------------------
+   Transition Utilities
+   ------------------------------------------------------------------------- */
+
+.transition-all {
+  transition: all var(--duration-normal) var(--ease-in-out);
+}
+
+.transition-colors {
+  transition: color var(--duration-fast) var(--ease-in-out),
+              background-color var(--duration-fast) var(--ease-in-out),
+              border-color var(--duration-fast) var(--ease-in-out);
+}
+
+.transition-transform {
+  transition: transform var(--duration-normal) var(--ease-in-out);
+}
+
+.transition-opacity {
+  transition: opacity var(--duration-normal) var(--ease-in-out);
+}
+
+.transition-shadow {
+  transition: box-shadow var(--duration-normal) var(--ease-in-out);
+}
+
+/* -------------------------------------------------------------------------
+   Confetti Container (for celebration screens)
+   ------------------------------------------------------------------------- */
+
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: var(--z-overlay);
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -10px;
+}
+
+.confetti-piece:nth-child(1) { left: 10%; background: var(--color-primary); animation: confetti1 2.5s ease-out forwards; animation-delay: 0s; }
+.confetti-piece:nth-child(2) { left: 20%; background: var(--color-secondary); animation: confetti2 2.8s ease-out forwards; animation-delay: 0.1s; border-radius: 50%; }
+.confetti-piece:nth-child(3) { left: 30%; background: var(--color-tertiary); animation: confetti3 2.3s ease-out forwards; animation-delay: 0.2s; }
+.confetti-piece:nth-child(4) { left: 40%; background: var(--color-primary-light); animation: confetti1 2.6s ease-out forwards; animation-delay: 0.15s; border-radius: 50%; }
+.confetti-piece:nth-child(5) { left: 50%; background: var(--color-secondary); animation: confetti2 2.4s ease-out forwards; animation-delay: 0.25s; }
+.confetti-piece:nth-child(6) { left: 60%; background: var(--color-primary); animation: confetti3 2.7s ease-out forwards; animation-delay: 0.05s; border-radius: 50%; }
+.confetti-piece:nth-child(7) { left: 70%; background: var(--color-tertiary-light); animation: confetti1 2.5s ease-out forwards; animation-delay: 0.3s; }
+.confetti-piece:nth-child(8) { left: 80%; background: var(--color-secondary-light); animation: confetti2 2.9s ease-out forwards; animation-delay: 0.2s; border-radius: 50%; }
+.confetti-piece:nth-child(9) { left: 90%; background: var(--color-primary); animation: confetti3 2.4s ease-out forwards; animation-delay: 0.1s; }
+.confetti-piece:nth-child(10) { left: 15%; background: var(--color-warning); animation: confetti1 2.6s ease-out forwards; animation-delay: 0.35s; border-radius: 50%; }
+.confetti-piece:nth-child(11) { left: 25%; background: var(--color-success); animation: confetti2 2.5s ease-out forwards; animation-delay: 0.4s; }
+.confetti-piece:nth-child(12) { left: 75%; background: var(--color-secondary); animation: confetti3 2.7s ease-out forwards; animation-delay: 0.15s; border-radius: 50%; }
+
+/* -------------------------------------------------------------------------
+   Progress Ring Animation
+   ------------------------------------------------------------------------- */
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset var(--duration-slower) var(--ease-out);
+}
+
+.progress-ring-circle.animate {
+  animation: ringFill 1s var(--ease-out) forwards;
+}

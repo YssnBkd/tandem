@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planning Complete - Tandem</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    .celebration-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--gradient-primary-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Progress Dots */
+    .progress-dots {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: calc(var(--status-bar-height) + var(--space-4)) var(--space-4) var(--space-4);
+    }
+
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: var(--radius-full);
+      background: var(--color-outline-variant);
+    }
+
+    .progress-dot.active {
+      background: var(--color-primary);
+      width: 24px;
+    }
+
+    .progress-dot.completed {
+      background: var(--color-primary);
+    }
+
+    /* Main Content */
+    .celebration-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-6);
+      text-align: center;
+    }
+
+    /* Success Icon */
+    .success-icon {
+      width: 120px;
+      height: 120px;
+      background: var(--color-primary);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-6);
+      box-shadow: var(--shadow-primary);
+      animation: popIn 0.6s var(--ease-spring);
+    }
+
+    .success-icon svg {
+      width: 64px;
+      height: 64px;
+      color: white;
+    }
+
+    .success-checkmark {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: checkmarkDraw 0.8s ease-out 0.4s forwards;
+    }
+
+    /* Title */
+    .celebration-title {
+      font-size: var(--text-3xl);
+      font-weight: var(--font-bold);
+      color: var(--color-on-surface);
+      margin-bottom: var(--space-2);
+      animation: slideUp 0.5s var(--ease-out) 0.2s both;
+    }
+
+    /* Stats */
+    .celebration-stats {
+      animation: slideUp 0.5s var(--ease-out) 0.3s both;
+    }
+
+    .stats-number {
+      font-size: var(--text-6xl);
+      font-weight: var(--font-bold);
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+
+    .stats-label {
+      font-size: var(--text-xl);
+      color: var(--color-on-surface-variant);
+      margin-top: var(--space-1);
+    }
+
+    /* Breakdown */
+    .stats-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+      animation: slideUp 0.5s var(--ease-out) 0.4s both;
+    }
+
+    .breakdown-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+    }
+
+    .breakdown-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+    }
+
+    .breakdown-dot.new {
+      background: var(--color-primary);
+    }
+
+    .breakdown-dot.rolled {
+      background: var(--color-secondary);
+    }
+
+    .breakdown-dot.partner {
+      background: var(--color-tertiary);
+    }
+
+    /* Task Preview */
+    .task-preview-section {
+      margin-top: var(--space-8);
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 320px;
+      animation: slideUp 0.5s var(--ease-out) 0.5s both;
+    }
+
+    .task-preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-3);
+    }
+
+    .task-preview-title {
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .task-preview-toggle {
+      font-size: var(--text-sm);
+      color: var(--color-primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: var(--font-medium);
+    }
+
+    .task-preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .task-preview-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-2);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-variant);
+    }
+
+    .task-preview-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-sm);
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-sm);
+    }
+
+    .task-preview-name {
+      flex: 1;
+      font-size: var(--text-sm);
+      color: var(--color-on-surface);
+    }
+
+    /* Streak Teaser */
+    .streak-teaser {
+      margin-top: var(--space-6);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-secondary-light);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-sm);
+      color: var(--color-secondary-dark);
+      animation: slideUp 0.5s var(--ease-out) 0.6s both;
+    }
+
+    .streak-teaser-icon {
+      font-size: var(--text-md);
+    }
+
+    /* Actions */
+    .celebration-actions {
+      padding: var(--space-4) var(--space-6) calc(var(--space-4) + var(--home-indicator-height));
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      background: var(--color-background);
+      animation: slideUp 0.5s var(--ease-out) 0.7s both;
+    }
+
+    .btn-partner {
+      background: var(--color-tertiary-light);
+      color: var(--color-tertiary-dark);
+    }
+
+    .btn-partner:hover {
+      background: #C0E8E8;
+    }
+
+    /* Confetti */
+    .confetti-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      top: -20px;
+    }
+
+    @keyframes confetti1 {
+      0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(800px) rotate(720deg) translateX(100px); opacity: 0; }
+    }
+
+    @keyframes confetti2 {
+      0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(800px) rotate(-540deg) translateX(-80px); opacity: 0; }
+    }
+
+    @keyframes confetti3 {
+      0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(800px) rotate(450deg) translateX(50px); opacity: 0; }
+    }
+
+    .confetti-piece:nth-child(1) { left: 5%; background: var(--color-primary); animation: confetti1 3s ease-out 0.5s forwards; }
+    .confetti-piece:nth-child(2) { left: 15%; background: var(--color-secondary); border-radius: 50%; animation: confetti2 3.2s ease-out 0.6s forwards; }
+    .confetti-piece:nth-child(3) { left: 25%; background: var(--color-tertiary); animation: confetti3 2.8s ease-out 0.4s forwards; }
+    .confetti-piece:nth-child(4) { left: 35%; background: var(--color-primary-light); border-radius: 50%; animation: confetti1 3.4s ease-out 0.7s forwards; }
+    .confetti-piece:nth-child(5) { left: 45%; background: var(--color-secondary); animation: confetti2 3s ease-out 0.5s forwards; }
+    .confetti-piece:nth-child(6) { left: 55%; background: var(--color-primary); border-radius: 50%; animation: confetti3 3.3s ease-out 0.6s forwards; }
+    .confetti-piece:nth-child(7) { left: 65%; background: var(--color-warning); animation: confetti1 2.9s ease-out 0.8s forwards; }
+    .confetti-piece:nth-child(8) { left: 75%; background: var(--color-tertiary-light); border-radius: 50%; animation: confetti2 3.1s ease-out 0.45s forwards; }
+    .confetti-piece:nth-child(9) { left: 85%; background: var(--color-secondary-light); animation: confetti3 3.5s ease-out 0.55s forwards; }
+    .confetti-piece:nth-child(10) { left: 95%; background: var(--color-primary); border-radius: 50%; animation: confetti1 2.7s ease-out 0.65s forwards; }
+    .confetti-piece:nth-child(11) { left: 10%; background: var(--color-success); animation: confetti2 3.2s ease-out 0.75s forwards; }
+    .confetti-piece:nth-child(12) { left: 90%; background: var(--color-secondary); border-radius: 50%; animation: confetti3 3s ease-out 0.85s forwards; }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span class="status-bar-time">9:41</span>
+        <div class="status-bar-icons">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor">
+            <path d="M1 4.5h2v7H1v-7zm4-3h2v10H5v-10zm4 5h2v5H9v-5zm4-2h2v7h-2v-7zm4-3h1v10h-1v-10z"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
+            <path d="M8 0C5.2 0 2.7 1.1.9 2.9l1.4 1.4C3.7 2.9 5.7 2 8 2s4.3.9 5.7 2.3l1.4-1.4C13.3 1.1 10.8 0 8 0zm0 4c-1.7 0-3.2.6-4.4 1.7l1.4 1.4c.8-.7 1.9-1.1 3-1.1s2.2.4 3 1.1l1.4-1.4C11.2 4.6 9.7 4 8 4zm0 4c-.8 0-1.6.3-2.1.9l2.1 2.1 2.1-2.1c-.5-.6-1.3-.9-2.1-.9z"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor">
+            <rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/>
+            <rect x="2" y="3" width="16" height="6" rx="1" fill="currentColor"/>
+            <path d="M23 4v4c.6 0 1-.7 1-2s-.4-2-1-2z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="phone-screen">
+        <div class="celebration-screen">
+          <!-- Confetti -->
+          <div class="confetti-container">
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+            <div class="confetti-piece"></div>
+          </div>
+
+          <!-- Progress Dots -->
+          <div class="progress-dots">
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot completed"></div>
+            <div class="progress-dot active"></div>
+          </div>
+
+          <!-- Main Content -->
+          <div class="celebration-content">
+            <!-- Success Icon -->
+            <div class="success-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline class="success-checkmark" points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+
+            <!-- Title -->
+            <h1 class="celebration-title">You're all set!</h1>
+
+            <!-- Stats -->
+            <div class="celebration-stats">
+              <div class="stats-number">8</div>
+              <div class="stats-label">tasks for this week</div>
+            </div>
+
+            <!-- Breakdown -->
+            <div class="stats-breakdown">
+              <div class="breakdown-item">
+                <span class="breakdown-dot new"></span>
+                5 new
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-dot rolled"></span>
+                2 rolled over
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-dot partner"></span>
+                1 from Alex
+              </div>
+            </div>
+
+            <!-- Task Preview -->
+            <div class="task-preview-section">
+              <div class="task-preview-header">
+                <span class="task-preview-title">Your week</span>
+                <button class="task-preview-toggle">Show all</button>
+              </div>
+              <div class="task-preview-list">
+                <div class="task-preview-item">
+                  <span class="task-preview-icon">💪</span>
+                  <span class="task-preview-name">Morning workout</span>
+                </div>
+                <div class="task-preview-item">
+                  <span class="task-preview-icon">📞</span>
+                  <span class="task-preview-name">Call mom</span>
+                </div>
+                <div class="task-preview-item">
+                  <span class="task-preview-icon">🛒</span>
+                  <span class="task-preview-name">Grocery shopping</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Streak Teaser -->
+            <div class="streak-teaser">
+              <span class="streak-teaser-icon">🔥</span>
+              <span>Review this Friday to keep your 12 week streak!</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="celebration-actions">
+            <button class="btn btn-primary btn-full btn-lg">
+              See My Week
+            </button>
+            <button class="btn btn-partner btn-full">
+              See Alex's Week
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-home-indicator"></div>
+    </div>
+  </div>
+</body>
+</html>
