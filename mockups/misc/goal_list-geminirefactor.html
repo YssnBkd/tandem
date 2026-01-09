@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Goals - Tandem Style</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    :root {
+      /* Warm Relationship Palette */
+      --color-primary: #D97757; /* Warm Terracotta */
+      --color-primary-soft: #FDF2EF;
+      --color-background: #FFFBF7; /* Soft Eggshell */
+      --color-surface: #FFFFFF;
+      --color-text-main: #4A4238; /* Warm Charcoal/Brown */
+      --color-text-muted: #9C9488;
+      --color-divider: #F0EBE6;
+      
+      --radius-pill: 999px;
+      --radius-card: 16px;
+      --shadow-soft: 0 4px 15px rgba(74, 66, 56, 0.05);
+    }
+
+    body {
+      background-color: var(--color-background);
+      color: var(--color-text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .phone-screen {
+      background: var(--color-background);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Soft Header */
+    .goals-header {
+      padding: calc(var(--status-bar-height) + 16px) 20px 12px;
+      background: var(--color-background);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .goals-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--color-text-main);
+      letter-spacing: -0.5px;
+    }
+
+    .icon-button {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: var(--color-surface);
+      border-radius: 12px;
+      color: var(--color-text-main);
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+    }
+
+    /* Warm Segment Control */
+    .segment-wrapper {
+      padding: 8px 20px;
+    }
+
+    .segment-control {
+      display: flex;
+      background: rgba(0,0,0,0.03);
+      padding: 4px;
+      border-radius: var(--radius-pill);
+    }
+
+    .segment-item {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .segment-item.active {
+      background: var(--color-surface);
+      color: var(--color-primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    /* List Layout */
+    .goals-list {
+      padding: 12px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    /* Soft Goal Card */
+    .goal-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-card);
+      padding: 16px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .goal-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .goal-icon {
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      background: var(--color-primary-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+
+    .goal-info {
+      flex: 1;
+    }
+
+    .goal-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-text-main);
+      margin-bottom: 2px;
+    }
+
+    .goal-ownership {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-primary);
+    }
+
+    /* Progress UI */
+    .progress-section {
+      margin-top: 4px;
+    }
+
+    .progress-bar-container {
+      height: 6px;
+      background: #F0EBE6;
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--color-primary);
+      border-radius: var(--radius-pill);
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    /* Add Goal Button */
+    .add-goal-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px;
+      border: 2px dashed #E0DCD6;
+      border-radius: var(--radius-card);
+      background: transparent;
+      color: var(--color-text-muted);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-divider);
+      padding: 12px 20px calc(12px + var(--home-indicator-height));
+      display: flex;
+      justify-content: space-around;
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.02);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--color-text-muted);
+      text-decoration: none;
+    }
+
+    .nav-item.active {
+      color: var(--color-primary);
+    }
+
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .nav-label {
+      font-size: 10px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+
+      <div class="status-bar" style="color: var(--color-text-main);">
+        <span class="status-bar-time">9:41</span>
+        <div class="status-bar-icons">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><path d="M1 4.5h2v7H1v-7zm4-3h2v10H5v-10zm4 5h2v5H9v-5zm4-2h2v7h-2v-7zm4-3h1v10h-1v-10z"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" fill="none"/><rect x="2" y="3" width="16" height="6" rx="1" fill="currentColor"/></svg>
+        </div>
+      </div>
+
+      <div class="phone-screen">
+        <header class="goals-header">
+          <h1 class="goals-title">Our Goals</h1>
+          <button class="icon-button" data-nav="17-create-goal.html">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+        </header>
+
+        <div class="segment-wrapper">
+          <div class="segment-control">
+            <button class="segment-item active">Active</button>
+            <button class="segment-item">Completed</button>
+          </div>
+        </div>
+
+        <div class="goals-list">
+          <div class="goal-card" data-nav="16-goal-detail.html">
+            <div class="goal-card-top">
+              <div class="goal-icon">🧘‍♀️</div>
+              <div class="goal-info">
+                <div class="goal-ownership">Together</div>
+                <h3 class="goal-name">Morning Yoga</h3>
+              </div>
+            </div>
+            <div class="progress-section">
+              <div class="progress-bar-container">
+                <div class="progress-fill" style="width: 66%;"></div>
+              </div>
+              <div class="progress-meta">
+                <span>2 of 3 this week</span>
+                <span>Habit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="goal-card" data-nav="16-goal-detail.html">
+            <div class="goal-card-top">
+              <div class="goal-icon">🏡</div>
+              <div class="goal-info">
+                <div class="goal-ownership">Together</div>
+                <h3 class="goal-name">Dream Home Fund</h3>
+              </div>
+            </div>
+            <div class="progress-section">
+              <div class="progress-bar-container">
+                <div class="progress-fill" style="width: 40%;"></div>
+              </div>
+              <div class="progress-meta">
+                <span>$2,000 / $5,000</span>
+                <span>Savings</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="goal-card" data-nav="16-goal-detail.html">
+            <div class="goal-card-top">
+              <div class="goal-icon">✈️</div>
+              <div class="goal-info">
+                <div class="goal-ownership">For Partner</div>
+                <h3 class="goal-name">Italy Trip Planning</h3>
+              </div>
+            </div>
+            <div class="progress-section">
+              <div class="progress-bar-container">
+                <div class="progress-fill" style="width: 15%;"></div>
+              </div>
+              <div class="progress-meta">
+                <span>1 of 8 milestones</span>
+                <span>Project</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="add-goal-btn" data-nav="17-create-goal.html">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+             Add a new goal
+          </button>
+        </div>
+
+        <nav class="bottom-nav">
+          <a href="#" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span class="nav-label">Home</span>
+          </a>
+          <a href="#" class="nav-item active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span class="nav-label">Goals</span>
+          </a>
+          <a href="#" class="nav-item">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <span class="nav-label">Us</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="phone-home-indicator"></div>
+    </div>
+  </div>
+  <script src="../scripts/navigation.js"></script>
+</body>
+</html>

@@ -1,6 +1,8 @@
 package org.epoque.tandem.presentation.week
 
+import kotlinx.datetime.LocalDate
 import org.epoque.tandem.domain.model.OwnerType
+import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.presentation.week.model.Segment
 
 /**
@@ -38,7 +40,10 @@ sealed class WeekEvent {
     data class AddTaskSubmitted(
         val title: String,
         val notes: String?,
-        val ownerType: OwnerType
+        val ownerType: OwnerType,
+        val priority: TaskPriority = TaskPriority.P4,
+        val scheduledDate: LocalDate? = null,
+        val linkedGoalId: String? = null
     ) : WeekEvent()
 
     // Refresh

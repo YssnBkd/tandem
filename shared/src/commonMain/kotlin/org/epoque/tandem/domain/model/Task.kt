@@ -1,6 +1,8 @@
 package org.epoque.tandem.domain.model
 
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 
 /**
  * Represents a user's task/commitment for a specific week.
@@ -20,6 +22,13 @@ data class Task(
     val linkedGoalId: String?,
     val reviewNote: String?,
     val rolledFromWeekId: String?,
+    // New fields for UI redesign (Feature 009)
+    val priority: TaskPriority,
+    val scheduledDate: LocalDate?,
+    val scheduledTime: LocalTime?,
+    val deadline: Instant?,
+    val parentTaskId: String?,
+    val labels: List<String>,
     val createdAt: Instant,
     val updatedAt: Instant
 ) {
@@ -28,4 +37,9 @@ data class Task(
     val repeatProgress: String? get() = repeatTarget?.let { "$repeatCompleted/$it" }
     val isPendingAcceptance: Boolean get() = status == TaskStatus.PENDING_ACCEPTANCE
     val isPartnerRequest: Boolean get() = ownerId != createdBy
+
+    // New computed properties for Feature 009
+    val isSubtask: Boolean get() = parentTaskId != null
+    val hasScheduledTime: Boolean get() = scheduledTime != null
+    val hasDeadline: Boolean get() = deadline != null
 }

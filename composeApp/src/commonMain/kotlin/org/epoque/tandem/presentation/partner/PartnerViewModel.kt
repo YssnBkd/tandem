@@ -17,6 +17,7 @@ import kotlinx.datetime.Instant
 import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.Partner
 import org.epoque.tandem.domain.model.Task
+import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.domain.repository.AuthRepository
 import org.epoque.tandem.domain.repository.AuthState
@@ -318,6 +319,12 @@ class PartnerViewModel(
                     linkedGoalId = null,
                     reviewNote = null,
                     rolledFromWeekId = null,
+                    priority = TaskPriority.P4,
+                    scheduledDate = null,
+                    scheduledTime = null,
+                    deadline = null,
+                    parentTaskId = null,
+                    labels = emptyList(),
                     createdAt = Instant.DISTANT_PAST,
                     updatedAt = Instant.DISTANT_PAST
                 )

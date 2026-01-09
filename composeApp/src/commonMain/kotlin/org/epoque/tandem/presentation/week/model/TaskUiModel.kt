@@ -1,7 +1,11 @@
 package org.epoque.tandem.presentation.week.model
 
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.Task
+import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.domain.model.TaskStatus
 
 /**
@@ -15,6 +19,7 @@ data class TaskUiModel(
     val isCompleted: Boolean,
     val ownerType: OwnerType,
     val segment: Segment,
+    val weekId: String,
 
     // Repeat task support
     val isRepeating: Boolean,
@@ -32,7 +37,15 @@ data class TaskUiModel(
     // Goal linking (Feature 007)
     val linkedGoalId: String? = null,
     val linkedGoalName: String? = null,
-    val linkedGoalIcon: String? = null
+    val linkedGoalIcon: String? = null,
+
+    // Feature 009: UI Redesign fields
+    val priority: TaskPriority = TaskPriority.P4,
+    val scheduledDate: LocalDate? = null,
+    val scheduledTime: LocalTime? = null,
+    val deadline: Instant? = null,
+    val parentTaskId: String? = null,
+    val labels: List<String> = emptyList()
 ) {
     companion object {
         /**
@@ -61,6 +74,7 @@ data class TaskUiModel(
                 isCompleted = isCompleted,
                 ownerType = task.ownerType,
                 segment = Segment.fromOwnerType(task.ownerType),
+                weekId = task.weekId,
                 isRepeating = task.isRepeating,
                 repeatTarget = task.repeatTarget,
                 repeatCompleted = task.repeatCompleted,
@@ -86,7 +100,14 @@ data class TaskUiModel(
                 } else null,
                 linkedGoalId = task.linkedGoalId,
                 linkedGoalName = goalName,
-                linkedGoalIcon = goalIcon
+                linkedGoalIcon = goalIcon,
+                // Feature 009 fields
+                priority = task.priority,
+                scheduledDate = task.scheduledDate,
+                scheduledTime = task.scheduledTime,
+                deadline = task.deadline,
+                parentTaskId = task.parentTaskId,
+                labels = task.labels
             )
         }
     }

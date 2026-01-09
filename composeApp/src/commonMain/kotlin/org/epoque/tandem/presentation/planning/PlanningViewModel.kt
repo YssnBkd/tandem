@@ -16,6 +16,7 @@ import kotlinx.datetime.Clock
 import org.epoque.tandem.domain.model.Goal
 import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.Task
+import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.domain.model.Week
 import org.epoque.tandem.domain.repository.AuthRepository
@@ -217,6 +218,12 @@ class PlanningViewModel(
                     linkedGoalId = originalTask.linkedGoalId,
                     reviewNote = null,
                     rolledFromWeekId = originalTask.weekId,
+                    priority = originalTask.priority,
+                    scheduledDate = null,
+                    scheduledTime = null,
+                    deadline = null,
+                    parentTaskId = null,
+                    labels = originalTask.labels,
                     createdAt = Clock.System.now(),
                     updatedAt = Clock.System.now()
                 )
@@ -304,6 +311,12 @@ class PlanningViewModel(
                     linkedGoalId = selectedGoal?.id,
                     reviewNote = null,
                     rolledFromWeekId = null,
+                    priority = TaskPriority.P4,
+                    scheduledDate = null,
+                    scheduledTime = null,
+                    deadline = null,
+                    parentTaskId = null,
+                    labels = emptyList(),
                     createdAt = Clock.System.now(),
                     updatedAt = Clock.System.now()
                 )

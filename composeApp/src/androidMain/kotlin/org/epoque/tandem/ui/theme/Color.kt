@@ -62,3 +62,39 @@ val TandemSurfaceVariantDark = Color(0xFF49454F)
 val TandemOnSurfaceVariantDark = Color(0xFFCAC4D0)
 val TandemOutlineDark = Color(0xFF938F99)
 val TandemOutlineVariantDark = Color(0xFF49454F)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UI REDESIGN COLORS (Feature 009)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Priority Colors (Todoist-style)
+val PriorityP1 = Color(0xFFD1453B)       // Red - Highest priority
+val PriorityP2 = Color(0xFFEB8909)       // Orange - High priority
+val PriorityP3 = Color(0xFF246FE0)       // Blue - Medium priority
+val PriorityP4 = Color(0xFF79747E)       // Gray - Low/No priority (default)
+
+// Priority Light Backgrounds (10% opacity)
+val PriorityP1Light = Color(0x1AD1453B)  // 10% red
+val PriorityP2Light = Color(0x1AEB8909)  // 10% orange
+val PriorityP3Light = Color(0x1A246FE0)  // 10% blue
+
+// Coral accent colors (FAB, AI button, borders)
+val CoralPrimary = Color(0xFFE07A5F)     // Main coral
+val CoralDark = Color(0xFFDC4C3E)        // Darker coral
+val CoralLight = Color(0xFFFFE5DE)       // Light coral background
+
+// Schedule green (Todoist style)
+val ScheduleGreen = Color(0xFF058527)    // Green for schedule indicators
+
+// Streak/progress gradient colors
+val StreakStart = Color(0xFFE07A5F)      // Gradient start
+val StreakEnd = Color(0xFFF4A261)        // Gradient end
+
+// Section colors
+val OverdueRed = Color(0xFFD1453B)       // Overdue section
+val TodayBlue = Color(0xFF246FE0)        // Today indicator
+
+// Owner type colors
+val OwnerSelfColor = Color(0xFF6750A4)   // Purple for "Me"
+val OwnerPartnerColor = Color(0xFFE07A5F) // Coral for Partner
+val OwnerTogetherColor = Color(0xFF246FE0) // Blue for Together

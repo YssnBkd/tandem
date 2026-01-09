@@ -6,6 +6,7 @@ import org.epoque.tandem.data.local.adapter.GoalStatusAdapter
 import org.epoque.tandem.data.local.adapter.GoalTypeAdapter
 import org.epoque.tandem.data.local.adapter.instantAdapter
 import org.epoque.tandem.data.local.adapter.localDateAdapter
+import org.epoque.tandem.data.local.adapter.localTimeAdapter
 
 /**
  * Factory for creating a TandemDatabase instance with custom type adapters.
@@ -17,6 +18,10 @@ object TandemDatabaseFactory {
             TaskAdapter = Task.Adapter(
                 owner_typeAdapter = EnumColumnAdapter(),
                 statusAdapter = EnumColumnAdapter(),
+                priorityAdapter = EnumColumnAdapter(),
+                scheduled_dateAdapter = localDateAdapter,
+                scheduled_timeAdapter = localTimeAdapter,
+                deadlineAdapter = instantAdapter,
                 created_atAdapter = instantAdapter,
                 updated_atAdapter = instantAdapter
             ),

@@ -24,8 +24,8 @@ import org.epoque.tandem.data.seed.MockDataSeeder
 import org.epoque.tandem.presentation.auth.AuthUiState
 import org.epoque.tandem.presentation.auth.AuthViewModel
 import org.epoque.tandem.presentation.partner.PartnerViewModel
-import org.epoque.tandem.ui.planning.PlanningScreen
-import org.epoque.tandem.ui.review.ReviewScreen
+import org.epoque.tandem.ui.legacy.planning.PlanningScreen
+import org.epoque.tandem.ui.legacy.review.ReviewScreen
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 

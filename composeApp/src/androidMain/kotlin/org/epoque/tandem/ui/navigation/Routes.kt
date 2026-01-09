@@ -43,6 +43,10 @@ sealed interface Routes {
         /** Goals tab content */
         @Serializable
         data object Goals : Main
+
+        /** Seasons tab content (Feature 009: UI Redesign) */
+        @Serializable
+        data object Seasons : Main
     }
 
     /**

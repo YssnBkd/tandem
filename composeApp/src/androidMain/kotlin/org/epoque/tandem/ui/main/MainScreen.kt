@@ -27,11 +27,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.epoque.tandem.domain.model.User
 import org.epoque.tandem.ui.navigation.NavigationTab
-import org.epoque.tandem.ui.progress.ProgressScreen
-import org.epoque.tandem.ui.week.WeekScreen
+import org.epoque.tandem.ui.legacy.progress.ProgressScreen
+import org.epoque.tandem.ui.screens.seasons.SeasonsScreen
+import org.epoque.tandem.ui.screens.week.WeekScreen
 
 /**
  * Main app screen with bottom navigation for authenticated users.
+ *
+ * Note: WeekScreen has its own WeekHeader, so we hide the TopAppBar
+ * when on the Week tab to avoid duplicate headers.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,48 +52,58 @@ fun MainScreen(
     var selectedTab by rememberSaveable(stateSaver = NavigationTab.Saver) { mutableStateOf(NavigationTab.Week) }
     var showMenu by rememberSaveable { mutableStateOf(false) }
 
+    // Week tab has its own header, so we don't show TopAppBar for it
+    val showTopBar = selectedTab != NavigationTab.Week
+
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = user?.displayName ?: "Tandem",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                actions = {
-                    Box {
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = "Menu"
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Sign Out") },
-                                onClick = {
-                                    showMenu = false
-                                    onSignOut()
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                                        contentDescription = null
-                                    )
-                                }
-                            )
+            if (showTopBar) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = when (selectedTab) {
+                                NavigationTab.Progress -> "Progress"
+                                NavigationTab.Goals -> "Goals"
+                                NavigationTab.Seasons -> "Seasons"
+                                else -> user?.displayName ?: "Tandem"
+                            },
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    actions = {
+                        Box {
+                            IconButton(onClick = { showMenu = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "Menu"
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Sign Out") },
+                                    onClick = {
+                                        showMenu = false
+                                        onSignOut()
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                            contentDescription = null
+                                        )
+                                    }
+                                )
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         },
         bottomBar = {
             NavigationBar {
@@ -120,12 +134,14 @@ fun MainScreen(
                     onNavigateToPlanning = onNavigateToPlanning,
                     onNavigateToReview = onNavigateToReview,
                     onNavigateToPartnerInvite = onNavigateToPartnerInvite,
-                    onNavigateToPartnerSettings = onNavigateToPartnerSettings
+                    onNavigateToPartnerSettings = onNavigateToPartnerSettings,
+                    onNavigateToSeasons = { selectedTab = NavigationTab.Seasons }
                 )
                 NavigationTab.Progress -> ProgressScreen(
                     onNavigateToWeekDetail = onNavigateToPastWeekDetail
                 )
                 NavigationTab.Goals -> GoalsScreen()
+                NavigationTab.Seasons -> SeasonsScreen()
             }
         }
     }

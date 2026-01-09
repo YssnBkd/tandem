@@ -17,9 +17,11 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import org.epoque.tandem.domain.model.Goal
 import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.Task
+import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.domain.repository.AuthRepository
 import org.epoque.tandem.domain.repository.AuthState
@@ -94,7 +96,10 @@ class WeekViewModel(
             is WeekEvent.TaskMarkCompleteRequested -> handleTaskMarkCompleteRequested()
             is WeekEvent.AddTaskSheetRequested -> handleAddTaskSheetRequested()
             is WeekEvent.AddTaskSheetDismissed -> handleAddTaskSheetDismissed()
-            is WeekEvent.AddTaskSubmitted -> handleAddTaskSubmitted(event.title, event.notes, event.ownerType)
+            is WeekEvent.AddTaskSubmitted -> handleAddTaskSubmitted(
+                event.title, event.notes, event.ownerType,
+                event.priority, event.scheduledDate, event.linkedGoalId
+            )
             is WeekEvent.RefreshRequested -> handleRefreshRequested()
             is WeekEvent.RequestTaskFromPartnerTapped -> handleRequestTaskFromPartner()
             is WeekEvent.InvitePartnerTapped -> handleInvitePartner()
@@ -370,6 +375,12 @@ class WeekViewModel(
                 linkedGoalId = null,
                 reviewNote = null,
                 rolledFromWeekId = null,
+                priority = TaskPriority.P4,
+                scheduledDate = null,
+                scheduledTime = null,
+                deadline = null,
+                parentTaskId = null,
+                labels = emptyList(),
                 createdAt = Instant.DISTANT_PAST,  // Set by repository
                 updatedAt = Instant.DISTANT_PAST   // Set by repository
             )
@@ -519,7 +530,14 @@ class WeekViewModel(
      * - Notify view of errors via snackbar
      * @see https://developer.android.com/kotlin/coroutines/coroutines-best-practices
      */
-    private fun handleAddTaskSubmitted(title: String, notes: String?, ownerType: OwnerType) {
+    private fun handleAddTaskSubmitted(
+        title: String,
+        notes: String?,
+        ownerType: OwnerType,
+        priority: TaskPriority,
+        scheduledDate: LocalDate?,
+        linkedGoalId: String?
+    ) {
         if (title.isBlank()) {
             return
         }
@@ -546,9 +564,15 @@ class WeekViewModel(
                 requestNote = null,
                 repeatTarget = null,
                 repeatCompleted = 0,
-                linkedGoalId = null,
+                linkedGoalId = linkedGoalId,
                 reviewNote = null,
                 rolledFromWeekId = null,
+                priority = priority,
+                scheduledDate = scheduledDate,
+                scheduledTime = null,
+                deadline = null,
+                parentTaskId = null,
+                labels = emptyList(),
                 createdAt = Instant.DISTANT_PAST,
                 updatedAt = Instant.DISTANT_PAST
             )

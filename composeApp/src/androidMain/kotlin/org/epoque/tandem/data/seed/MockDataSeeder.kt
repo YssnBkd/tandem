@@ -14,6 +14,7 @@ import org.epoque.tandem.domain.model.GoalStatus
 import org.epoque.tandem.domain.model.GoalType
 import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.PartnershipStatus
+import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.domain.model.toDbString
 import org.epoque.tandem.domain.util.WeekCalculator
@@ -256,6 +257,12 @@ class MockDataSeeder(
                     linked_goal_id = linkedGoalId,
                     review_note = reviewNote,
                     rolled_from_week_id = null,
+                    priority = TaskPriority.entries.random(),
+                    scheduled_date = null,
+                    scheduled_time = null,
+                    deadline = null,
+                    parent_task_id = null,
+                    labels = null,
                     created_at = createdAt,
                     updated_at = updatedAt
                 )

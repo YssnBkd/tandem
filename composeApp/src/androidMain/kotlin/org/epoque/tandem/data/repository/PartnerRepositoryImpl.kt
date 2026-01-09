@@ -30,6 +30,7 @@ import org.epoque.tandem.data.seed.MockDataSeeder
 import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.Partner
 import org.epoque.tandem.domain.model.PartnershipStatus
+import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.domain.repository.PartnerException
 import org.epoque.tandem.domain.repository.PartnerRepository
@@ -270,6 +271,12 @@ class PartnerRepositoryImpl(
             linked_goal_id = remote.linkedGoalId,
             review_note = remote.reviewNote,
             rolled_from_week_id = remote.rolledFromWeekId,
+            priority = TaskPriority.P4,
+            scheduled_date = null,
+            scheduled_time = null,
+            deadline = null,
+            parent_task_id = null,
+            labels = null,
             created_at = Instant.parse(remote.createdAt),
             updated_at = Instant.parse(remote.updatedAt)
         )

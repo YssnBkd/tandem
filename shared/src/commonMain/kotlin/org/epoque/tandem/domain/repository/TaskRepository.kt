@@ -1,8 +1,12 @@
 package org.epoque.tandem.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.Task
+import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.domain.model.TaskStatus
 
 /**
@@ -189,4 +193,142 @@ interface TaskRepository {
      * @return Flow of tasks linked to this goal
      */
     fun observeTasksForGoal(goalId: String): Flow<List<Task>>
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SUBTASK OPERATIONS (Feature 009: UI Redesign)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Observe subtasks for a parent task.
+     *
+     * @param parentTaskId The parent task's ID
+     * @return Flow of subtasks
+     */
+    fun observeSubtasks(parentTaskId: String): Flow<List<Task>>
+
+    /**
+     * Create a subtask under a parent task.
+     * The subtask inherits weekId and ownerId from parent.
+     *
+     * @param parentTaskId The parent task's ID
+     * @param task The subtask to create
+     * @return The created subtask
+     */
+    suspend fun createSubtask(parentTaskId: String, task: Task): Task
+
+    /**
+     * Get subtask counts for a parent task.
+     *
+     * @param parentTaskId The parent task's ID
+     * @return Pair of (total subtasks, completed subtasks)
+     */
+    suspend fun getSubtaskCounts(parentTaskId: String): Pair<Int, Int>
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SCHEDULE OPERATIONS (Feature 009: UI Redesign)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Update a task's schedule (date and time).
+     *
+     * @param taskId The task ID
+     * @param date The scheduled date (null to clear)
+     * @param time The scheduled time (null for all-day)
+     * @return The updated task, or null if not found
+     */
+    suspend fun updateTaskSchedule(
+        taskId: String,
+        date: LocalDate?,
+        time: LocalTime?
+    ): Task?
+
+    /**
+     * Observe tasks for a specific scheduled date within a week.
+     *
+     * @param weekId ISO 8601 week ID
+     * @param date The scheduled date
+     * @param userId The current user's ID
+     * @return Flow of tasks scheduled for the specified date
+     */
+    fun observeTasksByScheduledDate(
+        weekId: String,
+        date: LocalDate,
+        userId: String
+    ): Flow<List<Task>>
+
+    /**
+     * Observe unscheduled tasks for a week (no scheduled date).
+     *
+     * @param weekId ISO 8601 week ID
+     * @param userId The current user's ID
+     * @return Flow of unscheduled tasks
+     */
+    fun observeUnscheduledTasks(weekId: String, userId: String): Flow<List<Task>>
+
+    /**
+     * Observe overdue tasks for a week.
+     *
+     * @param weekId ISO 8601 week ID
+     * @param today Today's date
+     * @param userId The current user's ID
+     * @return Flow of overdue tasks
+     */
+    fun observeOverdueTasks(
+        weekId: String,
+        today: LocalDate,
+        userId: String
+    ): Flow<List<Task>>
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // DEADLINE OPERATIONS (Feature 009: UI Redesign)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Update a task's deadline.
+     *
+     * @param taskId The task ID
+     * @param deadline The deadline instant (null to clear)
+     * @return The updated task, or null if not found
+     */
+    suspend fun updateTaskDeadline(taskId: String, deadline: Instant?): Task?
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // PRIORITY OPERATIONS (Feature 009: UI Redesign)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Update a task's priority.
+     *
+     * @param taskId The task ID
+     * @param priority The new priority (P1-P4)
+     * @return The updated task, or null if not found
+     */
+    suspend fun updateTaskPriority(taskId: String, priority: TaskPriority): Task?
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // LABEL OPERATIONS (Feature 009: UI Redesign)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Update a task's labels.
+     *
+     * @param taskId The task ID
+     * @param labelIds List of label IDs
+     * @return The updated task, or null if not found
+     */
+    suspend fun updateTaskLabels(taskId: String, labelIds: List<String>): Task?
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // TITLE/NOTES OPERATIONS (Feature 009: UI Redesign)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Update only a task's title and notes.
+     *
+     * @param taskId The task ID
+     * @param title The new title
+     * @param notes The new notes (nullable)
+     * @return The updated task, or null if not found
+     */
+    suspend fun updateTaskTitleAndNotes(taskId: String, title: String, notes: String?): Task?
 }

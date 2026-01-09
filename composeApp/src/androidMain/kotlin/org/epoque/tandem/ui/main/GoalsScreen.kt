@@ -2,7 +2,7 @@ package org.epoque.tandem.ui.main
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.epoque.tandem.ui.goals.GoalsScreen as GoalsScreenImpl
+import org.epoque.tandem.ui.legacy.goals.GoalsScreen as GoalsScreenImpl
 
 /**
  * Goals tab screen showing goal setting and tracking.

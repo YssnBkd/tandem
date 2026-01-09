@@ -3,7 +3,7 @@ package org.epoque.tandem.ui.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import org.epoque.tandem.ui.progress.PastWeekDetailScreen
+import org.epoque.tandem.ui.legacy.progress.PastWeekDetailScreen
 
 /**
  * Navigation graph for Progress feature.
