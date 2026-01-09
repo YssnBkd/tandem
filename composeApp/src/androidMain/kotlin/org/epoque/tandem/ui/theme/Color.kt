@@ -2,66 +2,66 @@ package org.epoque.tandem.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Brand Colors - Tandem palette
-val TandemPrimary = Color(0xFF6750A4)
+// Brand Colors - Warm Terracotta palette (from Goals mockup)
+val TandemPrimary = Color(0xFFD97757)             // Warm terracotta
 val TandemOnPrimary = Color(0xFFFFFFFF)
-val TandemPrimaryContainer = Color(0xFFEADDFF)
-val TandemOnPrimaryContainer = Color(0xFF21005D)
+val TandemPrimaryContainer = Color(0xFFFDF2EF)   // Soft coral background
+val TandemOnPrimaryContainer = Color(0xFF4A4238) // Warm charcoal
 
-val TandemSecondary = Color(0xFF625B71)
+val TandemSecondary = Color(0xFF9C9488)          // Warm muted
 val TandemOnSecondary = Color(0xFFFFFFFF)
-val TandemSecondaryContainer = Color(0xFFE8DEF8)
-val TandemOnSecondaryContainer = Color(0xFF1D192B)
+val TandemSecondaryContainer = Color(0xFFF0EBE6) // Light warm gray
+val TandemOnSecondaryContainer = Color(0xFF4A4238)
 
-val TandemTertiary = Color(0xFF7D5260)
+val TandemTertiary = Color(0xFFE07A5F)           // Coral accent
 val TandemOnTertiary = Color(0xFFFFFFFF)
-val TandemTertiaryContainer = Color(0xFFFFD8E4)
-val TandemOnTertiaryContainer = Color(0xFF31111D)
+val TandemTertiaryContainer = Color(0xFFFFE5DE)  // Light coral
+val TandemOnTertiaryContainer = Color(0xFF4A4238)
 
-val TandemError = Color(0xFFB3261E)
+val TandemError = Color(0xFFD1453B)              // Consistent with OverdueRed
 val TandemOnError = Color(0xFFFFFFFF)
 val TandemErrorContainer = Color(0xFFF9DEDC)
 val TandemOnErrorContainer = Color(0xFF410E0B)
 
-// Light Theme Colors
-val TandemBackgroundLight = Color(0xFFFFFBFE)
-val TandemOnBackgroundLight = Color(0xFF1C1B1F)
-val TandemSurfaceLight = Color(0xFFFFFBFE)
-val TandemOnSurfaceLight = Color(0xFF1C1B1F)
-val TandemSurfaceVariantLight = Color(0xFFE7E0EC)
-val TandemOnSurfaceVariantLight = Color(0xFF49454F)
-val TandemOutlineLight = Color(0xFF79747E)
-val TandemOutlineVariantLight = Color(0xFFCAC4D0)
+// Light Theme Colors - Warm palette
+val TandemBackgroundLight = Color(0xFFFFFBF7)    // Soft eggshell
+val TandemOnBackgroundLight = Color(0xFF4A4238)  // Warm charcoal
+val TandemSurfaceLight = Color(0xFFFFFFFF)       // Pure white for cards
+val TandemOnSurfaceLight = Color(0xFF4A4238)     // Warm charcoal
+val TandemSurfaceVariantLight = Color(0xFFF0EBE6) // Light warm gray
+val TandemOnSurfaceVariantLight = Color(0xFF9C9488) // Warm muted
+val TandemOutlineLight = Color(0xFFE0DCD6)       // Warm outline
+val TandemOutlineVariantLight = Color(0xFFF0EBE6) // Light warm gray
 
-// Dark Theme Colors
-val TandemPrimaryDark = Color(0xFFD0BCFF)
-val TandemOnPrimaryDark = Color(0xFF381E72)
-val TandemPrimaryContainerDark = Color(0xFF4F378B)
-val TandemOnPrimaryContainerDark = Color(0xFFEADDFF)
+// Dark Theme Colors - Warm palette
+val TandemPrimaryDark = Color(0xFFE9A68E)         // Lighter terracotta
+val TandemOnPrimaryDark = Color(0xFF3D2016)
+val TandemPrimaryContainerDark = Color(0xFF5C3A2A)
+val TandemOnPrimaryContainerDark = Color(0xFFFDF2EF)
 
-val TandemSecondaryDark = Color(0xFFCCC2DC)
-val TandemOnSecondaryDark = Color(0xFF332D41)
-val TandemSecondaryContainerDark = Color(0xFF4A4458)
-val TandemOnSecondaryContainerDark = Color(0xFFE8DEF8)
+val TandemSecondaryDark = Color(0xFFD4CEC7)       // Light warm muted
+val TandemOnSecondaryDark = Color(0xFF3A3630)
+val TandemSecondaryContainerDark = Color(0xFF514B44)
+val TandemOnSecondaryContainerDark = Color(0xFFF0EBE6)
 
-val TandemTertiaryDark = Color(0xFFEFB8C8)
-val TandemOnTertiaryDark = Color(0xFF492532)
-val TandemTertiaryContainerDark = Color(0xFF633B48)
-val TandemOnTertiaryContainerDark = Color(0xFFFFD8E4)
+val TandemTertiaryDark = Color(0xFFFFB4A1)        // Light coral
+val TandemOnTertiaryDark = Color(0xFF5C2418)
+val TandemTertiaryContainerDark = Color(0xFF7A392A)
+val TandemOnTertiaryContainerDark = Color(0xFFFFE5DE)
 
 val TandemErrorDark = Color(0xFFF2B8B5)
 val TandemOnErrorDark = Color(0xFF601410)
 val TandemErrorContainerDark = Color(0xFF8C1D18)
 val TandemOnErrorContainerDark = Color(0xFFF9DEDC)
 
-val TandemBackgroundDark = Color(0xFF1C1B1F)
-val TandemOnBackgroundDark = Color(0xFFE6E1E5)
-val TandemSurfaceDark = Color(0xFF1C1B1F)
-val TandemOnSurfaceDark = Color(0xFFE6E1E5)
-val TandemSurfaceVariantDark = Color(0xFF49454F)
-val TandemOnSurfaceVariantDark = Color(0xFFCAC4D0)
-val TandemOutlineDark = Color(0xFF938F99)
-val TandemOutlineVariantDark = Color(0xFF49454F)
+val TandemBackgroundDark = Color(0xFF1A1816)      // Warm dark
+val TandemOnBackgroundDark = Color(0xFFE8E2DC)    // Warm light
+val TandemSurfaceDark = Color(0xFF1A1816)
+val TandemOnSurfaceDark = Color(0xFFE8E2DC)
+val TandemSurfaceVariantDark = Color(0xFF4A4238)  // Warm charcoal
+val TandemOnSurfaceVariantDark = Color(0xFFD4CEC7)
+val TandemOutlineDark = Color(0xFF9C9488)         // Warm muted
+val TandemOutlineVariantDark = Color(0xFF4A4238)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // UI REDESIGN COLORS (Feature 009)

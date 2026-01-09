@@ -31,6 +31,7 @@ import org.epoque.tandem.ui.components.week.WeekDayItem
 import org.epoque.tandem.ui.components.week.WeekDaySelector
 import org.epoque.tandem.ui.components.week.WeekFab
 import org.epoque.tandem.ui.components.week.WeekHeader
+import org.epoque.tandem.ui.components.SegmentedControl
 import org.epoque.tandem.ui.screens.week.AddTaskModal
 import org.epoque.tandem.ui.screens.week.GoalProgressUiModel
 import org.epoque.tandem.ui.screens.week.LabelUiModel
@@ -226,8 +227,10 @@ fun WeekScreen(
             // Segment Control
             item {
                 SegmentedControl(
-                    selectedSegment = selectedSegment,
-                    onSegmentSelected = { selectedSegment = it }
+                    segments = OwnerSegment.entries.map { it.displayName },
+                    selectedIndex = OwnerSegment.entries.indexOf(selectedSegment),
+                    onSegmentSelected = { selectedSegment = OwnerSegment.entries[it] },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
             }
 
