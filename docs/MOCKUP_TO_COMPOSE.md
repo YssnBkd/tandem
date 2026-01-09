@@ -6,7 +6,10 @@
 ```
 ui/
   components/                # NEW: Reusable design system
+    SegmentedControl.kt      # Pill-style segment selector (generic)
     chips/                   # (empty - to be populated)
+    goals/
+      GoalCard.kt            # Goal card with progress bar
     popovers/
       OwnerSelectorPopover.kt
       DateSelectorPopover.kt
@@ -27,9 +30,12 @@ ui/
       WeekHeader.kt
 
   screens/                   # NEW: Mockup-based screens
+    goals/
+      GoalsScreen.kt         # Goals list with Active/Completed tabs
+      GoalUiModel.kt         # Data models for goals UI
     week/
       WeekScreen.kt
-      SegmentedControl.kt
+      OwnerSegment.kt        # Enum for You/Partner/Together
       TaskDetailSheet.kt
       TaskDetailModels.kt
       DetailComponents.kt
@@ -90,8 +96,26 @@ Copy this prompt to start a new mockup-to-Compose session:
 Mockup: `mockups/screens/[SCREEN_NAME].html`
 Output: `composeApp/src/androidMain/kotlin/org/epoque/tandem/ui/screens/[feature]/[ScreenName].kt`
 
-## Important Rules
-- **IGNORE all existing UI in `ui/legacy/`** - do not reference or copy patterns from there
+## CRITICAL: Legacy Code Rules
+**THE `ui/legacy/` DIRECTORY IS OFF-LIMITS. THIS IS NON-NEGOTIABLE.**
+
+1. **NEVER search for files in `ui/legacy/`** - Do not use Glob/Grep patterns that match legacy paths
+2. **NEVER read files from `ui/legacy/`** - Even if a search returns legacy files, do not open them
+3. **NEVER reference or copy patterns from legacy code** - If you see a legacy path in search results, skip it entirely
+4. **If a component seems to exist in legacy/**, create it fresh from the mockup instead
+
+When searching for existing components, use these constrained patterns:
+```
+# CORRECT - only searches new design system
+**/ui/components/**/*.kt
+**/ui/screens/**/*.kt
+
+# WRONG - might return legacy files
+**/GoalCard.kt  # Could match ui/legacy/goals/GoalCard.kt
+**/*.kt         # Too broad, will include legacy
+```
+
+## Other Rules
 - **ONLY reference** components in `ui/components/` and `ui/screens/` (the new design system)
 - Use mock data defined locally in the screen file
 - Match the HTML mockup pixel-perfectly
@@ -152,7 +176,25 @@ Begin by opening the HTML mockup in Chrome and analyzing its visual structure.
 
 ## Design Tokens (Reference)
 
-### Colors
+### Theme Colors (Warm Terracotta Palette)
+```kotlin
+// Primary - use MaterialTheme.colorScheme.primary
+val TandemPrimary = Color(0xFFD97757)        // Warm terracotta
+
+// Backgrounds
+val TandemBackground = Color(0xFFFFFBF7)     // Soft eggshell
+val TandemSurface = Color(0xFFFFFFFF)        // White for cards
+val TandemSurfaceVariant = Color(0xFFF0EBE6) // Light warm gray
+
+// Text - use MaterialTheme.colorScheme.onSurface/onSurfaceVariant
+val TandemOnSurface = Color(0xFF4A4238)      // Warm charcoal (main text)
+val TandemOnSurfaceVariant = Color(0xFF9C9488) // Warm muted (secondary text)
+
+// Outline
+val TandemOutline = Color(0xFFE0DCD6)        // Warm outline/borders
+```
+
+### Component Colors
 ```kotlin
 // Backgrounds
 val ChipBackground = Color(0xFFF5F5F5)
@@ -167,6 +209,12 @@ val PriorityP1 = Color(0xFFD1453B)  // Red
 val PriorityP2 = Color(0xFFEB8909)  // Orange
 val PriorityP3 = Color(0xFF246FE0)  // Blue
 val PriorityP4 = Color(0xFF79747E)  // Gray
+
+// Goals
+val GoalPrimary = Color(0xFFD97757)          // Same as TandemPrimary
+val GoalIconBackground = Color(0xFFFDF2EF)   // Soft coral
+val GoalProgressBackground = Color(0xFFF0EBE6)
+val GoalTextMuted = Color(0xFF9C9488)
 ```
 
 ### Spacing
@@ -204,6 +252,8 @@ val RadiusDragHandle = 2.dp
 
 | Component | Location | Usage |
 |-----------|----------|-------|
+| `SegmentedControl` | components/ | Pill-style segment selector (generic, reusable) |
+| `GoalCard` | components/goals/ | Goal card with icon, progress bar, ownership label |
 | `MetadataChip` | TaskDetailModal, AddTaskModal | Icon + text chip (Owner, Date, Priority) |
 | `MetadataChipWithEmoji` | TaskDetailModal, AddTaskModal | Emoji + text chip |
 | `LabelChip` | TaskDetailModal, AddTaskModal | Colored dot + label name |
@@ -216,6 +266,35 @@ val RadiusDragHandle = 2.dp
 | `DragHandle` | TaskDetailModal, AddTaskModal | Standard sheet drag indicator |
 
 ### Patterns to Reuse
+
+**SegmentedControl Usage**
+```kotlin
+SegmentedControl(
+    segments = listOf("Active", "Completed"),
+    selectedIndex = selectedIndex,
+    onSegmentSelected = { selectedIndex = it },
+    modifier = Modifier.padding(horizontal = 16.dp),
+    selectedColor = MaterialTheme.colorScheme.primary,  // Optional
+    unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant  // Optional
+)
+```
+
+**GoalCard Usage**
+```kotlin
+GoalCard(
+    goal = GoalUiModel(
+        id = "1",
+        icon = "🧘‍♀️",
+        name = "Morning Yoga",
+        ownershipLabel = "Together",
+        ownershipType = OwnershipType.TOGETHER,
+        progressFraction = 0.66f,
+        progressText = "2 of 3 this week",
+        goalTypeLabel = "Habit"
+    ),
+    onClick = { /* navigate to goal detail */ }
+)
+```
 
 **Popover Anchoring**
 ```kotlin
