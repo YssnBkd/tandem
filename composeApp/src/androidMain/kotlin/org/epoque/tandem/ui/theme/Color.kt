@@ -98,3 +98,13 @@ val TodayBlue = Color(0xFF246FE0)        // Today indicator
 val OwnerSelfColor = Color(0xFF6750A4)   // Purple for "Me"
 val OwnerPartnerColor = Color(0xFFE07A5F) // Coral for Partner
 val OwnerTogetherColor = Color(0xFF246FE0) // Blue for Together
+
+// Goals screen colors
+val GoalPrimary = Color(0xFFD97757)            // Warm terracotta (from mockup)
+val GoalIconBackground = Color(0xFFFDF2EF)    // Soft coral for goal icon backgrounds
+val GoalProgressBackground = Color(0xFFF0EBE6) // Light warm gray for progress bar track
+val GoalTextMuted = Color(0xFF9C9488)          // Warm muted text
+val GoalTextMain = Color(0xFF4A4238)           // Warm charcoal for main text
+val GoalDashedBorder = Color(0xFFE0DCD6)       // Dashed border for add button
+val GoalCardShadow = Color(0x0D4A4238)         // 5% warm shadow
+val GoalCardBorder = Color(0x05000000)         // 2% black border

@@ -52,8 +52,8 @@ fun MainScreen(
     var selectedTab by rememberSaveable(stateSaver = NavigationTab.Saver) { mutableStateOf(NavigationTab.Week) }
     var showMenu by rememberSaveable { mutableStateOf(false) }
 
-    // Week tab has its own header, so we don't show TopAppBar for it
-    val showTopBar = selectedTab != NavigationTab.Week
+    // Week and Goals tabs have their own headers, so we don't show TopAppBar for them
+    val showTopBar = selectedTab != NavigationTab.Week && selectedTab != NavigationTab.Goals
 
     Scaffold(
         modifier = modifier,
