@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Season Detail</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <style>
+    /* ========================================
+       SEASON DETAIL SCREEN
+       Opens when tapping a season card
+       ======================================== */
+
+    .screen-content {
+      background: var(--color-surface-variant);
+      padding-top: 0;
+      padding-bottom: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header with back navigation */
+    .detail-header {
+      padding: calc(var(--status-bar-height) + var(--space-2)) var(--space-4) var(--space-4);
+      background: var(--color-background);
+      border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .back-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      color: var(--color-on-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: calc(-1 * var(--space-2));
+      /* HIG: 44pt touch target */
+    }
+
+    .back-btn:active {
+      background: var(--color-surface-variant);
+    }
+
+    .header-nav-title {
+      flex: 1;
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-muted);
+    }
+
+    .edit-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: var(--color-surface-variant);
+      color: var(--color-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Season Hero */
+    .season-hero {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+    }
+
+    .season-icon-large {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-xl);
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-2xl);
+      flex-shrink: 0;
+    }
+
+    .season-hero-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .season-hero-name {
+      font-size: var(--text-xl);
+      font-weight: var(--font-bold);
+      color: var(--color-on-surface);
+      margin-bottom: var(--space-1);
+    }
+
+    .season-hero-dates {
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+      margin-bottom: var(--space-2);
+    }
+
+    .season-hero-status {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: var(--space-1) var(--space-3);
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+    }
+
+    /* Content Container */
+    .detail-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-4);
+      padding-bottom: 100px;
+    }
+
+    /* Season Description */
+    .season-description {
+      background: var(--color-background);
+      border-radius: var(--radius-xl);
+      padding: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    .section-label {
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      color: var(--color-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: var(--space-2);
+    }
+
+    .description-text {
+      font-size: var(--text-sm);
+      color: var(--color-on-surface);
+      line-height: var(--leading-relaxed);
+    }
+
+    /* Season Metrics */
+    .season-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .metric-card {
+      background: var(--color-background);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      text-align: center;
+    }
+
+    .metric-value {
+      font-size: var(--text-xl);
+      font-weight: var(--font-bold);
+      color: var(--color-on-surface);
+    }
+
+    .metric-value.success {
+      color: var(--color-success);
+    }
+
+    .metric-value.primary {
+      color: var(--color-primary);
+    }
+
+    .metric-label {
+      font-size: var(--text-xs);
+      color: var(--color-muted);
+      margin-top: var(--space-1);
+    }
+
+    /* Linked Goals Section */
+    .goals-section {
+      background: var(--color-background);
+      border-radius: var(--radius-xl);
+      padding: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-3);
+    }
+
+    .add-link-btn {
+      font-size: var(--text-xs);
+      font-weight: var(--font-medium);
+      color: var(--color-primary);
+      background: none;
+      border: none;
+      padding: var(--space-2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .goal-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      background: var(--color-surface-variant);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-2);
+      cursor: pointer;
+      min-height: 56px;
+    }
+
+    .goal-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .goal-item:active {
+      transform: scale(0.99);
+    }
+
+    .goal-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-base);
+      flex-shrink: 0;
+    }
+
+    .goal-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .goal-name {
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-on-surface);
+      margin-bottom: var(--space-1);
+    }
+
+    .goal-progress-bar {
+      height: 6px;
+      background: var(--color-divider);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .goal-progress-fill {
+      height: 100%;
+      background: var(--color-primary);
+      border-radius: 3px;
+      transition: width var(--duration-normal);
+    }
+
+    .goal-progress-text {
+      font-size: var(--text-xs);
+      color: var(--color-muted);
+      margin-left: var(--space-2);
+      flex-shrink: 0;
+    }
+
+    /* Weeks Timeline Section */
+    .weeks-section {
+      background: var(--color-background);
+      border-radius: var(--radius-xl);
+      padding: var(--space-4);
+    }
+
+    .week-timeline {
+      position: relative;
+    }
+
+    /* Timeline line */
+    .week-timeline::before {
+      content: '';
+      position: absolute;
+      left: 18px;
+      top: 24px;
+      bottom: 24px;
+      width: 2px;
+      background: var(--color-divider);
+    }
+
+    .timeline-week {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .timeline-week:first-child {
+      padding-top: 0;
+    }
+
+    .timeline-week:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-week:active {
+      opacity: 0.8;
+    }
+
+    .timeline-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: var(--radius-full);
+      background: var(--color-outline-variant);
+      flex-shrink: 0;
+      margin-top: 4px;
+      margin-left: 12px;
+      z-index: 1;
+    }
+
+    .timeline-week.current .timeline-dot {
+      background: var(--color-primary);
+      box-shadow: 0 0 0 4px var(--color-primary-light);
+    }
+
+    .timeline-week.past .timeline-dot {
+      background: var(--color-success);
+    }
+
+    .timeline-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .timeline-week-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-1);
+    }
+
+    .timeline-week-name {
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-on-surface);
+    }
+
+    .timeline-week.current .timeline-week-name {
+      color: var(--color-primary);
+    }
+
+    .timeline-week.past .timeline-week-name {
+      color: var(--color-muted);
+    }
+
+    .timeline-week-badge {
+      font-size: var(--text-xs);
+      font-weight: var(--font-medium);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      background: var(--color-surface-variant);
+      color: var(--color-muted);
+    }
+
+    .timeline-week.current .timeline-week-badge {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .timeline-week.past .timeline-week-badge {
+      background: var(--color-success-light);
+      color: var(--color-success);
+    }
+
+    .timeline-week-dates {
+      font-size: var(--text-xs);
+      color: var(--color-muted);
+    }
+
+    /* Milestones in timeline */
+    .timeline-milestones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+    }
+
+    .timeline-milestone {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 5px 10px;
+      min-height: 28px;
+      background: var(--color-secondary-light);
+      border-radius: var(--radius-lg);
+      border-left: 3px solid var(--color-secondary);
+      cursor: pointer;
+    }
+
+    .timeline-milestone:hover {
+      background: var(--color-secondary);
+    }
+
+    .timeline-milestone:hover .milestone-text,
+    .timeline-milestone:hover .milestone-date {
+      color: white;
+    }
+
+    .milestone-icon {
+      font-size: 12px;
+    }
+
+    .milestone-text {
+      font-size: var(--text-xs);
+      font-weight: var(--font-medium);
+      color: var(--color-secondary-dark);
+    }
+
+    .milestone-date {
+      font-size: var(--text-xs);
+      color: var(--color-muted);
+      margin-left: var(--space-1);
+    }
+
+    /* Disclosure chevron */
+    .timeline-week::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-right: 2px solid var(--color-outline-variant);
+      border-bottom: 2px solid var(--color-outline-variant);
+      transform: rotate(-45deg);
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+
+    .timeline-week.current::after {
+      border-color: var(--color-primary);
+    }
+
+    /* FAB for adding milestone */
+    .fab-milestone {
+      position: fixed;
+      bottom: calc(var(--bottom-nav-height) + var(--space-4));
+      right: var(--space-4);
+      height: 48px;
+      padding: 0 var(--space-4);
+      border-radius: var(--radius-full);
+      background: var(--color-secondary);
+      color: white;
+      border: none;
+      box-shadow: var(--shadow-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      cursor: pointer;
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+    }
+
+    .fab-milestone svg {
+      width: 20px;
+      height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span class="status-bar-time">9:41</span>
+        <div class="status-bar-icons">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor">
+            <path d="M1 4.5h2v7H1v-7zm4-3h2v10H5v-10zm4 5h2v5H9v-5zm4-2h2v7h-2v-7zm4-3h1v10h-1v-10z"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
+            <path d="M8 0C5.2 0 2.7 1.1.9 2.9l1.4 1.4C3.7 2.9 5.7 2 8 2s4.3.9 5.7 2.3l1.4-1.4C13.3 1.1 10.8 0 8 0zm0 4c-1.7 0-3.2.6-4.4 1.7l1.4 1.4c.8-.7 1.9-1.1 3-1.1s2.2.4 3 1.1l1.4-1.4C11.2 4.6 9.7 4 8 4zm0 4c-.8 0-1.6.3-2.1.9l2.1 2.1 2.1-2.1c-.5-.6-1.3-.9-2.1-.9z"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor">
+            <rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/>
+            <rect x="2" y="3" width="16" height="6" rx="1" fill="currentColor"/>
+            <path d="M23 4v4c.6 0 1-.7 1-2s-.4-2-1-2z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="phone-screen">
+        <div class="screen-content">
+
+          <!-- Header -->
+          <div class="detail-header">
+            <div class="header-nav">
+              <button class="back-btn" data-nav="seasons-timeline-v3-cards.html">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+              </button>
+              <span class="header-nav-title">Seasons</span>
+              <button class="edit-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 20h9"/>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="season-hero">
+              <div class="season-icon-large">🌱</div>
+              <div class="season-hero-info">
+                <div class="season-hero-name">Q1 2026 - New Beginnings</div>
+                <div class="season-hero-dates">Jan 5 - Mar 28, 2026</div>
+                <span class="season-hero-status">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="6"/>
+                  </svg>
+                  Week 3 of 12
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="detail-content">
+
+            <!-- Season Description -->
+            <div class="season-description">
+              <div class="section-label">Intent</div>
+              <p class="description-text">
+                Focus on launching the MVP and establishing core product foundations. Build momentum through consistent weekly shipping and gather early user feedback.
+              </p>
+            </div>
+
+            <!-- Metrics -->
+            <div class="season-metrics">
+              <div class="metric-card">
+                <div class="metric-value success">87%</div>
+                <div class="metric-label">Avg Completion</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value primary">22/26</div>
+                <div class="metric-label">Tasks Done</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value">4</div>
+                <div class="metric-label">Milestones</div>
+              </div>
+            </div>
+
+            <!-- Linked Goals -->
+            <div class="goals-section">
+              <div class="section-header">
+                <div class="section-label" style="margin-bottom: 0;">Linked Goals</div>
+                <button class="add-link-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                  </svg>
+                  Link Goal
+                </button>
+              </div>
+              <div class="goal-item">
+                <div class="goal-icon">🚀</div>
+                <div class="goal-info">
+                  <div class="goal-name">Launch MVP</div>
+                  <div class="goal-progress-bar">
+                    <div class="goal-progress-fill" style="width: 65%;"></div>
+                  </div>
+                </div>
+                <span class="goal-progress-text">65%</span>
+              </div>
+              <div class="goal-item">
+                <div class="goal-icon">📈</div>
+                <div class="goal-info">
+                  <div class="goal-name">Get 100 beta users</div>
+                  <div class="goal-progress-bar">
+                    <div class="goal-progress-fill" style="width: 32%;"></div>
+                  </div>
+                </div>
+                <span class="goal-progress-text">32%</span>
+              </div>
+            </div>
+
+            <!-- Weeks Timeline -->
+            <div class="weeks-section">
+              <div class="section-header">
+                <div class="section-label" style="margin-bottom: 0;">Week Timeline</div>
+              </div>
+
+              <div class="week-timeline">
+                <!-- Future Week -->
+                <div class="timeline-week">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-content">
+                    <div class="timeline-week-header">
+                      <span class="timeline-week-name">Week 4</span>
+                      <span class="timeline-week-badge">Upcoming</span>
+                    </div>
+                    <div class="timeline-week-dates">Jan 19 - 25</div>
+                  </div>
+                </div>
+
+                <!-- Current Week -->
+                <div class="timeline-week current">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-content">
+                    <div class="timeline-week-header">
+                      <span class="timeline-week-name">Week 3 · This Week</span>
+                      <span class="timeline-week-badge">5/8</span>
+                    </div>
+                    <div class="timeline-week-dates">Jan 12 - 18</div>
+                    <div class="timeline-milestones">
+                      <div class="timeline-milestone">
+                        <span class="milestone-icon">🚀</span>
+                        <span class="milestone-text">Launch MVP</span>
+                        <span class="milestone-date">Jan 15</span>
+                      </div>
+                      <div class="timeline-milestone">
+                        <span class="milestone-icon">📊</span>
+                        <span class="milestone-text">Review meeting</span>
+                        <span class="milestone-date">Jan 17</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Past Weeks -->
+                <div class="timeline-week past">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-content">
+                    <div class="timeline-week-header">
+                      <span class="timeline-week-name">Week 2</span>
+                      <span class="timeline-week-badge">11/12</span>
+                    </div>
+                    <div class="timeline-week-dates">Jan 5 - 11</div>
+                  </div>
+                </div>
+
+                <div class="timeline-week past">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-content">
+                    <div class="timeline-week-header">
+                      <span class="timeline-week-name">Week 1</span>
+                      <span class="timeline-week-badge">6/7</span>
+                    </div>
+                    <div class="timeline-week-dates">Dec 29 - Jan 4</div>
+                    <div class="timeline-milestones">
+                      <div class="timeline-milestone">
+                        <span class="milestone-icon">🎯</span>
+                        <span class="milestone-text">Season kickoff</span>
+                        <span class="milestone-date">Jan 5</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- FAB for adding milestone -->
+          <button class="fab-milestone" data-modal="add-milestone.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Add Milestone
+          </button>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav" style="display: flex; justify-content: space-around;">
+          <a href="01-week-view-v2.html" class="nav-item" style="flex: 1;">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Week</span>
+          </a>
+          <a href="03-progress.html" class="nav-item" style="flex: 1;">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3.5 18.5l6-6 4 4L22 6.92 20.59 5.5l-7.09 8-4-4L2 17l1.5 1.5z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Progress</span>
+          </a>
+          <a href="04-goals.html" class="nav-item" style="flex: 1;">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Goals</span>
+          </a>
+          <a href="seasons-timeline-v3-cards.html" class="nav-item active" style="flex: 1;">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Seasons</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="phone-home-indicator"></div>
+    </div>
+  </div>
+  <script src="../scripts/navigation.js"></script>
+</body>
+</html>

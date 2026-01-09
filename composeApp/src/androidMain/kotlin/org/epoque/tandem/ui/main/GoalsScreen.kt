@@ -10,7 +10,13 @@ import org.epoque.tandem.ui.screens.goals.GoalsScreen as GoalsScreenImpl
  */
 @Composable
 fun GoalsScreen(
+    onNavigateToAddGoal: () -> Unit = {},
+    onNavigateToGoalDetail: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    GoalsScreenImpl(modifier = modifier)
+    GoalsScreenImpl(
+        onNavigateToGoalDetail = onNavigateToGoalDetail,
+        onNavigateToAddGoal = onNavigateToAddGoal,
+        modifier = modifier
+    )
 }

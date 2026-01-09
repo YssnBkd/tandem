@@ -50,6 +50,19 @@ sealed interface Routes {
     }
 
     /**
+     * Goals feature routes.
+     */
+    sealed interface Goals : Routes {
+        /** Goal creation screen */
+        @Serializable
+        data object Create : Goals
+
+        /** Goal detail screen */
+        @Serializable
+        data class Detail(val goalId: String) : Goals
+    }
+
+    /**
      * Progress feature routes for detail navigation.
      */
     sealed interface Progress : Routes {

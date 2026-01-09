@@ -38,6 +38,12 @@ fun NavGraphBuilder.mainNavGraph(
             onNavigateToPartnerSettings = onNavigateToPartnerSettings,
             onNavigateToPastWeekDetail = { weekId ->
                 navController.navigate(Routes.Progress.PastWeekDetail(weekId))
+            },
+            onNavigateToAddGoal = {
+                navController.navigate(Routes.Goals.Create)
+            },
+            onNavigateToGoalDetail = { goalId ->
+                navController.navigate(Routes.Goals.Detail(goalId))
             }
         )
     }
