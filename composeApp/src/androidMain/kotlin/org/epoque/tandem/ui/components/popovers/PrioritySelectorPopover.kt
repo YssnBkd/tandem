@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.ui.theme.PriorityP1
 import org.epoque.tandem.ui.theme.PriorityP2
@@ -62,6 +63,7 @@ fun PrioritySelectorPopover(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
+        properties = PopupProperties(focusable = false),
         offset = DpOffset(0.dp, 4.dp),
         shape = RoundedCornerShape(12.dp),
         containerColor = MaterialTheme.colorScheme.surface,

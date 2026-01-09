@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 
 /**
  * Owner type for task assignment.
@@ -49,6 +50,7 @@ fun OwnerSelectorPopover(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
+        properties = PopupProperties(focusable = false),
         offset = DpOffset(0.dp, 4.dp),
         shape = RoundedCornerShape(12.dp),
         containerColor = MaterialTheme.colorScheme.surface,
