@@ -1,30 +1,41 @@
 package org.epoque.tandem.ui.screens.week
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
-import org.epoque.tandem.domain.model.TaskPriority
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.epoque.tandem.presentation.week.WeekEvent
+import org.epoque.tandem.presentation.week.WeekSideEffect
+import org.epoque.tandem.presentation.week.WeekViewModel
+import org.epoque.tandem.presentation.week.model.CalendarDay
+import org.epoque.tandem.presentation.week.model.Segment
+import org.epoque.tandem.presentation.week.model.TaskSection
+import org.epoque.tandem.presentation.week.model.TaskUiModel
 import org.epoque.tandem.ui.components.week.CompletedSection
 import org.epoque.tandem.ui.components.week.TaskRowItem
-import org.epoque.tandem.ui.components.week.TaskSection
 import org.epoque.tandem.ui.components.week.TaskSectionHeader
 import org.epoque.tandem.ui.components.week.TaskUiItem
 import org.epoque.tandem.ui.components.week.WeekDayItem
@@ -32,358 +43,427 @@ import org.epoque.tandem.ui.components.week.WeekDaySelector
 import org.epoque.tandem.ui.components.week.WeekFab
 import org.epoque.tandem.ui.components.week.WeekHeader
 import org.epoque.tandem.ui.components.SegmentedControl
-import org.epoque.tandem.ui.screens.week.AddTaskModal
-import org.epoque.tandem.ui.screens.week.GoalProgressUiModel
-import org.epoque.tandem.ui.screens.week.LabelUiModel
-import org.epoque.tandem.ui.screens.week.SubtaskUiModel
-import org.epoque.tandem.ui.screens.week.TaskDetailSheet
-import org.epoque.tandem.ui.screens.week.TaskDetailUiModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Main Week View screen with Todoist-inspired UI redesign.
- * Uses mock data for visual iteration.
+ * Connected to WeekViewModel for data and state management.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeekScreen(
-    onNavigateToPlanning: () -> Unit = {},
-    onNavigateToReview: () -> Unit = {},
+    viewModel: WeekViewModel = koinViewModel(),
     onNavigateToPartnerInvite: () -> Unit = {},
-    onNavigateToPartnerSettings: () -> Unit = {},
     onNavigateToSeasons: () -> Unit = {},
-    onNavigateToAddTask: () -> Unit = {},
-    onNavigateToTaskDetail: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    // Local state
-    var selectedDayIndex by remember { mutableIntStateOf(2) } // Tuesday selected
-    var selectedSegment by remember { mutableStateOf(OwnerSegment.YOU) }
-    var completedExpanded by remember { mutableStateOf(true) }
-
-    // Task detail sheet state
-    var showTaskDetail by remember { mutableStateOf(false) }
-    var selectedTaskId by remember { mutableStateOf<String?>(null) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val hapticFeedback = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
 
+    // Task detail sheet state - use confirmValueChange to prevent dismiss when unsaved changes exist
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false,
+        confirmValueChange = { targetValue ->
+            // When trying to hide the sheet, check for unsaved text changes
+            if (targetValue == androidx.compose.material3.SheetValue.Hidden) {
+                val hasUnsavedChanges = uiState.taskDetailState?.hasUnsavedTextChanges == true
+                if (hasUnsavedChanges) {
+                    // Show the discard dialog instead of dismissing
+                    viewModel.onEvent(WeekEvent.DetailSheetDismissRequested)
+                    false // Prevent the sheet from hiding
+                } else {
+                    // No unsaved changes, allow dismiss
+                    viewModel.onEvent(WeekEvent.DetailSheetDismissed)
+                    true
+                }
+            } else {
+                true // Allow other state changes (expanding, etc.)
+            }
+        }
+    )
+
     // Add task modal state
-    var showAddTaskModal by remember { mutableStateOf(false) }
     val addTaskSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    // Mock task detail data (matching mockup)
-    val mockTaskDetail = TaskDetailUiModel(
-        id = "2",
-        title = "Morning workout routine",
-        description = "30 minutes cardio + 15 minutes stretching. Remember to warm up properly!",
-        priority = TaskPriority.P1,
-        owner = "Me",
-        dueDate = "Today",
-        project = "This Week",
-        labels = listOf(LabelUiModel("Health", Color(0xFFD1453B))),
-        goal = GoalProgressUiModel(
-            emoji = "\uD83D\uDCAA",
-            name = "Get fit together",
-            current = 2,
-            total = 3
-        ),
-        subtasks = listOf(
-            SubtaskUiModel("st1", "Warm up (5 min)", isCompleted = true),
-            SubtaskUiModel("st2", "Cardio session", isCompleted = false)
-        )
-    )
-
-    // Mock data matching the mockup exactly
-    val mockDays = listOf(
-        WeekDayItem("SUN", 5, isToday = false, isSelected = false, hasTasks = true),
-        WeekDayItem("MON", 6, isToday = false, isSelected = false, hasTasks = true),
-        WeekDayItem("TUE", 7, isToday = true, isSelected = true, hasTasks = true),
-        WeekDayItem("WED", 8, isToday = false, isSelected = false, hasTasks = true),
-        WeekDayItem("THU", 9, isToday = false, isSelected = false, hasTasks = false),
-        WeekDayItem("FRI", 10, isToday = false, isSelected = false, hasTasks = true),
-        WeekDayItem("SAT", 11, isToday = false, isSelected = false, hasTasks = false)
-    )
-
-    val overdueTasks = listOf(
-        TaskUiItem(
-            id = "1",
-            title = "Submit expense report",
-            priority = TaskPriority.P1,
-            schedule = "Yesterday",
-            isOverdue = true,
-            projectOrGoal = "Work"
-        )
-    )
-
-    val todayTasks = listOf(
-        TaskUiItem(
-            id = "2",
-            title = "Do 30 minutes of yoga \uD83E\uDDD8",
-            priority = TaskPriority.P1,
-            schedule = "7:30 AM",
-            isRecurring = true,
-            projectOrGoal = "Fitness"
-        ),
-        TaskUiItem(
-            id = "3",
-            title = "Review monthly budget",
-            priority = TaskPriority.P2,
-            schedule = "10:00 AM",
-            projectOrGoal = "Finance"
-        ),
-        TaskUiItem(
-            id = "4",
-            title = "Call dentist to reschedule",
-            priority = TaskPriority.P4,
-            projectOrGoal = "Appointments"
-        )
-    )
-
-    val tomorrowTasks = listOf(
-        TaskUiItem(
-            id = "5",
-            title = "Grocery shopping \uD83D\uDED2",
-            priority = TaskPriority.P2,
-            subtaskCount = 3,
-            projectOrGoal = "Groceries"
-        ),
-        TaskUiItem(
-            id = "6",
-            title = "Read chapter 5 \uD83D\uDCDA",
-            priority = TaskPriority.P4,
-            projectOrGoal = "Learning"
-        )
-    )
-
-    val laterTasks = listOf(
-        TaskUiItem(
-            id = "7",
-            title = "Clean apartment",
-            priority = TaskPriority.P4,
-            schedule = "Sat",
-            projectOrGoal = "Home"
-        )
-    )
-
-    val completedTasks = listOf(
-        TaskUiItem(
-            id = "8",
-            title = "Call mom",
-            priority = TaskPriority.P4,
-            isCompleted = true
-        ),
-        TaskUiItem(
-            id = "9",
-            title = "Meal prep for week \uD83E\uDD57",
-            priority = TaskPriority.P4,
-            isCompleted = true,
-            projectOrGoal = "Healthy eating"
-        ),
-        TaskUiItem(
-            id = "10",
-            title = "Schedule dentist appointment",
-            priority = TaskPriority.P4,
-            isCompleted = true,
-            projectOrGoal = "Appointments"
-        )
-    )
-
-    // Update day selection state
-    val daysWithSelection = mockDays.mapIndexed { index, day ->
-        day.copy(isSelected = index == selectedDayIndex)
+    // Handle side effects
+    LaunchedEffect(Unit) {
+        viewModel.sideEffects.collect { effect ->
+            when (effect) {
+                is WeekSideEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
+                is WeekSideEffect.TriggerHapticFeedback -> {
+                    hapticFeedback.performHapticFeedback(
+                        androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress
+                    )
+                }
+                is WeekSideEffect.NavigateToPartnerInvite -> {
+                    onNavigateToPartnerInvite()
+                }
+                is WeekSideEffect.NavigateToRequestTask -> {
+                    // Will be implemented in Partner feature
+                }
+                is WeekSideEffect.ClearFocus -> {
+                    // Could use FocusManager here if needed
+                }
+                is WeekSideEffect.DismissKeyboard -> {
+                    // Could use FocusManager here if needed
+                }
+                is WeekSideEffect.ScrollToSection -> {
+                    // Could scroll to section using LazyListState
+                }
+                is WeekSideEffect.ShowDatePicker -> {
+                    // Will be implemented in Modal conversation
+                }
+                is WeekSideEffect.ShowTimePicker -> {
+                    // Will be implemented in Modal conversation
+                }
+                is WeekSideEffect.ShowPriorityPicker -> {
+                    // Will be implemented in Modal conversation
+                }
+                is WeekSideEffect.ShowLabelsPicker -> {
+                    // Will be implemented in Modal conversation
+                }
+                is WeekSideEffect.ShowGoalPicker -> {
+                    // Will be implemented in Modal conversation
+                }
+            }
+        }
     }
+
+    // Map CalendarDay to WeekDayItem for the selector
+    val calendarDays = uiState.calendarDays.map { it.toWeekDayItem() }
+
+    // Map TaskUiModel to TaskUiItem for display
+    val overdueTasks = uiState.overdueTasks.map { it.toTaskUiItem(isOverdue = true) }
+    val todayTasks = uiState.todayTasks.map { it.toTaskUiItem() }
+    val tomorrowTasks = uiState.tomorrowTasks.map { it.toTaskUiItem() }
+    val laterTasks = uiState.laterThisWeekTasks.map { it.toTaskUiItem() }
+    val unscheduledTasks = uiState.unscheduledTasks.map { it.toTaskUiItem() }
+    val completedTasks = uiState.completedTasks.map { it.toTaskUiItem() }
+
+    // Header info
+    val headerTitle = if (uiState.weekInfo?.isCurrentWeek == true) "This Week" else "Week"
+    val headerSubtitle = uiState.weekInfo?.let {
+        "${it.dateRangeText.removePrefix("Week of ")} · ${uiState.totalCount} tasks"
+    } ?: ""
 
     Scaffold(
         modifier = modifier,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            WeekFab(onClick = { showAddTaskModal = true })
+            WeekFab(onClick = { viewModel.onEvent(WeekEvent.AddTaskSheetRequested) })
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            // Week Header
-            item {
-                WeekHeader(
-                    title = "This Week",
-                    subtitle = "Jan 5 - 11 · 7 tasks",
-                    seasonInfo = "\uD83C\uDF31 Q1 2026 · Week 3 of 12",
-                    onSeasonClick = onNavigateToSeasons
-                )
+        // Show loading state
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
-
-            // Day Selector
-            item {
-                WeekDaySelector(
-                    days = daysWithSelection,
-                    onDaySelected = { index -> selectedDayIndex = index },
-                    onPreviousWeek = { /* TODO */ },
-                    onNextWeek = { /* TODO */ }
-                )
-            }
-
-            // Segment Control
-            item {
-                SegmentedControl(
-                    segments = OwnerSegment.entries.map { it.displayName },
-                    selectedIndex = OwnerSegment.entries.indexOf(selectedSegment),
-                    onSegmentSelected = { selectedSegment = OwnerSegment.entries[it] },
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-            }
-
-            // Overdue Section
-            if (overdueTasks.isNotEmpty()) {
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                // Week Header
                 item {
-                    TaskSectionHeader(section = TaskSection.OVERDUE)
-                }
-                items(overdueTasks, key = { it.id }) { task ->
-                    TaskRowItem(
-                        task = task,
-                        onCheckedChange = { /* TODO */ },
-                        onClick = {
-                            selectedTaskId = task.id
-                            showTaskDetail = true
-                        }
+                    WeekHeader(
+                        title = headerTitle,
+                        subtitle = headerSubtitle,
+                        seasonInfo = "\uD83C\uDF31 Q1 2026 · Week 3 of 12",
+                        onSeasonClick = onNavigateToSeasons
                     )
                 }
-            }
 
-            // Today Section
-            if (todayTasks.isNotEmpty()) {
+                // Day Selector
                 item {
-                    TaskSectionHeader(section = TaskSection.TODAY)
-                }
-                items(todayTasks, key = { it.id }) { task ->
-                    TaskRowItem(
-                        task = task,
-                        onCheckedChange = { /* TODO */ },
-                        onClick = {
-                            selectedTaskId = task.id
-                            showTaskDetail = true
-                        }
+                    WeekDaySelector(
+                        days = calendarDays,
+                        onDaySelected = { index ->
+                            val day = uiState.calendarDays.getOrNull(index)
+                            day?.let { viewModel.onEvent(WeekEvent.CalendarDateTapped(it.date)) }
+                        },
+                        onPreviousWeek = { viewModel.onEvent(WeekEvent.PreviousWeekTapped) },
+                        onNextWeek = { viewModel.onEvent(WeekEvent.NextWeekTapped) }
                     )
                 }
-            }
 
-            // Tomorrow Section
-            if (tomorrowTasks.isNotEmpty()) {
+                // Segment Control
                 item {
-                    TaskSectionHeader(section = TaskSection.TOMORROW)
-                }
-                items(tomorrowTasks, key = { it.id }) { task ->
-                    TaskRowItem(
-                        task = task,
-                        onCheckedChange = { /* TODO */ },
-                        onClick = {
-                            selectedTaskId = task.id
-                            showTaskDetail = true
-                        }
+                    SegmentedControl(
+                        segments = Segment.entries.map { it.displayName },
+                        selectedIndex = Segment.entries.indexOf(uiState.selectedSegment),
+                        onSegmentSelected = { index ->
+                            viewModel.onEvent(WeekEvent.SegmentSelected(Segment.entries[index]))
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                 }
-            }
 
-            // Later this week Section
-            if (laterTasks.isNotEmpty()) {
-                item {
-                    TaskSectionHeader(section = TaskSection.LATER_THIS_WEEK)
+                // Overdue Section
+                if (overdueTasks.isNotEmpty()) {
+                    item {
+                        TaskSectionHeader(section = TaskSection.OVERDUE)
+                    }
+                    items(overdueTasks, key = { it.id }) { task ->
+                        TaskRowItem(
+                            task = task,
+                            onCheckedChange = { viewModel.onEvent(WeekEvent.TaskCheckboxTapped(task.id)) },
+                            onClick = { viewModel.onEvent(WeekEvent.TaskTapped(task.id)) }
+                        )
+                    }
                 }
-                items(laterTasks, key = { it.id }) { task ->
-                    TaskRowItem(
-                        task = task,
-                        onCheckedChange = { /* TODO */ },
-                        onClick = {
-                            selectedTaskId = task.id
-                            showTaskDetail = true
-                        }
-                    )
-                }
-            }
 
-            // Completed Section (collapsible)
-            if (completedTasks.isNotEmpty()) {
-                item {
-                    CompletedSection(
-                        completedCount = completedTasks.size,
-                        expanded = completedExpanded,
-                        onExpandToggle = { completedExpanded = !completedExpanded }
-                    ) {
-                        completedTasks.forEach { task ->
-                            TaskRowItem(
-                                task = task,
-                                onCheckedChange = { /* TODO */ },
-                                onClick = {
-                            selectedTaskId = task.id
-                            showTaskDetail = true
-                        }
-                            )
+                // Today Section
+                if (todayTasks.isNotEmpty()) {
+                    item {
+                        TaskSectionHeader(section = TaskSection.TODAY)
+                    }
+                    items(todayTasks, key = { it.id }) { task ->
+                        TaskRowItem(
+                            task = task,
+                            onCheckedChange = { viewModel.onEvent(WeekEvent.TaskCheckboxTapped(task.id)) },
+                            onClick = { viewModel.onEvent(WeekEvent.TaskTapped(task.id)) }
+                        )
+                    }
+                }
+
+                // Tomorrow Section
+                if (tomorrowTasks.isNotEmpty()) {
+                    item {
+                        TaskSectionHeader(section = TaskSection.TOMORROW)
+                    }
+                    items(tomorrowTasks, key = { it.id }) { task ->
+                        TaskRowItem(
+                            task = task,
+                            onCheckedChange = { viewModel.onEvent(WeekEvent.TaskCheckboxTapped(task.id)) },
+                            onClick = { viewModel.onEvent(WeekEvent.TaskTapped(task.id)) }
+                        )
+                    }
+                }
+
+                // Later this week Section
+                if (laterTasks.isNotEmpty()) {
+                    item {
+                        TaskSectionHeader(section = TaskSection.LATER_THIS_WEEK)
+                    }
+                    items(laterTasks, key = { it.id }) { task ->
+                        TaskRowItem(
+                            task = task,
+                            onCheckedChange = { viewModel.onEvent(WeekEvent.TaskCheckboxTapped(task.id)) },
+                            onClick = { viewModel.onEvent(WeekEvent.TaskTapped(task.id)) }
+                        )
+                    }
+                }
+
+                // Unscheduled Section
+                if (unscheduledTasks.isNotEmpty()) {
+                    item {
+                        TaskSectionHeader(section = TaskSection.UNSCHEDULED)
+                    }
+                    items(unscheduledTasks, key = { it.id }) { task ->
+                        TaskRowItem(
+                            task = task,
+                            onCheckedChange = { viewModel.onEvent(WeekEvent.TaskCheckboxTapped(task.id)) },
+                            onClick = { viewModel.onEvent(WeekEvent.TaskTapped(task.id)) }
+                        )
+                    }
+                }
+
+                // Completed Section (collapsible)
+                if (completedTasks.isNotEmpty()) {
+                    item {
+                        CompletedSection(
+                            completedCount = completedTasks.size,
+                            expanded = uiState.isCompletedSectionExpanded,
+                            onExpandToggle = { viewModel.onEvent(WeekEvent.CompletedSectionToggled) }
+                        ) {
+                            completedTasks.forEach { task ->
+                                TaskRowItem(
+                                    task = task,
+                                    onCheckedChange = { viewModel.onEvent(WeekEvent.TaskCheckboxTapped(task.id)) },
+                                    onClick = { viewModel.onEvent(WeekEvent.TaskTapped(task.id)) }
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-            // Bottom padding for FAB
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
+                // Empty state (when no tasks at all)
+                if (!uiState.hasIncompleteTasks && completedTasks.isEmpty()) {
+                    item {
+                        EmptyStateContent(
+                            message = uiState.emptyStateMessage,
+                            actionText = uiState.emptyStateActionText,
+                            onActionClick = {
+                                when (uiState.selectedSegment) {
+                                    Segment.PARTNER -> viewModel.onEvent(WeekEvent.InvitePartnerTapped)
+                                    Segment.SHARED -> viewModel.onEvent(WeekEvent.AddTaskSheetRequested)
+                                    else -> {}
+                                }
+                            }
+                        )
+                    }
+                }
+
+                // Bottom padding for FAB
+                item {
+                    Spacer(modifier = Modifier.height(80.dp))
+                }
             }
         }
 
-        // Task Detail Bottom Sheet
-        if (showTaskDetail) {
+        // Task Detail Bottom Sheet - show when taskDetailState is not null
+        // Note: Dismiss handling is done in sheetState.confirmValueChange above
+        uiState.taskDetailState?.let { taskDetailState ->
             TaskDetailSheet(
-                task = mockTaskDetail,
-                sheetState = sheetState,
-                onDismiss = {
-                    scope.launch {
-                        sheetState.hide()
-                        showTaskDetail = false
-                    }
-                },
-                onComplete = {
-                    scope.launch {
-                        sheetState.hide()
-                        showTaskDetail = false
-                    }
-                },
-                onSkip = {
-                    scope.launch {
-                        sheetState.hide()
-                        showTaskDetail = false
-                    }
-                }
+                state = taskDetailState,
+                availableGoals = uiState.availableGoals,
+                onEvent = { viewModel.onEvent(it) },
+                onDismiss = { /* Handled by confirmValueChange in sheetState */ },
+                sheetState = sheetState
             )
         }
 
-        // Add Task Modal
-        if (showAddTaskModal) {
+        // Discard Changes Dialog - show when trying to dismiss with unsaved text changes
+        if (uiState.showDiscardChangesDialog) {
+            DiscardChangesDialog(
+                onDiscard = { viewModel.onEvent(WeekEvent.DiscardChangesConfirmed) },
+                onCancel = { viewModel.onEvent(WeekEvent.DiscardChangesCancelled) }
+            )
+        }
+
+        // Add Task Modal - show when showAddTaskSheet is true
+        if (uiState.showAddTaskSheet) {
             AddTaskModal(
-                sheetState = addTaskSheetState,
-                onDismiss = {
-                    scope.launch {
-                        addTaskSheetState.hide()
-                        showAddTaskModal = false
-                    }
-                },
-                onTaskCreated = { title, description, date, priority, project ->
-                    // TODO: Actually create the task
-                    scope.launch {
-                        addTaskSheetState.hide()
-                        showAddTaskModal = false
-                    }
-                }
+                state = uiState.addTaskForm,
+                availableGoals = uiState.availableGoals,
+                onEvent = { viewModel.onEvent(it) },
+                onDismiss = { viewModel.onEvent(WeekEvent.AddTaskSheetDismissed) },
+                sheetState = addTaskSheetState
             )
         }
     }
 }
 
+// ============================================
+// MAPPING EXTENSIONS
+// ============================================
+
 /**
- * Helper function to show task detail sheet.
+ * Convert CalendarDay to WeekDayItem for UI component.
  */
-private fun showTaskDetailSheet(
-    taskId: String,
-    onShow: (String) -> Unit
+private fun CalendarDay.toWeekDayItem(): WeekDayItem {
+    return WeekDayItem(
+        dayName = dayOfWeekLabel,
+        dayNumber = dayNumber,
+        isToday = isToday,
+        isSelected = isSelected,
+        hasTasks = hasTasks
+    )
+}
+
+/**
+ * Convert TaskUiModel to TaskUiItem for UI component.
+ */
+private fun TaskUiModel.toTaskUiItem(isOverdue: Boolean = false): TaskUiItem {
+    // Format schedule text
+    val scheduleText = when {
+        scheduledTime != null -> {
+            val hour = scheduledTime.hour
+            val minute = scheduledTime.minute
+            val amPm = if (hour >= 12) "PM" else "AM"
+            val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+            val minuteStr = if (minute > 0) ":${minute.toString().padStart(2, '0')}" else ""
+            "$displayHour$minuteStr $amPm"
+        }
+        subtitleText != null -> subtitleText
+        else -> null
+    }
+
+    return TaskUiItem(
+        id = id,
+        title = title,
+        priority = priority,
+        isCompleted = isCompleted,
+        schedule = scheduleText,
+        isOverdue = isOverdue,
+        isRecurring = isRepeating,
+        subtaskCount = if (subtaskCount > 0) subtaskCount else null,
+        projectOrGoal = linkedGoalName ?: primaryLabelText
+    )
+}
+
+// ============================================
+// EMPTY STATE COMPONENT
+// ============================================
+
+@Composable
+private fun EmptyStateContent(
+    message: String,
+    actionText: String?,
+    onActionClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    onShow(taskId)
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        androidx.compose.foundation.layout.Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp)
+        ) {
+            androidx.compose.material3.Text(
+                text = message,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+            if (actionText != null) {
+                androidx.compose.material3.TextButton(onClick = onActionClick) {
+                    androidx.compose.material3.Text(actionText)
+                }
+            }
+        }
+    }
+}
+
+// ============================================
+// DISCARD CHANGES DIALOG
+// ============================================
+
+/**
+ * Dialog shown when user tries to dismiss task detail sheet with unsaved text changes.
+ */
+@Composable
+private fun DiscardChangesDialog(
+    onDiscard: () -> Unit,
+    onCancel: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text("Discard changes?") },
+        text = { Text("You have unsaved changes to the task title or description. Are you sure you want to discard them?") },
+        confirmButton = {
+            TextButton(onClick = onDiscard) {
+                Text("Discard")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onCancel) {
+                Text("Cancel")
+            }
+        }
+    )
 }

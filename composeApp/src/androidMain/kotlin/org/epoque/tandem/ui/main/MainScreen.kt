@@ -133,10 +133,7 @@ fun MainScreen(
         ) {
             when (selectedTab) {
                 NavigationTab.Week -> WeekScreen(
-                    onNavigateToPlanning = onNavigateToPlanning,
-                    onNavigateToReview = onNavigateToReview,
                     onNavigateToPartnerInvite = onNavigateToPartnerInvite,
-                    onNavigateToPartnerSettings = onNavigateToPartnerSettings,
                     onNavigateToSeasons = { selectedTab = NavigationTab.Seasons }
                 )
                 NavigationTab.Progress -> ProgressScreen(

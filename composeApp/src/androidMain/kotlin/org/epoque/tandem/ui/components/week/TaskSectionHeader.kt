@@ -8,17 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.epoque.tandem.presentation.week.model.TaskSection
 import org.epoque.tandem.ui.theme.OverdueRed
-
-/**
- * Task section types for grouping.
- */
-enum class TaskSection {
-    OVERDUE,
-    TODAY,
-    TOMORROW,
-    LATER_THIS_WEEK
-}
 
 /**
  * Section header for task groups (Overdue, Today, Tomorrow, Later this week).
@@ -35,6 +26,8 @@ fun TaskSectionHeader(
         TaskSection.TODAY -> "Today"
         TaskSection.TOMORROW -> "Tomorrow"
         TaskSection.LATER_THIS_WEEK -> "Later this week"
+        TaskSection.UNSCHEDULED -> "Unscheduled"
+        TaskSection.COMPLETED -> "Completed"
     }
 
     val color = when (section) {

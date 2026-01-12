@@ -45,7 +45,19 @@ data class TaskUiModel(
     val scheduledTime: LocalTime? = null,
     val deadline: Instant? = null,
     val parentTaskId: String? = null,
-    val labels: List<String> = emptyList()
+    val labels: List<String> = emptyList(),
+
+    // Subtitle display (computed based on section context)
+    val subtitleIcon: SubtitleIcon? = null,      // Which icon to show
+    val subtitleText: String? = null,            // "7:30 AM", "3 items", "Yesterday", "Sat"
+    val showRepeatIndicator: Boolean = false,    // Show ↻ after subtitle (only with time)
+
+    // Subtask info (needed for subtitle computation)
+    val subtaskCount: Int = 0,
+    val completedSubtaskCount: Int = 0,
+
+    // Label display (right side of task item)
+    val primaryLabelText: String? = null         // "Fitness #", "Work #" (first label + " #", or null)
 ) {
     companion object {
         /**
@@ -56,16 +68,23 @@ data class TaskUiModel(
          * @param partnerName Partner's display name (for shared task completion)
          * @param goalName Display name of linked goal (if any)
          * @param goalIcon Emoji icon of linked goal (if any)
+         * @param subtaskCount Total number of subtasks
+         * @param completedSubtaskCount Number of completed subtasks
          */
         fun fromTask(
             task: Task,
             currentUserId: String,
             partnerName: String? = null,
             goalName: String? = null,
-            goalIcon: String? = null
+            goalIcon: String? = null,
+            subtaskCount: Int = 0,
+            completedSubtaskCount: Int = 0
         ): TaskUiModel {
             val isCompleted = task.status == TaskStatus.COMPLETED ||
                 (task.isRepeating && task.repeatCompleted >= (task.repeatTarget ?: 0))
+
+            // Compute primary label text (first label + " #" suffix)
+            val primaryLabel = task.labels.firstOrNull()?.let { "$it #" }
 
             return TaskUiModel(
                 id = task.id,
@@ -107,7 +126,16 @@ data class TaskUiModel(
                 scheduledTime = task.scheduledTime,
                 deadline = task.deadline,
                 parentTaskId = task.parentTaskId,
-                labels = task.labels
+                labels = task.labels,
+                // Subtitle fields - computed later by ViewModel based on section
+                subtitleIcon = null,
+                subtitleText = null,
+                showRepeatIndicator = false,
+                // Subtask info
+                subtaskCount = subtaskCount,
+                completedSubtaskCount = completedSubtaskCount,
+                // Primary label
+                primaryLabelText = primaryLabel
             )
         }
     }

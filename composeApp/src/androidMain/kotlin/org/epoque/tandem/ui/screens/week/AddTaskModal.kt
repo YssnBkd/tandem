@@ -28,6 +28,8 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Replay
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,18 +56,27 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
+import org.epoque.tandem.domain.model.Goal
+import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.TaskPriority
+import org.epoque.tandem.presentation.week.WeekEvent
+import org.epoque.tandem.presentation.week.model.AddTaskFormState
 import org.epoque.tandem.ui.theme.PriorityP1
 import org.epoque.tandem.ui.components.popovers.DateSelectorPopover
 import org.epoque.tandem.ui.components.popovers.OwnerSelectorPopover
-import org.epoque.tandem.ui.components.popovers.OwnerType
 import org.epoque.tandem.ui.components.popovers.PrioritySelectorPopover
 import org.epoque.tandem.ui.components.popovers.QuickDate
 import org.epoque.tandem.ui.components.selectors.GoalOption
 import org.epoque.tandem.ui.components.selectors.GoalSelectorSheet
 import org.epoque.tandem.ui.components.selectors.LabelSelectorSheet
-import org.epoque.tandem.ui.components.selectors.mockGoals
 import org.epoque.tandem.ui.components.selectors.mockLabels
+import org.epoque.tandem.ui.components.popovers.OwnerType as PopoverOwnerType
 
 // Colors - matching TaskDetailSheet
 private val ChipBackground = Color(0xFFF5F5F5)
@@ -75,13 +86,15 @@ private val DragHandleColor = Color(0xFFE0E0E0)
 
 /**
  * Add Task Modal - Todoist-style compact task creation sheet.
- * Consistent with TaskDetailSheet styling.
+ * Connected to ViewModel state.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskModal(
+    state: AddTaskFormState,
+    availableGoals: List<Goal>,
+    onEvent: (WeekEvent) -> Unit,
     onDismiss: () -> Unit,
-    onTaskCreated: (title: String, description: String?, date: String?, priority: TaskPriority, project: String) -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 ) {
@@ -94,7 +107,11 @@ fun AddTaskModal(
         contentWindowInsets = { WindowInsets.ime },
         dragHandle = { DragHandle() }
     ) {
-        AddTaskContent(onDismiss = onDismiss)
+        AddTaskContent(
+            state = state,
+            availableGoals = availableGoals,
+            onEvent = onEvent
+        )
     }
 }
 
@@ -122,31 +139,41 @@ private fun DragHandle() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddTaskContent(
-    onDismiss: () -> Unit
+    state: AddTaskFormState,
+    availableGoals: List<Goal>,
+    onEvent: (WeekEvent) -> Unit
 ) {
-    // Task state
-    var taskName by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var selectedOwner by remember { mutableStateOf(OwnerType.ME) }
-    var selectedDate by remember { mutableStateOf("Today") }
-    var selectedPriority by remember { mutableStateOf(TaskPriority.P4) }
-    var selectedLabels by remember { mutableStateOf<List<LabelUiModel>>(emptyList()) }
-    var selectedGoalId by remember { mutableStateOf<String?>(null) }
-    var selectedProject by remember { mutableStateOf("Inbox") }
+    // Convert domain OwnerType to popover OwnerType
+    val selectedOwner = state.ownerType.toPopoverOwnerType()
 
-    // Option chip states
-    var deadlineSet by remember { mutableStateOf(false) }
+    // Format date for display
+    val dateDisplayText = state.scheduledDate?.let { formatDateForDisplay(it) } ?: "Today"
+
+    // Option chip states (local UI state - not persisted to ViewModel yet)
+    var deadlineSet by remember { mutableStateOf(state.deadline != null) }
     var reminderSet by remember { mutableStateOf(false) }
     var locationSet by remember { mutableStateOf(false) }
     var repeatSet by remember { mutableStateOf(false) }
 
-    // Selector sheet states
+    // Selector sheet states (local UI state)
     var showGoalSelector by remember { mutableStateOf(false) }
     var showLabelSelector by remember { mutableStateOf(false) }
 
-    // Selected goal (derived from mockGoals for display)
-    val selectedGoal = selectedGoalId?.let { id ->
-        mockGoals.find { it.id == id }
+    // Find selected goal from available goals
+    val selectedGoal = state.linkedGoalId?.let { goalId ->
+        availableGoals.find { it.id == goalId }?.let { goal ->
+            GoalOption(
+                id = goal.id,
+                emoji = goal.icon,
+                name = goal.name,
+                progress = goal.progressText
+            )
+        }
+    }
+
+    // Selected labels as LabelUiModel
+    val selectedLabels = state.labels.map { labelName ->
+        mockLabels.find { it.name == labelName } ?: LabelUiModel(labelName, Color.Gray)
     }
 
     // Focus requester for auto-focus on task name
@@ -163,9 +190,9 @@ private fun AddTaskContent(
             .padding(horizontal = 16.dp)
             .padding(bottom = 16.dp)
     ) {
-        // Project selector header
+        // Project selector header (placeholder)
         ProjectSelectorRow(
-            selectedProject = selectedProject,
+            selectedProject = "Inbox",
             onProjectClick = { /* TODO: Open project picker */ }
         )
 
@@ -173,36 +200,42 @@ private fun AddTaskContent(
 
         // Task name input
         TaskNameInput(
-            value = taskName,
-            onValueChange = { taskName = it },
-            focusRequester = focusRequester
+            value = state.title,
+            onValueChange = { onEvent(WeekEvent.AddTaskTitleChanged(it)) },
+            focusRequester = focusRequester,
+            error = state.titleError
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Description input
         DescriptionInput(
-            value = description,
-            onValueChange = { description = it }
+            value = state.description,
+            onValueChange = { onEvent(WeekEvent.AddTaskDescriptionChanged(it)) }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Compact metadata row - matching TaskDetailSheet
+        // Compact metadata row
         CompactMetadataRow(
             selectedOwner = selectedOwner,
-            onOwnerSelected = { selectedOwner = it },
-            selectedDate = selectedDate,
-            onDateSelected = { selectedDate = it },
-            selectedPriority = selectedPriority,
-            onPrioritySelected = { selectedPriority = it },
+            onOwnerSelected = { popoverType ->
+                onEvent(WeekEvent.AddTaskOwnerChanged(popoverType.toDomainOwnerType()))
+            },
+            dateDisplayText = dateDisplayText,
+            onDateSelected = { quickDate ->
+                val newDate = quickDate.toLocalDate()
+                onEvent(WeekEvent.AddTaskDateChanged(newDate))
+            },
+            selectedPriority = state.priority,
+            onPrioritySelected = { onEvent(WeekEvent.AddTaskPriorityChanged(it)) },
             selectedLabels = selectedLabels,
             onLabelsClick = { showLabelSelector = true }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Goal row - matching TaskDetailSheet
+        // Goal row
         GoalRow(
             selectedGoal = selectedGoal,
             onClick = { showGoalSelector = true }
@@ -210,7 +243,7 @@ private fun AddTaskContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Options chips row - matching TaskDetailSheet
+        // Options chips row
         OptionsChipRow(
             onDeadlineClick = { deadlineSet = !deadlineSet },
             onRemindersClick = { reminderSet = !reminderSet },
@@ -221,14 +254,42 @@ private fun AddTaskContent(
             locationSet = locationSet,
             repeatSet = repeatSet
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Submit button
+        Button(
+            onClick = { onEvent(WeekEvent.AddTaskSubmitted) },
+            enabled = state.isValid,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Text(
+                text = "Add Task",
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
     }
 
     // Goal Selector Sheet
     if (showGoalSelector) {
+        val goalOptions = availableGoals.map { goal ->
+            GoalOption(
+                id = goal.id,
+                emoji = goal.icon,
+                name = goal.name,
+                progress = goal.progressText
+            )
+        }
         GoalSelectorSheet(
-            goals = mockGoals,
-            selectedGoalId = selectedGoalId,
-            onGoalSelected = { selectedGoalId = it },
+            goals = goalOptions,
+            selectedGoalId = state.linkedGoalId,
+            onGoalSelected = { goalId ->
+                onEvent(WeekEvent.AddTaskGoalChanged(goalId))
+            },
             onDismiss = { showGoalSelector = false }
         )
     }
@@ -237,18 +298,55 @@ private fun AddTaskContent(
     if (showLabelSelector) {
         LabelSelectorSheet(
             availableLabels = mockLabels,
-            selectedLabels = selectedLabels.map { it.name },
+            selectedLabels = state.labels,
             onLabelToggled = { labelName ->
-                val currentNames = selectedLabels.map { it.name }
-                selectedLabels = if (labelName in currentNames) {
-                    selectedLabels.filter { it.name != labelName }
+                val newLabels = if (labelName in state.labels) {
+                    state.labels - labelName
                 } else {
-                    val newLabel = mockLabels.find { it.name == labelName }
-                    if (newLabel != null) selectedLabels + newLabel else selectedLabels
+                    state.labels + labelName
                 }
+                onEvent(WeekEvent.AddTaskLabelsChanged(newLabels))
             },
             onDismiss = { showLabelSelector = false }
         )
+    }
+}
+
+// ============================================
+// TYPE CONVERSION HELPERS
+// ============================================
+
+private fun OwnerType.toPopoverOwnerType(): PopoverOwnerType = when (this) {
+    OwnerType.SELF -> PopoverOwnerType.ME
+    OwnerType.PARTNER -> PopoverOwnerType.PARTNER
+    OwnerType.SHARED -> PopoverOwnerType.TOGETHER
+}
+
+private fun PopoverOwnerType.toDomainOwnerType(): OwnerType = when (this) {
+    PopoverOwnerType.ME -> OwnerType.SELF
+    PopoverOwnerType.PARTNER -> OwnerType.PARTNER
+    PopoverOwnerType.TOGETHER -> OwnerType.SHARED
+}
+
+private fun formatDateForDisplay(date: LocalDate): String {
+    val now = Clock.System.now()
+    val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+    val tomorrow = today.plus(1, DateTimeUnit.DAY)
+    return when (date) {
+        today -> "Today"
+        tomorrow -> "Tomorrow"
+        else -> "${date.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} ${date.dayOfMonth}"
+    }
+}
+
+private fun QuickDate.toLocalDate(): LocalDate? {
+    val now = Clock.System.now()
+    val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+    return when (this) {
+        is QuickDate.Today -> today
+        is QuickDate.Tomorrow -> today.plus(1, DateTimeUnit.DAY)
+        is QuickDate.NextWeek -> today.plus(7, DateTimeUnit.DAY)
+        is QuickDate.PickDate -> null // User will pick specific date
     }
 }
 
@@ -297,37 +395,48 @@ private fun TaskNameInput(
     value: String,
     onValueChange: (String) -> Unit,
     focusRequester: FocusRequester,
+    error: String? = null,
     modifier: Modifier = Modifier
 ) {
-    BasicTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier
-            .fillMaxWidth()
-            .focusRequester(focusRequester),
-        textStyle = TextStyle(
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
-        ),
-        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-        singleLine = true,
-        decorationBox = { innerTextField ->
-            Box {
-                if (value.isEmpty()) {
-                    Text(
-                        text = "Task name",
-                        style = TextStyle(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = PlaceholderColor
+    Column(modifier = modifier) {
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
+            textStyle = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            singleLine = true,
+            decorationBox = { innerTextField ->
+                Box {
+                    if (value.isEmpty()) {
+                        Text(
+                            text = "Task name",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = PlaceholderColor
+                            )
                         )
-                    )
+                    }
+                    innerTextField()
                 }
-                innerTextField()
             }
+        )
+        if (error != null) {
+            Text(
+                text = error,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
-    )
+    }
 }
 
 /**
@@ -376,10 +485,10 @@ private fun DescriptionInput(
  */
 @Composable
 private fun CompactMetadataRow(
-    selectedOwner: OwnerType,
-    onOwnerSelected: (OwnerType) -> Unit,
-    selectedDate: String,
-    onDateSelected: (String) -> Unit,
+    selectedOwner: PopoverOwnerType,
+    onOwnerSelected: (PopoverOwnerType) -> Unit,
+    dateDisplayText: String,
+    onDateSelected: (QuickDate) -> Unit,
     selectedPriority: TaskPriority,
     onPrioritySelected: (TaskPriority) -> Unit,
     selectedLabels: List<LabelUiModel>,
@@ -420,16 +529,14 @@ private fun CompactMetadataRow(
         Box {
             MetadataChip(
                 icon = Icons.Outlined.CalendarToday,
-                text = selectedDate,
+                text = dateDisplayText,
                 onClick = { showDatePopover = true }
             )
             DateSelectorPopover(
                 expanded = showDatePopover,
-                selectedDate = selectedDate,
+                selectedDate = dateDisplayText,
                 onDateSelected = { quickDate ->
-                    if (quickDate !is QuickDate.PickDate) {
-                        onDateSelected(quickDate.label)
-                    }
+                    onDateSelected(quickDate)
                     showDatePopover = false
                 },
                 onDismiss = { showDatePopover = false }

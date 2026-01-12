@@ -190,6 +190,42 @@ ORDER BY scheduled_date ASC, (CASE WHEN scheduled_time IS NULL THEN 1 ELSE 0 END
 updateTaskTitleAndNotes:
 UPDATE Task SET title = ?, notes = ?, updated_at = ? WHERE id = ?;
 
+-- Update task owner type
+updateTaskOwner:
+UPDATE Task SET owner_type = ?, updated_at = ? WHERE id = ?;
+
 -- Delete subtasks when parent is deleted
 deleteSubtasks:
 DELETE FROM Task WHERE parent_task_id = ?;
+
+-- ============================================================================
+-- ADDITIONAL QUERIES FOR WEEK SCREEN (Feature 009)
+-- ============================================================================
+
+-- Get completed tasks for a week (for completed section)
+getCompletedTasksByWeekId:
+SELECT * FROM Task
+WHERE week_id = ?
+  AND status = 'COMPLETED'
+  AND parent_task_id IS NULL
+ORDER BY updated_at DESC;
+
+-- Get task counts per date for a week (for calendar dot indicators)
+-- Returns scheduled_date and count for each date with tasks
+getTaskCountsByDateForWeek:
+SELECT scheduled_date, COUNT(*) AS task_count
+FROM Task
+WHERE week_id = ?
+  AND scheduled_date IS NOT NULL
+  AND parent_task_id IS NULL
+GROUP BY scheduled_date;
+
+-- Get tasks scheduled for today or later (not overdue, not completed)
+-- Used for Today, Tomorrow, Later This Week sections
+getUpcomingTasksByWeekId:
+SELECT * FROM Task
+WHERE week_id = ?
+  AND scheduled_date >= ?
+  AND status != 'COMPLETED'
+  AND parent_task_id IS NULL
+ORDER BY scheduled_date ASC, (CASE WHEN scheduled_time IS NULL THEN 1 ELSE 0 END), scheduled_time ASC;

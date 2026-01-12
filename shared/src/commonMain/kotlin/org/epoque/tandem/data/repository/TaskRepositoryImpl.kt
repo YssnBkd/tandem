@@ -309,6 +309,17 @@ class TaskRepositoryImpl(
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // OWNER OPERATIONS (Feature 009: UI Redesign)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    override suspend fun updateTaskOwner(taskId: String, ownerType: OwnerType): Task? =
+        withContext(Dispatchers.IO) {
+            val now = Clock.System.now()
+            queries.updateTaskOwner(ownerType, now, taskId)
+            queries.getTaskById(taskId).executeAsOneOrNull()?.toDomain()
+        }
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // GOAL LINKING OPERATIONS (Feature 007: Goals System)
     // ═══════════════════════════════════════════════════════════════════════════
 
@@ -467,5 +478,45 @@ class TaskRepositoryImpl(
         val now = Clock.System.now()
         queries.updateTaskTitleAndNotes(title, notes, now, taskId)
         queries.getTaskById(taskId).executeAsOneOrNull()?.toDomain()
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // WEEK SCREEN SUPPORT (Feature 009: UI Redesign)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    override fun observeCompletedTasksForWeek(weekId: String, userId: String): Flow<List<Task>> {
+        return queries.getCompletedTasksByWeekId(weekId)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { tasks ->
+                tasks
+                    .filter { it.owner_id == userId || it.created_by == userId }
+                    .map { it.toDomain() }
+            }
+    }
+
+    override suspend fun getTaskCountsByDate(weekId: String): Map<LocalDate, Int> =
+        withContext(Dispatchers.IO) {
+            queries.getTaskCountsByDateForWeek(weekId)
+                .executeAsList()
+                .associate { row ->
+                    // scheduled_date is guaranteed non-null by the SQL WHERE clause
+                    row.scheduled_date to row.task_count.toInt()
+                }
+        }
+
+    override fun observeUpcomingTasks(
+        weekId: String,
+        fromDate: LocalDate,
+        userId: String
+    ): Flow<List<Task>> {
+        return queries.getUpcomingTasksByWeekId(weekId, fromDate)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { tasks ->
+                tasks
+                    .filter { it.owner_id == userId || it.created_by == userId }
+                    .map { it.toDomain() }
+            }
     }
 }

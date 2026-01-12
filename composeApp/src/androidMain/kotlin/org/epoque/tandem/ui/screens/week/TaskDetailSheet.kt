@@ -16,12 +16,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Subject
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.material.icons.outlined.CalendarToday
@@ -52,23 +53,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
+import org.epoque.tandem.domain.model.Goal
+import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.TaskPriority
+import org.epoque.tandem.presentation.week.WeekEvent
+import org.epoque.tandem.presentation.week.model.SubtaskUiModel
+import org.epoque.tandem.presentation.week.model.TaskDetailState
 import org.epoque.tandem.ui.theme.PriorityP1
 import org.epoque.tandem.ui.components.week.LargePriorityCheckbox
 import org.epoque.tandem.ui.components.popovers.DateSelectorPopover
 import org.epoque.tandem.ui.components.popovers.OwnerSelectorPopover
-import org.epoque.tandem.ui.components.popovers.OwnerType
 import org.epoque.tandem.ui.components.popovers.PrioritySelectorPopover
 import org.epoque.tandem.ui.components.popovers.QuickDate
+import org.epoque.tandem.ui.components.selectors.GoalOption
 import org.epoque.tandem.ui.components.selectors.GoalSelectorSheet
 import org.epoque.tandem.ui.components.selectors.LabelSelectorSheet
-import org.epoque.tandem.ui.components.selectors.mockGoals
 import org.epoque.tandem.ui.components.selectors.mockLabels
+import org.epoque.tandem.ui.components.popovers.OwnerType as PopoverOwnerType
 
 // Colors
 private val DragHandleColor = Color(0xFFE0E0E0)
@@ -77,16 +92,16 @@ private val SuccessGreen = Color(0xFF4CAF50)
 private val DividerColor = Color(0xFFE8E8E8)
 
 /**
- * Task Detail Bottom Sheet matching the Todoist-inspired mockup.
+ * Task Detail Bottom Sheet connected to ViewModel state.
  * Draggable modal that shows task details, subtasks, and actions.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskDetailSheet(
-    task: TaskDetailUiModel,
+    state: TaskDetailState,
+    availableGoals: List<Goal>,
+    onEvent: (WeekEvent) -> Unit,
     onDismiss: () -> Unit,
-    onComplete: () -> Unit,
-    onSkip: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 ) {
@@ -99,9 +114,9 @@ fun TaskDetailSheet(
         dragHandle = { DragHandle() }
     ) {
         TaskDetailContent(
-            task = task,
-            onComplete = onComplete,
-            onSkip = onSkip
+            state = state,
+            availableGoals = availableGoals,
+            onEvent = onEvent
         )
     }
 }
@@ -134,23 +149,24 @@ private fun DragHandle() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskDetailContent(
-    task: TaskDetailUiModel,
-    onComplete: () -> Unit,
-    onSkip: () -> Unit
+    state: TaskDetailState,
+    availableGoals: List<Goal>,
+    onEvent: (WeekEvent) -> Unit
 ) {
-    // Bottom sheet visibility states (popovers are now in CompactMetadataRow)
+    // Bottom sheet visibility states (for nested selectors)
     var showGoalSelector by remember { mutableStateOf(false) }
     var showLabelSelector by remember { mutableStateOf(false) }
 
-    // Editable values (initialized from task, mock data for now)
-    var selectedOwner by remember { mutableStateOf(OwnerType.ME) }
-    var selectedDate by remember { mutableStateOf(task.dueDate ?: "Today") }
-    var selectedPriority by remember { mutableStateOf(task.priority) }
-    var selectedLabels by remember { mutableStateOf(task.labels) }
-    var selectedGoalId by remember { mutableStateOf(task.goal?.let { "fitness" }) }
+    // Map domain OwnerType to popover OwnerType
+    val selectedOwner = state.ownerType.toPopoverOwnerType()
 
-    // Option chip states
-    var deadlineSet by remember { mutableStateOf(false) }
+    // Format date for display
+    val dateDisplayText = state.scheduledDate?.let { date ->
+        formatDateForDisplay(date)
+    } ?: "No date"
+
+    // Option chip states (local for now - could be moved to state)
+    var deadlineSet by remember { mutableStateOf(state.deadline != null) }
     var reminderSet by remember { mutableStateOf(false) }
     var locationSet by remember { mutableStateOf(false) }
     var repeatSet by remember { mutableStateOf(false) }
@@ -160,21 +176,28 @@ private fun TaskDetailContent(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
     ) {
+        // Save button row - shows when there are unsaved text changes
+        if (state.hasUnsavedTextChanges) {
+            SaveButtonRow(
+                onSave = { onEvent(WeekEvent.SaveTextChangesRequested) }
+            )
+        }
+
         // Primary content that should be visible in partial mode
         PrimaryContent(
-            task = task,
+            state = state,
             selectedOwner = selectedOwner,
-            selectedDate = selectedDate,
-            selectedPriority = selectedPriority,
-            selectedLabels = selectedLabels,
-            onOwnerSelected = { selectedOwner = it },
-            onDateSelected = { quickDate ->
-                if (quickDate !is QuickDate.PickDate) {
-                    selectedDate = quickDate.label
-                }
-                // TODO: Open date picker for PickDate
+            dateDisplayText = dateDisplayText,
+            onTitleChanged = { onEvent(WeekEvent.TaskTitleChanged(it)) },
+            onDescriptionChanged = { onEvent(WeekEvent.TaskDescriptionChanged(it)) },
+            onOwnerSelected = { popoverOwner ->
+                onEvent(WeekEvent.TaskOwnerChanged(popoverOwner.toDomainOwnerType()))
             },
-            onPrioritySelected = { selectedPriority = it },
+            onDateSelected = { quickDate ->
+                val date = quickDate.toLocalDate()
+                onEvent(WeekEvent.TaskDateChanged(date))
+            },
+            onPrioritySelected = { onEvent(WeekEvent.TaskPriorityChanged(it)) },
             onLabelsClick = { showLabelSelector = true },
             onGoalClick = { showGoalSelector = true },
             onDeadlineClick = { deadlineSet = !deadlineSet },
@@ -185,23 +208,46 @@ private fun TaskDetailContent(
             reminderSet = reminderSet,
             locationSet = locationSet,
             repeatSet = repeatSet,
-            onComplete = onComplete
+            onComplete = { onEvent(WeekEvent.TaskCompleteRequested) }
         )
 
         // Subtasks, comments, and action buttons (visible when scrolled/expanded)
         ExpandedContent(
-            task = task,
-            onComplete = onComplete,
-            onSkip = onSkip
+            state = state,
+            onSubtaskCheckboxTapped = { subtaskId -> onEvent(WeekEvent.SubtaskCheckboxTapped(subtaskId)) },
+            onNewSubtaskTitleChanged = { title -> onEvent(WeekEvent.NewSubtaskTitleChanged(title)) },
+            onAddSubtaskSubmitted = { onEvent(WeekEvent.AddSubtaskSubmitted) },
+            onSubtaskDeleted = { subtaskId -> onEvent(WeekEvent.SubtaskDeleted(subtaskId)) },
+            onCommentTextChanged = { text -> onEvent(WeekEvent.CommentTextChanged(text)) },
+            onCommentSubmitted = { onEvent(WeekEvent.CommentSubmitted) },
+            onComplete = { onEvent(WeekEvent.TaskCompleteRequested) }
         )
     }
 
     // Goal Selector Sheet
     if (showGoalSelector) {
+        // Map domain Goals to GoalOption for the selector
+        val goalOptions = buildList {
+            // Add "No goal" option first
+            add(GoalOption(id = "none", emoji = "\u2796", name = "No goal", progress = null))
+            // Add actual goals
+            availableGoals.forEach { goal ->
+                add(GoalOption(
+                    id = goal.id,
+                    emoji = goal.icon,
+                    name = goal.name,
+                    progress = goal.progressText
+                ))
+            }
+        }
+
         GoalSelectorSheet(
-            goals = mockGoals,
-            selectedGoalId = selectedGoalId,
-            onGoalSelected = { selectedGoalId = it },
+            goals = goalOptions,
+            selectedGoalId = state.linkedGoalId,
+            onGoalSelected = { goalId ->
+                onEvent(WeekEvent.TaskGoalChanged(goalId))
+                showGoalSelector = false
+            },
             onDismiss = { showGoalSelector = false }
         )
     }
@@ -210,18 +256,90 @@ private fun TaskDetailContent(
     if (showLabelSelector) {
         LabelSelectorSheet(
             availableLabels = mockLabels,
-            selectedLabels = selectedLabels.map { it.name },
+            selectedLabels = state.labels,
             onLabelToggled = { labelName ->
-                val currentNames = selectedLabels.map { it.name }
-                selectedLabels = if (labelName in currentNames) {
-                    selectedLabels.filter { it.name != labelName }
+                val newLabels = if (labelName in state.labels) {
+                    state.labels - labelName
                 } else {
-                    val newLabel = mockLabels.find { it.name == labelName }
-                    if (newLabel != null) selectedLabels + newLabel else selectedLabels
+                    state.labels + labelName
                 }
+                onEvent(WeekEvent.TaskLabelsChanged(newLabels))
             },
             onDismiss = { showLabelSelector = false }
         )
+    }
+}
+
+// Helper functions for type conversion
+private fun OwnerType.toPopoverOwnerType(): PopoverOwnerType = when (this) {
+    OwnerType.SELF -> PopoverOwnerType.ME
+    OwnerType.PARTNER -> PopoverOwnerType.PARTNER
+    OwnerType.SHARED -> PopoverOwnerType.TOGETHER
+}
+
+private fun PopoverOwnerType.toDomainOwnerType(): OwnerType = when (this) {
+    PopoverOwnerType.ME -> OwnerType.SELF
+    PopoverOwnerType.PARTNER -> OwnerType.PARTNER
+    PopoverOwnerType.TOGETHER -> OwnerType.SHARED
+}
+
+private fun formatDateForDisplay(date: LocalDate): String {
+    val now = Clock.System.now()
+    val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+    val tomorrow = today.plus(1, DateTimeUnit.DAY)
+    return when (date) {
+        today -> "Today"
+        tomorrow -> "Tomorrow"
+        else -> "${date.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }} ${date.dayOfMonth}"
+    }
+}
+
+private fun QuickDate.toLocalDate(): LocalDate? {
+    val now = Clock.System.now()
+    val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+    return when (this) {
+        is QuickDate.Today -> today
+        is QuickDate.Tomorrow -> today.plus(1, DateTimeUnit.DAY)
+        is QuickDate.NextWeek -> today.plus(7, DateTimeUnit.DAY)
+        is QuickDate.PickDate -> null // User will pick specific date
+    }
+}
+
+/**
+ * Save button row - appears when there are unsaved text changes.
+ */
+@Composable
+private fun SaveButtonRow(
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+        horizontalArrangement = Arrangement.End
+    ) {
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.primary)
+                .clickable(onClick = onSave)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Check,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
+            Text(
+                text = "Save",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
     }
 }
 
@@ -231,12 +349,12 @@ private fun TaskDetailContent(
  */
 @Composable
 private fun PrimaryContent(
-    task: TaskDetailUiModel,
-    selectedOwner: OwnerType,
-    selectedDate: String,
-    selectedPriority: TaskPriority,
-    selectedLabels: List<LabelUiModel>,
-    onOwnerSelected: (OwnerType) -> Unit,
+    state: TaskDetailState,
+    selectedOwner: PopoverOwnerType,
+    dateDisplayText: String,
+    onTitleChanged: (String) -> Unit,
+    onDescriptionChanged: (String) -> Unit,
+    onOwnerSelected: (PopoverOwnerType) -> Unit,
     onDateSelected: (QuickDate) -> Unit,
     onPrioritySelected: (TaskPriority) -> Unit,
     onLabelsClick: () -> Unit,
@@ -253,36 +371,34 @@ private fun PrimaryContent(
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         // Header: Project selector + More button
-        TaskDetailHeader(project = task.project)
+        TaskDetailHeader(project = "This Week")
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Task title row
-        TaskTitleRow(
-            title = task.title,
-            priority = selectedPriority,
-            isCompleted = false,
+        // Task title row (editable)
+        EditableTaskTitleRow(
+            title = state.title,
+            priority = state.priority,
+            onTitleChanged = onTitleChanged,
             onCheckedChange = { onComplete() }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Description
-        if (task.description != null) {
-            DetailRow(
-                icon = Icons.AutoMirrored.Outlined.Subject,
-                content = task.description
-            )
-        }
+        // Description (editable)
+        EditableDescriptionRow(
+            description = state.description,
+            onDescriptionChanged = onDescriptionChanged
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Compact metadata row: Owner, Date, Priority, Labels - all horizontal with anchored popovers
         CompactMetadataRow(
             selectedOwner = selectedOwner,
-            selectedDate = selectedDate,
-            selectedPriority = selectedPriority,
-            selectedLabels = selectedLabels,
+            selectedDate = dateDisplayText,
+            selectedPriority = state.priority,
+            selectedLabels = state.labels.map { LabelUiModel(it, Color.Gray) }, // Map to UI model
             onOwnerSelected = onOwnerSelected,
             onDateSelected = onDateSelected,
             onPrioritySelected = onPrioritySelected,
@@ -291,9 +407,20 @@ private fun PrimaryContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Goal Progress
-        if (task.goal != null) {
-            GoalProgressRow(goal = task.goal, onClick = onGoalClick)
+        // Goal Progress (if linked)
+        if (state.linkedGoalId != null && state.linkedGoalName != null) {
+            GoalProgressRow(
+                goal = GoalProgressUiModel(
+                    emoji = state.linkedGoalIcon ?: "🎯",
+                    name = state.linkedGoalName,
+                    current = (state.linkedGoalProgressFraction * 3).toInt(), // Approximate
+                    total = 3
+                ),
+                onClick = onGoalClick
+            )
+        } else {
+            // Show "Add goal" placeholder
+            AddGoalRow(onClick = onGoalClick)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -315,28 +442,491 @@ private fun PrimaryContent(
 }
 
 /**
+ * Editable task title row with priority checkbox.
+ */
+@Composable
+private fun EditableTaskTitleRow(
+    title: String,
+    priority: TaskPriority,
+    onTitleChanged: (String) -> Unit,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Top
+    ) {
+        LargePriorityCheckbox(
+            checked = false,
+            priority = priority,
+            onCheckedChange = onCheckedChange
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        BasicTextField(
+            value = title,
+            onValueChange = onTitleChanged,
+            modifier = Modifier
+                .weight(1f)
+                .padding(top = 4.dp),
+            textStyle = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            singleLine = true,
+            decorationBox = { innerTextField ->
+                Box {
+                    if (title.isEmpty()) {
+                        Text(
+                            text = "Task title",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
+    }
+}
+
+/**
+ * Editable description row.
+ */
+@Composable
+private fun EditableDescriptionRow(
+    description: String,
+    onDescriptionChanged: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Outlined.Subject,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        BasicTextField(
+            value = description,
+            onValueChange = onDescriptionChanged,
+            modifier = Modifier.weight(1f),
+            textStyle = TextStyle(
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurface,
+                lineHeight = 20.sp
+            ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            singleLine = false,
+            maxLines = 5,
+            decorationBox = { innerTextField ->
+                Box {
+                    if (description.isEmpty()) {
+                        Text(
+                            text = "Add description",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
+    }
+}
+
+/**
+ * Add goal row placeholder.
+ */
+@Composable
+private fun AddGoalRow(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "🎯",
+            fontSize = 18.sp,
+            modifier = Modifier.width(20.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = "Add goal",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+        )
+    }
+}
+
+/**
+ * Connected subtasks section with event callbacks.
+ */
+@Composable
+private fun SubtasksSectionConnected(
+    subtasks: List<SubtaskUiModel>,
+    newSubtaskTitle: String,
+    onSubtaskCheckboxTapped: (String) -> Unit,
+    onNewSubtaskTitleChanged: (String) -> Unit,
+    onAddSubtaskSubmitted: () -> Unit,
+    onSubtaskDeleted: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(true) }
+    val completedCount = subtasks.count { it.isCompleted }
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(DividerColor)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Header
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded },
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Sub-tasks",
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "$completedCount/${subtasks.size}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    imageVector = Icons.Outlined.KeyboardArrowUp,
+                    contentDescription = if (expanded) "Collapse" else "Expand",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        // Subtask items
+        if (expanded) {
+            subtasks.forEach { subtask ->
+                SubtaskItemConnected(
+                    subtask = subtask,
+                    onCheckboxTapped = { onSubtaskCheckboxTapped(subtask.id) },
+                    onDelete = { onSubtaskDeleted(subtask.id) }
+                )
+            }
+
+            // Add subtask input
+            AddSubtaskInput(
+                value = newSubtaskTitle,
+                onValueChange = onNewSubtaskTitleChanged,
+                onSubmit = onAddSubtaskSubmitted
+            )
+        }
+    }
+}
+
+/**
+ * Single subtask item with connected callbacks.
+ */
+@Composable
+private fun SubtaskItemConnected(
+    subtask: SubtaskUiModel,
+    onCheckboxTapped: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Checkbox
+        Box(
+            modifier = Modifier
+                .size(20.dp)
+                .clip(CircleShape)
+                .background(
+                    if (subtask.isCompleted) SuccessGreen else Color.Transparent
+                )
+                .then(
+                    if (!subtask.isCompleted) {
+                        Modifier.background(Color.Transparent, CircleShape)
+                    } else Modifier
+                )
+                .clickable(onClick = onCheckboxTapped),
+            contentAlignment = Alignment.Center
+        ) {
+            if (subtask.isCompleted) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Completed",
+                    modifier = Modifier.size(12.dp),
+                    tint = Color.White
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .background(MaterialTheme.colorScheme.outline, CircleShape)
+                        .padding(2.dp)
+                        .background(MaterialTheme.colorScheme.surface, CircleShape)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(
+            text = subtask.title,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                textDecoration = if (subtask.isCompleted) TextDecoration.LineThrough else TextDecoration.None
+            ),
+            color = if (subtask.isCompleted) {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+            modifier = Modifier.weight(1f)
+        )
+
+        // Delete button
+        IconButton(
+            onClick = onDelete,
+            modifier = Modifier.size(32.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Delete subtask",
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+/**
+ * Add subtask input field.
+ */
+@Composable
+private fun AddSubtaskInput(
+    value: String,
+    onValueChange: (String) -> Unit,
+    onSubmit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.weight(1f),
+            textStyle = TextStyle(
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            singleLine = true,
+            decorationBox = { innerTextField ->
+                Box {
+                    if (value.isEmpty()) {
+                        Text(
+                            text = "Add sub-task",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
+
+        if (value.isNotEmpty()) {
+            IconButton(
+                onClick = onSubmit,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Add",
+                    modifier = Modifier.size(18.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Connected comment input with callbacks.
+ */
+@Composable
+private fun CommentInputConnected(
+    commentText: String,
+    onCommentTextChanged: (String) -> Unit,
+    onCommentSubmitted: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(DividerColor)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(ChipBackground, RoundedCornerShape(24.dp))
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BasicTextField(
+                value = commentText,
+                onValueChange = onCommentTextChanged,
+                modifier = Modifier.weight(1f),
+                textStyle = TextStyle(
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                singleLine = true,
+                decorationBox = { innerTextField ->
+                    Box {
+                        if (commentText.isEmpty()) {
+                            Text(
+                                text = "Add a comment",
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                )
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
+            )
+
+            if (commentText.isNotEmpty()) {
+                IconButton(
+                    onClick = onCommentSubmitted,
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Submit",
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            } else {
+                Icon(
+                    imageVector = Icons.Outlined.AttachFile,
+                    contentDescription = "Attach",
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+/**
  * Expanded content revealed when sheet is fully expanded.
  * Contains subtasks, comments, and action buttons.
  */
 @Composable
 private fun ExpandedContent(
-    task: TaskDetailUiModel,
-    onComplete: () -> Unit,
-    onSkip: () -> Unit
+    state: TaskDetailState,
+    onSubtaskCheckboxTapped: (String) -> Unit,
+    onNewSubtaskTitleChanged: (String) -> Unit,
+    onAddSubtaskSubmitted: () -> Unit,
+    onSubtaskDeleted: (String) -> Unit,
+    onCommentTextChanged: (String) -> Unit,
+    onCommentSubmitted: () -> Unit,
+    onComplete: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         // Subtasks section
-        if (task.subtasks.isNotEmpty()) {
-            SubtasksSection(subtasks = task.subtasks)
-        }
+        SubtasksSectionConnected(
+            subtasks = state.subtasks,
+            newSubtaskTitle = state.newSubtaskTitle,
+            onSubtaskCheckboxTapped = onSubtaskCheckboxTapped,
+            onNewSubtaskTitleChanged = onNewSubtaskTitleChanged,
+            onAddSubtaskSubmitted = onAddSubtaskSubmitted,
+            onSubtaskDeleted = onSubtaskDeleted
+        )
 
         // Comment input
-        CommentInput()
+        CommentInputConnected(
+            commentText = state.commentText,
+            onCommentTextChanged = onCommentTextChanged,
+            onCommentSubmitted = onCommentSubmitted
+        )
 
         // Action buttons
         ActionButtons(
-            onComplete = onComplete,
-            onSkip = onSkip
+            onComplete = onComplete
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -468,11 +1058,11 @@ private fun DetailRow(
  */
 @Composable
 private fun CompactMetadataRow(
-    selectedOwner: OwnerType,
+    selectedOwner: PopoverOwnerType,
     selectedDate: String,
     selectedPriority: TaskPriority,
     selectedLabels: List<LabelUiModel>,
-    onOwnerSelected: (OwnerType) -> Unit,
+    onOwnerSelected: (PopoverOwnerType) -> Unit,
     onDateSelected: (QuickDate) -> Unit,
     onPrioritySelected: (TaskPriority) -> Unit,
     onLabelsClick: () -> Unit,
@@ -1084,12 +1674,11 @@ private fun CommentInput(
 }
 
 /**
- * Action buttons - Complete and Skip.
+ * Action button - Complete.
  */
 @Composable
 private fun ActionButtons(
     onComplete: () -> Unit,
-    onSkip: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -1102,52 +1691,30 @@ private fun ActionButtons(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Complete button (full width)
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(SuccessGreen, RoundedCornerShape(12.dp))
+                .clickable { onComplete() }
+                .padding(vertical = 14.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Complete button
-            Row(
-                modifier = Modifier
-                    .weight(1f)
-                    .background(SuccessGreen, RoundedCornerShape(12.dp))
-                    .clickable { onComplete() }
-                    .padding(vertical = 14.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Complete",
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    color = Color.White
-                )
-            }
-
-            // Skip button
-            Box(
-                modifier = Modifier
-                    .background(ChipBackground, RoundedCornerShape(12.dp))
-                    .clickable { onSkip() }
-                    .padding(horizontal = 20.dp, vertical = 14.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Skip",
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.Medium
-                    ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = Color.White
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Complete",
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                color = Color.White
+            )
         }
     }
 }

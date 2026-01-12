@@ -166,6 +166,19 @@ interface TaskRepository {
     suspend fun deleteTasksForWeek(weekId: String): Int
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // OWNER OPERATIONS (Feature 009: UI Redesign)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Update a task's owner type.
+     *
+     * @param taskId The task ID
+     * @param ownerType The new owner type (SELF, PARTNER, SHARED)
+     * @return The updated task, or null if not found
+     */
+    suspend fun updateTaskOwner(taskId: String, ownerType: OwnerType): Task?
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // GOAL LINKING OPERATIONS (Feature 007: Goals System)
     // ═══════════════════════════════════════════════════════════════════════════
 
@@ -331,4 +344,41 @@ interface TaskRepository {
      * @return The updated task, or null if not found
      */
     suspend fun updateTaskTitleAndNotes(taskId: String, title: String, notes: String?): Task?
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // WEEK SCREEN SUPPORT (Feature 009: UI Redesign)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Observe completed tasks for a week.
+     *
+     * @param weekId ISO 8601 week ID
+     * @param userId The current user's ID
+     * @return Flow of completed tasks
+     */
+    fun observeCompletedTasksForWeek(weekId: String, userId: String): Flow<List<Task>>
+
+    /**
+     * Get task counts per scheduled date for a week.
+     * Used for calendar dot indicators.
+     *
+     * @param weekId ISO 8601 week ID
+     * @return Map of date to task count
+     */
+    suspend fun getTaskCountsByDate(weekId: String): Map<LocalDate, Int>
+
+    /**
+     * Observe upcoming tasks for a week (scheduled for today or later, not completed).
+     * Used for Today, Tomorrow, Later This Week sections.
+     *
+     * @param weekId ISO 8601 week ID
+     * @param fromDate The earliest date to include (typically today)
+     * @param userId The current user's ID
+     * @return Flow of upcoming tasks sorted by scheduled date/time
+     */
+    fun observeUpcomingTasks(
+        weekId: String,
+        fromDate: LocalDate,
+        userId: String
+    ): Flow<List<Task>>
 }
