@@ -59,7 +59,8 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material3)
+            // Use Material3 alpha for Expressive APIs (FloatingActionButtonMenu, etc.)
+            implementation("org.jetbrains.compose.material3:material3:1.10.0-alpha04")
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)

@@ -40,7 +40,7 @@ import org.epoque.tandem.ui.components.week.TaskSectionHeader
 import org.epoque.tandem.ui.components.week.TaskUiItem
 import org.epoque.tandem.ui.components.week.WeekDayItem
 import org.epoque.tandem.ui.components.week.WeekDaySelector
-import org.epoque.tandem.ui.components.week.WeekFab
+import org.epoque.tandem.ui.components.week.WeekFabMenu
 import org.epoque.tandem.ui.components.week.WeekHeader
 import org.epoque.tandem.ui.components.SegmentedControl
 import org.koin.compose.viewmodel.koinViewModel
@@ -55,6 +55,8 @@ fun WeekScreen(
     viewModel: WeekViewModel = koinViewModel(),
     onNavigateToPartnerInvite: () -> Unit = {},
     onNavigateToSeasons: () -> Unit = {},
+    onNavigateToPlanning: () -> Unit = {},
+    onNavigateToReview: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -154,7 +156,11 @@ fun WeekScreen(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            WeekFab(onClick = { viewModel.onEvent(WeekEvent.AddTaskSheetRequested) })
+            WeekFabMenu(
+                onAddTaskClick = { viewModel.onEvent(WeekEvent.AddTaskSheetRequested) },
+                onPlanWeekClick = onNavigateToPlanning,
+                onReviewWeekClick = onNavigateToReview
+            )
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
