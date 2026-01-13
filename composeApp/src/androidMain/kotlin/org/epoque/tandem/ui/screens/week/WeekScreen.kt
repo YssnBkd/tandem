@@ -1,6 +1,7 @@
 package org.epoque.tandem.ui.screens.week
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -11,16 +12,14 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,10 +47,16 @@ import org.koin.compose.viewmodel.koinViewModel
 /**
  * Main Week View screen with Todoist-inspired UI redesign.
  * Connected to WeekViewModel for data and state management.
+ *
+ * Note: This screen does NOT use its own Scaffold. It receives padding
+ * from MainScreen's Scaffold to ensure proper NavigationBar spacing.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeekScreen(
+    contentPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
+    onProvideFab: (@Composable () -> Unit) -> Unit,
     viewModel: WeekViewModel = koinViewModel(),
     onNavigateToPartnerInvite: () -> Unit = {},
     onNavigateToSeasons: () -> Unit = {},
@@ -60,9 +65,22 @@ fun WeekScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
     val hapticFeedback = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
+
+    // Provide FAB to parent MainScreen
+    DisposableEffect(Unit) {
+        onProvideFab {
+            WeekFabMenu(
+                onAddTaskClick = { viewModel.onEvent(WeekEvent.AddTaskSheetRequested) },
+                onPlanWeekClick = onNavigateToPlanning,
+                onReviewWeekClick = onNavigateToReview
+            )
+        }
+        onDispose {
+            // FAB will be cleared when switching tabs via onClearFab
+        }
+    }
 
     // Task detail sheet state - use confirmValueChange to prevent dismiss when unsaved changes exist
     val sheetState = rememberModalBottomSheetState(
@@ -152,33 +170,22 @@ fun WeekScreen(
         "${it.dateRangeText.removePrefix("Week of ")} · ${uiState.totalCount} tasks"
     } ?: ""
 
-    Scaffold(
-        modifier = modifier,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = {
-            WeekFabMenu(
-                onAddTaskClick = { viewModel.onEvent(WeekEvent.AddTaskSheetRequested) },
-                onPlanWeekClick = onNavigateToPlanning,
-                onReviewWeekClick = onNavigateToReview
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { paddingValues ->
+    // Content without Scaffold - uses contentPadding from parent MainScreen
+    Box(modifier = modifier.fillMaxSize()) {
         // Show loading state
         if (uiState.isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+                    .padding(contentPadding),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = contentPadding
             ) {
                 // Week Header
                 item {

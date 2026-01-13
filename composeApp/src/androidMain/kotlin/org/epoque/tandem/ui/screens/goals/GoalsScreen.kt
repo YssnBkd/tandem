@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,9 +52,13 @@ import org.epoque.tandem.ui.theme.GoalTextMuted
 /**
  * Goals screen showing goal list with Active/Completed tabs.
  * Uses mock data for visual iteration.
+ *
+ * Note: This screen does NOT use its own Scaffold. It receives padding
+ * from MainScreen's Scaffold to ensure proper NavigationBar spacing.
  */
 @Composable
 fun GoalsScreen(
+    contentPadding: PaddingValues,
     onNavigateToGoalDetail: (String) -> Unit = {},
     onNavigateToAddGoal: () -> Unit = {},
     modifier: Modifier = Modifier
@@ -102,14 +105,15 @@ fun GoalsScreen(
         GoalStatusSegment.COMPLETED -> emptyList()
     }
 
-    Scaffold(
+    // Content without Scaffold - uses contentPadding from parent MainScreen
+    Surface(
         modifier = modifier.fillMaxSize(),
-        containerColor = Color(0xFFFFFBF7)
-    ) { paddingValues ->
+        color = Color(0xFFFFFBF7)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(top = contentPadding.calculateTopPadding())
         ) {
             // Header
             GoalsHeader(
@@ -127,7 +131,12 @@ fun GoalsScreen(
             // Goals list
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 8.dp,
+                    bottom = contentPadding.calculateBottomPadding() + 8.dp
+                ),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(displayedGoals, key = { it.id }) { goal ->

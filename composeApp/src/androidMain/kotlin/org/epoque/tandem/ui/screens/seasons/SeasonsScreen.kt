@@ -2,6 +2,7 @@ package org.epoque.tandem.ui.screens.seasons
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -27,14 +28,19 @@ import org.epoque.tandem.ui.theme.CoralPrimary
  * Seasons represent quarterly or custom time periods for tracking
  * longer-term goals and habits. Users can create "seasons" with
  * specific focuses, themes, and target habits.
+ *
+ * Note: This screen does NOT use its own Scaffold. It receives padding
+ * from MainScreen's Scaffold to ensure proper NavigationBar spacing.
  */
 @Composable
 fun SeasonsScreen(
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .padding(contentPadding)
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

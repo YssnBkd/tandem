@@ -1,6 +1,7 @@
 package org.epoque.tandem.ui.legacy.progress
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,14 +10,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -32,15 +31,26 @@ import org.koin.compose.viewmodel.koinViewModel
  *
  * Displays streak information, completion trends, and past weeks list.
  * Handles navigation to past week detail via callback.
+ *
+ * Note: This screen does NOT use its own Scaffold. It receives padding
+ * from MainScreen's Scaffold to ensure proper NavigationBar spacing.
  */
 @Composable
 fun ProgressScreen(
+    contentPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
     onNavigateToWeekDetail: (String) -> Unit,
+    onClearFab: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProgressViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Clear FAB when this screen is shown (Progress has no FAB)
+    DisposableEffect(Unit) {
+        onClearFab()
+        onDispose { }
+    }
 
     // Collect side effects
     LaunchedEffect(Unit) {
@@ -57,28 +67,28 @@ fun ProgressScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+    // Content without Scaffold - uses contentPadding from parent MainScreen
+    ProgressContent(
+        uiState = uiState,
+        onEvent = viewModel::onEvent,
+        contentPadding = contentPadding,
         modifier = modifier
-    ) { paddingValues ->
-        ProgressContent(
-            uiState = uiState,
-            onEvent = viewModel::onEvent,
-            modifier = Modifier.padding(paddingValues)
-        )
-    }
+    )
 }
 
 @Composable
 private fun ProgressContent(
     uiState: ProgressUiState,
     onEvent: (ProgressEvent) -> Unit,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
     when {
         uiState.isLoading -> {
             Box(
-                modifier = modifier.fillMaxSize(),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -87,7 +97,9 @@ private fun ProgressContent(
 
         uiState.error != null -> {
             Box(
-                modifier = modifier.fillMaxSize(),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
                 contentAlignment = Alignment.Center
             ) {
                 ProgressErrorState(
@@ -99,7 +111,9 @@ private fun ProgressContent(
 
         uiState.showEmptyState -> {
             Box(
-                modifier = modifier.fillMaxSize(),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
                 contentAlignment = Alignment.Center
             ) {
                 ProgressEmptyState()
@@ -108,9 +122,13 @@ private fun ProgressContent(
 
         else -> {
             LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+                modifier = modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = contentPadding.calculateTopPadding(),
+                    bottom = contentPadding.calculateBottomPadding()
+                )
             ) {
                 // Streak Card
                 item {

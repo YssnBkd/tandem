@@ -1,6 +1,7 @@
 package org.epoque.tandem.ui.main
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -13,18 +14,24 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import org.epoque.tandem.domain.model.User
 import org.epoque.tandem.ui.navigation.NavigationTab
 import org.epoque.tandem.ui.legacy.progress.ProgressScreen
@@ -54,11 +61,18 @@ fun MainScreen(
     var selectedTab by rememberSaveable(stateSaver = NavigationTab.Saver) { mutableStateOf(NavigationTab.Week) }
     var showMenu by rememberSaveable { mutableStateOf(false) }
 
+    // Shared snackbar state for all child screens
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // FAB composable provided by the current tab (only Week tab has FAB)
+    var currentFab: (@Composable () -> Unit)? by remember { mutableStateOf(null) }
+
     // Week and Goals tabs have their own headers, so we don't show TopAppBar for them
     val showTopBar = selectedTab != NavigationTab.Week && selectedTab != NavigationTab.Goals
 
     Scaffold(
         modifier = modifier,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             if (showTopBar) {
                 TopAppBar(
@@ -108,7 +122,12 @@ fun MainScreen(
             }
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                tonalElevation = 0.dp,
+                windowInsets = NavigationBarDefaults.windowInsets
+            ) {
                 NavigationTab.entries.forEach { tab ->
                     val selected = selectedTab == tab
                     NavigationBarItem(
@@ -120,32 +139,48 @@ fun MainScreen(
                                 contentDescription = tab.title
                             )
                         },
-                        label = { Text(tab.title) }
+                        label = { Text(tab.title) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     )
                 }
             }
+        },
+        floatingActionButton = {
+            currentFab?.invoke()
         }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            when (selectedTab) {
-                NavigationTab.Week -> WeekScreen(
-                    onNavigateToPartnerInvite = onNavigateToPartnerInvite,
-                    onNavigateToSeasons = { selectedTab = NavigationTab.Seasons },
-                    onNavigateToPlanning = onNavigateToPlanning,
-                    onNavigateToReview = onNavigateToReview
-                )
-                NavigationTab.Progress -> ProgressScreen(
-                    onNavigateToWeekDetail = onNavigateToPastWeekDetail
-                )
-                NavigationTab.Goals -> GoalsScreen(
-                    onNavigateToAddGoal = onNavigateToAddGoal,
-                    onNavigateToGoalDetail = onNavigateToGoalDetail
-                )
-                NavigationTab.Seasons -> SeasonsScreen()
+        // Pass paddingValues to child screens - they should NOT have their own Scaffold
+        when (selectedTab) {
+            NavigationTab.Week -> WeekScreen(
+                contentPadding = paddingValues,
+                snackbarHostState = snackbarHostState,
+                onProvideFab = { fab -> currentFab = fab },
+                onNavigateToPartnerInvite = onNavigateToPartnerInvite,
+                onNavigateToSeasons = { selectedTab = NavigationTab.Seasons },
+                onNavigateToPlanning = onNavigateToPlanning,
+                onNavigateToReview = onNavigateToReview
+            )
+            NavigationTab.Progress -> ProgressScreen(
+                contentPadding = paddingValues,
+                snackbarHostState = snackbarHostState,
+                onNavigateToWeekDetail = onNavigateToPastWeekDetail,
+                onClearFab = { currentFab = null }
+            )
+            NavigationTab.Goals -> GoalsScreen(
+                contentPadding = paddingValues,
+                onNavigateToAddGoal = onNavigateToAddGoal,
+                onNavigateToGoalDetail = onNavigateToGoalDetail,
+                onClearFab = { currentFab = null }
+            )
+            NavigationTab.Seasons -> {
+                currentFab = null
+                SeasonsScreen(contentPadding = paddingValues)
             }
         }
     }
