@@ -162,6 +162,9 @@ fun TandemNavHost(
 
             // Goals routes
             goalsNavGraph(navController = navController)
+
+            // Timeline routes
+            timelineNavGraph(navController = navController)
         }
 
         // Snackbar host for showing messages

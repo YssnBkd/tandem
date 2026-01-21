@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import org.epoque.tandem.domain.model.User
 import org.epoque.tandem.ui.navigation.NavigationTab
 import org.epoque.tandem.ui.legacy.progress.ProgressScreen
-import org.epoque.tandem.ui.screens.seasons.SeasonsScreen
+import org.epoque.tandem.ui.screens.timeline.TimelineScreen
 import org.epoque.tandem.ui.screens.week.WeekScreen
 
 /**
@@ -81,7 +81,7 @@ fun MainScreen(
                             text = when (selectedTab) {
                                 NavigationTab.Progress -> "Progress"
                                 NavigationTab.Goals -> "Goals"
-                                NavigationTab.Seasons -> "Seasons"
+                                NavigationTab.Timeline -> "Timeline"
                                 else -> user?.displayName ?: "Tandem"
                             },
                             style = MaterialTheme.typography.titleLarge
@@ -162,7 +162,7 @@ fun MainScreen(
                 snackbarHostState = snackbarHostState,
                 onProvideFab = { fab -> currentFab = fab },
                 onNavigateToPartnerInvite = onNavigateToPartnerInvite,
-                onNavigateToSeasons = { selectedTab = NavigationTab.Seasons },
+                onNavigateToSeasons = { selectedTab = NavigationTab.Timeline },
                 onNavigateToPlanning = onNavigateToPlanning,
                 onNavigateToReview = onNavigateToReview
             )
@@ -178,9 +178,13 @@ fun MainScreen(
                 onNavigateToGoalDetail = onNavigateToGoalDetail,
                 onClearFab = { currentFab = null }
             )
-            NavigationTab.Seasons -> {
-                currentFab = null
-                SeasonsScreen(contentPadding = paddingValues)
+            NavigationTab.Timeline -> {
+                TimelineScreen(
+                    contentPadding = paddingValues,
+                    onWeekClick = onNavigateToPastWeekDetail,
+                    onBackClick = { selectedTab = NavigationTab.Week },
+                    onProvideFab = { fab -> currentFab = fab }
+                )
             }
         }
     }

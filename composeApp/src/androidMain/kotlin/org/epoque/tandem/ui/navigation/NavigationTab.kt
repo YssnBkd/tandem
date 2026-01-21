@@ -4,11 +4,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.ViewTimeline
 import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.Eco
 import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.material.icons.outlined.ViewTimeline
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -43,16 +43,16 @@ sealed class NavigationTab(
         unselectedIcon = Icons.Outlined.Flag
     )
 
-    /** Seasons tab (Feature 009: UI Redesign) */
-    data object Seasons : NavigationTab(
-        route = Routes.Main.Seasons,
-        title = "Seasons",
-        selectedIcon = Icons.Filled.Eco,
-        unselectedIcon = Icons.Outlined.Eco
+    /** Timeline tab - shows all weeks history */
+    data object Timeline : NavigationTab(
+        route = Routes.Main.Timeline,
+        title = "Timeline",
+        selectedIcon = Icons.Filled.ViewTimeline,
+        unselectedIcon = Icons.Outlined.ViewTimeline
     )
 
     companion object {
-        val entries = listOf(Week, Progress, Goals, Seasons)
+        val entries = listOf(Week, Progress, Goals, Timeline)
 
         /** Saver for use with rememberSaveable */
         val Saver: Saver<NavigationTab, String> = Saver(

@@ -44,9 +44,9 @@ sealed interface Routes {
         @Serializable
         data object Goals : Main
 
-        /** Seasons tab content (Feature 009: UI Redesign) */
+        /** Timeline tab content - shows all weeks history */
         @Serializable
-        data object Seasons : Main
+        data object Timeline : Main
     }
 
     /**
@@ -128,5 +128,14 @@ sealed interface Routes {
         /** Partner settings screen */
         @Serializable
         data object Settings : Partner
+    }
+
+    /**
+     * Timeline feature routes.
+     */
+    sealed interface Timeline : Routes {
+        /** Timeline screen showing all weeks */
+        @Serializable
+        data object Home : Timeline
     }
 }

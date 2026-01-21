@@ -10,6 +10,7 @@ import org.epoque.tandem.di.progressModule
 import org.epoque.tandem.di.reviewModule
 import org.epoque.tandem.di.seedModule
 import org.epoque.tandem.di.taskModule
+import org.epoque.tandem.di.timelineModule
 import org.epoque.tandem.di.weekModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -40,6 +41,7 @@ class TandemApp : Application() {
                     partnerModule,
                     goalsModule,
                     progressModule,
+                    timelineModule,
                     // DEBUG only: Mock data seeder module
                     if (BuildConfig.DEBUG) seedModule else null
                 )
