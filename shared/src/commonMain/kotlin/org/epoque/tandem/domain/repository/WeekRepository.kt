@@ -2,6 +2,7 @@ package org.epoque.tandem.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import org.epoque.tandem.domain.model.Week
+import org.epoque.tandem.domain.model.WeekWithStats
 
 /**
  * Repository interface for week data access.
@@ -38,6 +39,15 @@ interface WeekRepository {
      * @return Flow of past weeks, ordered descending
      */
     fun observePastWeeks(currentWeekId: String, userId: String): Flow<List<Week>>
+
+    /**
+     * Observe all weeks with task statistics for timeline display.
+     * Returns weeks ordered by start_date DESC (most recent first).
+     *
+     * @param userId The user's ID
+     * @return Flow of weeks with task counts
+     */
+    fun observeWeeksWithStats(userId: String): Flow<List<WeekWithStats>>
 
     // ═══════════════════════════════════════════════════════════════════════════
     // READ OPERATIONS (One-shot)

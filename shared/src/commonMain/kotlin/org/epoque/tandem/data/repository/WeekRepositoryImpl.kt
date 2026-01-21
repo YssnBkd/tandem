@@ -17,6 +17,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import org.epoque.tandem.data.local.TandemDatabase
 import org.epoque.tandem.domain.model.Week
+import org.epoque.tandem.domain.model.WeekWithStats
 import org.epoque.tandem.domain.repository.WeekRepository
 
 /**
@@ -195,6 +196,30 @@ class WeekRepositoryImpl(
                 weeks
                     .filter { it.id < currentWeekId }
                     .map { it.toDomain() }
+            }
+    }
+
+    override fun observeWeeksWithStats(userId: String): Flow<List<WeekWithStats>> {
+        return queries.getAllWeeksWithTaskCounts(userId)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { results ->
+                results.map { row ->
+                    WeekWithStats(
+                        week = Week(
+                            id = row.id,
+                            startDate = row.start_date,
+                            endDate = row.end_date,
+                            userId = row.user_id,
+                            overallRating = row.overall_rating?.toInt(),
+                            reviewNote = row.review_note,
+                            reviewedAt = row.reviewed_at,
+                            planningCompletedAt = row.planning_completed_at
+                        ),
+                        totalTasks = row.total_tasks.toInt(),
+                        completedTasks = (row.completed_tasks ?: 0).toInt()
+                    )
+                }
             }
     }
 

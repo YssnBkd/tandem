@@ -69,3 +69,20 @@ UPDATE Week SET overall_rating = ?, review_note = ?, reviewed_at = ? WHERE id = 
 -- Count weeks by user
 countWeeksByUser:
 SELECT COUNT(*) FROM Week WHERE user_id = ?;
+
+-- ============================================================================
+-- TIMELINE FEATURE QUERIES
+-- ============================================================================
+
+-- Get all weeks with task counts for timeline display
+-- Returns weeks ordered by start_date DESC (most recent first)
+getAllWeeksWithTaskCounts:
+SELECT
+    w.*,
+    COUNT(t.id) AS total_tasks,
+    SUM(CASE WHEN t.status = 'COMPLETED' THEN 1 ELSE 0 END) AS completed_tasks
+FROM Week w
+LEFT JOIN Task t ON t.week_id = w.id AND t.owner_id = w.user_id AND t.parent_task_id IS NULL
+WHERE w.user_id = :userId
+GROUP BY w.id
+ORDER BY w.start_date DESC;
