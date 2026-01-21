@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tandem - Timeline</title>
+    <style>
+        /* ========================================
+           DESIGN SYSTEM TOKENS
+           ======================================== */
+        :root {
+            /* Primary - Warm Terracotta */
+            --tandem-primary: #D97757;
+            --tandem-on-primary: #FFFFFF;
+            --tandem-primary-container: #FDF2EF;
+            --tandem-on-primary-container: #4A4238;
+
+            /* Secondary */
+            --tandem-secondary: #9C9488;
+            --tandem-secondary-container: #F0EBE6;
+            --tandem-on-secondary-container: #4A4238;
+
+            /* Tertiary - Coral */
+            --tandem-tertiary: #E07A5F;
+            --tandem-tertiary-container: #FFE5DE;
+
+            /* Background & Surface */
+            --background: #FFFBF7;
+            --on-background: #4A4238;
+            --surface: #FFFFFF;
+            --on-surface: #4A4238;
+            --surface-variant: #F0EBE6;
+            --on-surface-variant: #9C9488;
+            --outline: #E0DCD6;
+            --outline-light: #E0DCD6;
+
+            /* Priority Colors */
+            --priority-p1: #D1453B;
+            --priority-p1-light: rgba(209, 69, 59, 0.1);
+            --priority-p2: #EB8909;
+            --priority-p2-light: rgba(235, 137, 9, 0.1);
+            --priority-p3: #246FE0;
+            --priority-p3-light: rgba(36, 111, 224, 0.1);
+            --priority-p4: #79747E;
+
+            /* Status Colors */
+            --overdue-red: #D1453B;
+            --schedule-green: #058527;
+            --today-blue: #246FE0;
+            --coral-dark: #DC4C3E;
+
+            /* Typography */
+            --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Roboto', sans-serif;
+
+            /* Spacing */
+            --spacing-2: 2px;
+            --spacing-4: 4px;
+            --spacing-6: 6px;
+            --spacing-8: 8px;
+            --spacing-12: 12px;
+            --spacing-16: 16px;
+            --spacing-24: 24px;
+            --spacing-32: 32px;
+
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 50px;
+        }
+
+        /* ========================================
+           RESET & BASE
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background);
+            color: var(--on-background);
+            line-height: 1.5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ========================================
+           APP CONTAINER (Mobile Frame)
+           ======================================== */
+        .app-container {
+            max-width: 390px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--background);
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
+        }
+
+        /* ========================================
+           TOP NAV BAR
+           ======================================== */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--background);
+            padding: var(--spacing-16);
+            padding-top: var(--spacing-24);
+            border-bottom: 1px solid var(--outline);
+        }
+
+        .top-nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--on-background);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--spacing-8);
+        }
+
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: var(--surface);
+            color: var(--on-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--surface-variant);
+        }
+
+        .nav-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ========================================
+           FILTER BAR
+           ======================================== */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-8);
+            padding: var(--spacing-8) var(--spacing-16);
+            background: var(--background);
+            border-bottom: 1px solid var(--outline);
+        }
+
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-4);
+            padding: var(--spacing-6) var(--spacing-12);
+            border-radius: var(--radius-full);
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--on-surface-variant);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active {
+            background: var(--tandem-primary-container);
+            border-color: var(--tandem-primary);
+            color: var(--tandem-primary);
+        }
+
+        .filter-chip svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ========================================
+           TIMELINE CONTENT
+           ======================================== */
+        .timeline-content {
+            padding-bottom: 100px;
+        }
+
+        /* ========================================
+           STICKY SECTION HEADER (Quarter - Month)
+           ======================================== */
+        .section-header {
+            position: sticky;
+            top: 89px; /* Below nav */
+            z-index: 50;
+            background: var(--background);
+            padding: var(--spacing-12) var(--spacing-16);
+            border-bottom: 1px solid var(--outline);
+        }
+
+        .section-header-content {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-8);
+        }
+
+        .section-quarter {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--tandem-primary);
+            background: var(--tandem-primary-container);
+            padding: var(--spacing-4) var(--spacing-8);
+            border-radius: var(--radius-sm);
+        }
+
+        .section-month {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--on-background);
+        }
+
+        .section-year {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--on-surface-variant);
+        }
+
+        /* ========================================
+           WEEK CARD
+           ======================================== */
+        .week-card {
+            margin: var(--spacing-8) var(--spacing-16);
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--outline);
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .week-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .week-card.current {
+            border: 2px solid var(--tandem-primary);
+            background: linear-gradient(to bottom, var(--tandem-primary-container), var(--surface));
+        }
+
+        .week-card.current .current-badge {
+            display: flex;
+        }
+
+        .week-card-header {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-12) var(--spacing-16);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .week-card-header:active {
+            background: var(--surface-variant);
+        }
+
+        .week-info {
+            flex: 1;
+        }
+
+        .week-label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-8);
+        }
+
+        .week-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .current-badge {
+            display: none;
+            align-items: center;
+            gap: var(--spacing-4);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--tandem-primary);
+            background: var(--tandem-on-primary);
+            padding: var(--spacing-2) var(--spacing-6);
+            border-radius: var(--radius-full);
+        }
+
+        .week-dates {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+            margin-top: var(--spacing-2);
+        }
+
+        .week-stats {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-12);
+        }
+
+        .task-ratio {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-6);
+        }
+
+        .ratio-bar {
+            width: 40px;
+            height: 4px;
+            background: var(--surface-variant);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .ratio-fill {
+            height: 100%;
+            background: var(--schedule-green);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .ratio-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--on-surface-variant);
+        }
+
+        .expand-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--on-surface-variant);
+            transition: transform 0.2s ease;
+        }
+
+        .week-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        /* ========================================
+           WEEK CARD EXPANDED CONTENT
+           ======================================== */
+        .week-card-body {
+            display: none;
+            border-top: 1px solid var(--outline);
+        }
+
+        .week-card.expanded .week-card-body {
+            display: block;
+        }
+
+        .task-list {
+            padding: var(--spacing-8) 0;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            padding: var(--spacing-8) var(--spacing-16);
+            gap: var(--spacing-12);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--priority-p4);
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+
+        .task-checkbox.p1 {
+            border-color: var(--priority-p1);
+            background: var(--priority-p1-light);
+        }
+
+        .task-checkbox.p2 {
+            border-color: var(--priority-p2);
+            background: var(--priority-p2-light);
+        }
+
+        .task-checkbox.p3 {
+            border-color: var(--priority-p3);
+            background: var(--priority-p3-light);
+        }
+
+        .task-checkbox.completed {
+            border-color: var(--outline-light);
+            background: var(--outline-light);
+        }
+
+        .task-checkbox.completed svg {
+            width: 12px;
+            height: 12px;
+            color: white;
+        }
+
+        .task-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-title {
+            font-size: 14px;
+            color: var(--on-surface);
+            line-height: 1.4;
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: var(--on-surface-variant);
+            opacity: 0.6;
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-8);
+            margin-top: var(--spacing-4);
+            font-size: 11px;
+            color: var(--on-surface-variant);
+        }
+
+        .task-meta svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .task-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-4);
+        }
+
+        .task-goal-tag {
+            font-size: 10px;
+            font-weight: 500;
+            padding: var(--spacing-2) var(--spacing-6);
+            border-radius: var(--radius-sm);
+            background: var(--tandem-tertiary-container);
+            color: var(--tandem-tertiary);
+        }
+
+        .partner-assigned {
+            color: var(--tandem-tertiary);
+        }
+
+        /* Week Card Footer */
+        .week-card-footer {
+            display: flex;
+            justify-content: center;
+            padding: var(--spacing-8) var(--spacing-16);
+            border-top: 1px solid var(--outline);
+        }
+
+        .view-detail-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-6);
+            padding: var(--spacing-8) var(--spacing-16);
+            border-radius: var(--radius-full);
+            background: var(--tandem-primary-container);
+            border: none;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--tandem-primary);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .view-detail-btn:hover {
+            background: var(--tandem-tertiary-container);
+        }
+
+        .view-detail-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ========================================
+           GAP INDICATOR
+           ======================================== */
+        .gap-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-8);
+            padding: var(--spacing-16) var(--spacing-16);
+            color: var(--on-surface-variant);
+        }
+
+        .gap-dots {
+            display: flex;
+            gap: var(--spacing-4);
+        }
+
+        .gap-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--outline);
+        }
+
+        .gap-text {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--on-surface-variant);
+        }
+
+        .gap-indicator:hover {
+            cursor: pointer;
+        }
+
+        .gap-indicator:hover .gap-text {
+            color: var(--tandem-primary);
+            text-decoration: underline;
+        }
+
+        /* ========================================
+           FLOATING "BACK TO TODAY" BUTTON
+           ======================================== */
+        .back-to-today {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            align-items: center;
+            gap: var(--spacing-8);
+            padding: var(--spacing-12) var(--spacing-24);
+            background: var(--on-background);
+            color: var(--surface);
+            border: none;
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            z-index: 200;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .back-to-today.visible {
+            display: flex;
+        }
+
+        .back-to-today:hover {
+            transform: translateX(-50%) scale(1.02);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+
+        .back-to-today svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ========================================
+           EMPTY STATE
+           ======================================== */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-32);
+            text-align: center;
+            min-height: 60vh;
+        }
+
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: var(--spacing-24);
+            color: var(--outline);
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: var(--spacing-8);
+        }
+
+        .empty-state-description {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+            max-width: 280px;
+        }
+
+        /* ========================================
+           ANIMATIONS
+           ======================================== */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .week-card {
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        /* Stagger animation for cards */
+        .week-card:nth-child(1) { animation-delay: 0ms; }
+        .week-card:nth-child(2) { animation-delay: 50ms; }
+        .week-card:nth-child(3) { animation-delay: 100ms; }
+        .week-card:nth-child(4) { animation-delay: 150ms; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="top-nav-content">
+                <h1 class="nav-title">Timeline</h1>
+                <div class="nav-actions">
+                    <button class="nav-btn" id="filterBtn" title="Filter">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <button class="filter-chip active" id="hideEmptyChip">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Hide empty weeks
+            </button>
+        </div>
+
+        <!-- Timeline Content -->
+        <div class="timeline-content">
+
+            <!-- Q1 - January 2025 Section -->
+            <div class="section-header">
+                <div class="section-header-content">
+                    <span class="section-quarter">Q1</span>
+                    <span class="section-month">January</span>
+                    <span class="section-year">2025</span>
+                </div>
+            </div>
+
+            <!-- Current Week -->
+            <div class="week-card current expanded" id="currentWeek">
+                <div class="week-card-header" onclick="toggleWeek(this)">
+                    <div class="week-info">
+                        <div class="week-label">
+                            <span class="week-title">Week of Jan 20</span>
+                            <span class="current-badge">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
+                                    <circle cx="12" cy="12" r="10"/>
+                                </svg>
+                                This week
+                            </span>
+                        </div>
+                        <div class="week-dates">Mon 20 – Sun 26</div>
+                    </div>
+                    <div class="week-stats">
+                        <div class="task-ratio">
+                            <div class="ratio-bar">
+                                <div class="ratio-fill" style="width: 58%"></div>
+                            </div>
+                            <span class="ratio-text">7/12</span>
+                        </div>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="week-card-body">
+                    <div class="task-list">
+                        <div class="task-item completed">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Review Q4 financial reports</div>
+                                <div class="task-meta">
+                                    <span class="task-goal-tag">💰 Finances</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-item completed">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Book dentist appointment</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-checkbox p1"></div>
+                            <div class="task-content">
+                                <div class="task-title">Finalize project proposal</div>
+                                <div class="task-meta">
+                                    <span class="task-meta-item partner-assigned">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                        </svg>
+                                        From Sarah
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-checkbox p2"></div>
+                            <div class="task-content">
+                                <div class="task-title">Call insurance company about claim</div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-checkbox p3"></div>
+                            <div class="task-content">
+                                <div class="task-title">Research vacation destinations</div>
+                                <div class="task-meta">
+                                    <span class="task-goal-tag">✈️ Travel</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="week-card-footer">
+                        <button class="view-detail-btn">
+                            View full week
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 2 -->
+            <div class="week-card" id="week2">
+                <div class="week-card-header" onclick="toggleWeek(this)">
+                    <div class="week-info">
+                        <div class="week-label">
+                            <span class="week-title">Week of Jan 13</span>
+                        </div>
+                        <div class="week-dates">Mon 13 – Sun 19</div>
+                    </div>
+                    <div class="week-stats">
+                        <div class="task-ratio">
+                            <div class="ratio-bar">
+                                <div class="ratio-fill" style="width: 100%"></div>
+                            </div>
+                            <span class="ratio-text">10/10</span>
+                        </div>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="week-card-body">
+                    <div class="task-list">
+                        <div class="task-item completed">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Submit tax documents</div>
+                                <div class="task-meta">
+                                    <span class="task-goal-tag">💰 Finances</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-item completed">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Meal prep for the week</div>
+                                <div class="task-meta">
+                                    <span class="task-goal-tag">🥗 Health</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task-item completed">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Schedule car service</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="week-card-footer">
+                        <button class="view-detail-btn">
+                            View full week
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 3 -->
+            <div class="week-card">
+                <div class="week-card-header" onclick="toggleWeek(this)">
+                    <div class="week-info">
+                        <div class="week-label">
+                            <span class="week-title">Week of Jan 6</span>
+                        </div>
+                        <div class="week-dates">Mon 6 – Sun 12</div>
+                    </div>
+                    <div class="week-stats">
+                        <div class="task-ratio">
+                            <div class="ratio-bar">
+                                <div class="ratio-fill" style="width: 75%"></div>
+                            </div>
+                            <span class="ratio-text">6/8</span>
+                        </div>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="week-card-body">
+                    <div class="task-list">
+                        <div class="task-item completed">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Set yearly goals</div>
+                            </div>
+                        </div>
+                        <div class="task-item completed">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Organize home office</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="week-card-footer">
+                        <button class="view-detail-btn">
+                            View full week
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gap Indicator -->
+            <div class="gap-indicator" onclick="showEmptyWeeks()">
+                <div class="gap-dots">
+                    <span class="gap-dot"></span>
+                    <span class="gap-dot"></span>
+                    <span class="gap-dot"></span>
+                </div>
+                <span class="gap-text">2 empty weeks</span>
+                <div class="gap-dots">
+                    <span class="gap-dot"></span>
+                    <span class="gap-dot"></span>
+                    <span class="gap-dot"></span>
+                </div>
+            </div>
+
+            <!-- Q4 2024 Section -->
+            <div class="section-header">
+                <div class="section-header-content">
+                    <span class="section-quarter">Q4</span>
+                    <span class="section-month">December</span>
+                    <span class="section-year">2024</span>
+                </div>
+            </div>
+
+            <!-- Week Dec 16 -->
+            <div class="week-card">
+                <div class="week-card-header" onclick="toggleWeek(this)">
+                    <div class="week-info">
+                        <div class="week-label">
+                            <span class="week-title">Week of Dec 16</span>
+                        </div>
+                        <div class="week-dates">Mon 16 – Sun 22</div>
+                    </div>
+                    <div class="week-stats">
+                        <div class="task-ratio">
+                            <div class="ratio-bar">
+                                <div class="ratio-fill" style="width: 85%"></div>
+                            </div>
+                            <span class="ratio-text">11/13</span>
+                        </div>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="week-card-body">
+                    <div class="task-list">
+                        <div class="task-item completed">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Buy holiday gifts</div>
+                            </div>
+                        </div>
+                        <div class="task-item completed">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Plan holiday dinner menu</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="week-card-footer">
+                        <button class="view-detail-btn">
+                            View full week
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week Dec 9 -->
+            <div class="week-card">
+                <div class="week-card-header" onclick="toggleWeek(this)">
+                    <div class="week-info">
+                        <div class="week-label">
+                            <span class="week-title">Week of Dec 9</span>
+                        </div>
+                        <div class="week-dates">Mon 9 – Sun 15</div>
+                    </div>
+                    <div class="week-stats">
+                        <div class="task-ratio">
+                            <div class="ratio-bar">
+                                <div class="ratio-fill" style="width: 66%"></div>
+                            </div>
+                            <span class="ratio-text">4/6</span>
+                        </div>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="week-card-body">
+                    <div class="task-list">
+                        <div class="task-item completed">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Year-end review at work</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="week-card-footer">
+                        <button class="view-detail-btn">
+                            View full week
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- November Section -->
+            <div class="section-header">
+                <div class="section-header-content">
+                    <span class="section-quarter">Q4</span>
+                    <span class="section-month">November</span>
+                    <span class="section-year">2024</span>
+                </div>
+            </div>
+
+            <!-- Week Nov 25 -->
+            <div class="week-card">
+                <div class="week-card-header" onclick="toggleWeek(this)">
+                    <div class="week-info">
+                        <div class="week-label">
+                            <span class="week-title">Week of Nov 25</span>
+                        </div>
+                        <div class="week-dates">Mon 25 – Sun 1</div>
+                    </div>
+                    <div class="week-stats">
+                        <div class="task-ratio">
+                            <div class="ratio-bar">
+                                <div class="ratio-fill" style="width: 90%"></div>
+                            </div>
+                            <span class="ratio-text">9/10</span>
+                        </div>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="week-card-body">
+                    <div class="task-list">
+                        <div class="task-item completed">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Thanksgiving prep</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="week-card-footer">
+                        <button class="view-detail-btn">
+                            View full week
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Back to Today Button -->
+        <button class="back-to-today" id="backToToday">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="18 15 12 9 6 15"/>
+            </svg>
+            Back to this week
+        </button>
+    </div>
+
+    <script>
+        // Toggle week card expansion
+        function toggleWeek(header) {
+            const card = header.closest('.week-card');
+            card.classList.toggle('expanded');
+        }
+
+        // Show empty weeks (placeholder)
+        function showEmptyWeeks() {
+            alert('This would expand to show the 2 empty weeks in this gap.');
+        }
+
+        // Back to Today button visibility
+        const backToTodayBtn = document.getElementById('backToToday');
+        const currentWeek = document.getElementById('currentWeek');
+
+        function checkScrollPosition() {
+            const rect = currentWeek.getBoundingClientRect();
+            const isCurrentWeekVisible = rect.top >= 0 && rect.top <= window.innerHeight;
+
+            if (isCurrentWeekVisible) {
+                backToTodayBtn.classList.remove('visible');
+            } else {
+                backToTodayBtn.classList.add('visible');
+            }
+        }
+
+        // Scroll to current week
+        backToTodayBtn.addEventListener('click', () => {
+            currentWeek.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        // Listen for scroll
+        window.addEventListener('scroll', checkScrollPosition);
+
+        // Filter toggle
+        const hideEmptyChip = document.getElementById('hideEmptyChip');
+        hideEmptyChip.addEventListener('click', () => {
+            hideEmptyChip.classList.toggle('active');
+            // Toggle would show/hide gap indicators and empty weeks
+        });
+
+        // Initial check
+        checkScrollPosition();
+    </script>
+</body>
+</html>
