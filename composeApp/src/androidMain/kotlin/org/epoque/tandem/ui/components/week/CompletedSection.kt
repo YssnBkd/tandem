@@ -23,8 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import org.epoque.tandem.ui.theme.TandemSizing
+import org.epoque.tandem.ui.theme.TandemSpacing
+import org.epoque.tandem.ui.theme.TandemTypography
 
 /**
  * Collapsible section for completed tasks.
@@ -82,7 +83,10 @@ private fun CompletedSectionHeader(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(
+                horizontal = TandemSpacing.List.itemHorizontalPadding,
+                vertical = TandemSpacing.List.itemVerticalPadding
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Chevron icon
@@ -90,20 +94,17 @@ private fun CompletedSectionHeader(
             imageVector = Icons.Default.ChevronRight,
             contentDescription = if (expanded) "Collapse" else "Expand",
             modifier = Modifier
-                .size(16.dp)
+                .size(TandemSizing.Icon.md)
                 .rotate(rotation),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(TandemSpacing.xs))
 
         // Count text
         Text(
             text = "$count completed",
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp
-            ),
+            style = TandemTypography.titleSmall.copy(fontWeight = FontWeight.Medium),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

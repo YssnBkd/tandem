@@ -24,8 +24,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.epoque.tandem.ui.theme.TandemSpacing
 import org.epoque.tandem.presentation.week.WeekEvent
 import org.epoque.tandem.presentation.week.WeekSideEffect
 import org.epoque.tandem.presentation.week.WeekViewModel
@@ -218,7 +218,10 @@ fun WeekScreen(
                         onSegmentSelected = { index ->
                             viewModel.onEvent(WeekEvent.SegmentSelected(Segment.entries[index]))
                         },
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        modifier = Modifier.padding(
+                            horizontal = TandemSpacing.Screen.horizontalPadding,
+                            vertical = TandemSpacing.xs
+                        )
                     )
                 }
 
@@ -330,7 +333,7 @@ fun WeekScreen(
 
                 // Bottom padding for FAB
                 item {
-                    Spacer(modifier = Modifier.height(80.dp))
+                    Spacer(modifier = Modifier.height(TandemSpacing.Screen.bottomPaddingWithFab))
                 }
             }
         }
@@ -430,12 +433,12 @@ private fun EmptyStateContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(32.dp),
+            .padding(TandemSpacing.xl),
         contentAlignment = Alignment.Center
     ) {
         androidx.compose.foundation.layout.Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp)
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(TandemSpacing.md)
         ) {
             androidx.compose.material3.Text(
                 text = message,

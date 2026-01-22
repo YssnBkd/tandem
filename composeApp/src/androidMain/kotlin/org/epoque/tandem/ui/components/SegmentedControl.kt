@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,9 +19,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.epoque.tandem.ui.theme.GoalPrimary
 import org.epoque.tandem.ui.theme.GoalTextMuted
+import org.epoque.tandem.ui.theme.TandemShapes
+import org.epoque.tandem.ui.theme.TandemSpacing
+import org.epoque.tandem.ui.theme.TandemTextStyles
 
 /**
  * A reusable segmented control component with pill-style selection.
@@ -49,9 +51,9 @@ fun SegmentedControl(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(percent = 50))
+            .clip(TandemShapes.pill)
             .background(backgroundColor)
-            .padding(3.dp)
+            .padding(TandemSpacing.xxxs)
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             segments.forEachIndexed { index, label ->
@@ -66,17 +68,17 @@ fun SegmentedControl(
                                 interactionSource = interactionSource,
                                 indication = null
                             ) { onSegmentSelected(index) },
-                        shape = RoundedCornerShape(percent = 50),
+                        shape = TandemShapes.pill,
                         color = Color.White,
                         shadowElevation = pillElevation
                     ) {
                         Box(
-                            modifier = Modifier.padding(vertical = 6.dp),
+                            modifier = Modifier.padding(vertical = TandemSpacing.sm),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = label,
-                                fontSize = 12.sp,
+                                style = TandemTextStyles.Label.small,
                                 fontWeight = FontWeight.SemiBold,
                                 color = selectedColor
                             )
@@ -86,17 +88,17 @@ fun SegmentedControl(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .clip(RoundedCornerShape(percent = 50))
+                            .clip(TandemShapes.pill)
                             .clickable(
                                 interactionSource = interactionSource,
                                 indication = null
                             ) { onSegmentSelected(index) }
-                            .padding(vertical = 6.dp),
+                            .padding(vertical = TandemSpacing.sm),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = label,
-                            fontSize = 12.sp,
+                            style = TandemTextStyles.Label.small,
                             fontWeight = FontWeight.SemiBold,
                             color = unselectedColor
                         )

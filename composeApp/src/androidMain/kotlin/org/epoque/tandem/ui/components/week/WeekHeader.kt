@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
@@ -21,10 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.epoque.tandem.ui.theme.TandemOnPrimaryContainer
 import org.epoque.tandem.ui.theme.TandemPrimaryContainer
+import org.epoque.tandem.ui.theme.TandemShapes
+import org.epoque.tandem.ui.theme.TandemSizing
+import org.epoque.tandem.ui.theme.TandemSpacing
+import org.epoque.tandem.ui.theme.TandemTextStyles
+import org.epoque.tandem.ui.theme.TandemTypography
 
 /**
  * Week header showing title, subtitle, and Season context chip.
@@ -41,32 +43,30 @@ fun WeekHeader(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(
+                horizontal = TandemSpacing.Screen.horizontalPadding,
+                vertical = TandemSpacing.sm
+            )
     ) {
         // Title
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            ),
+            style = TandemTextStyles.Title.section.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onBackground
         )
 
-        Spacer(modifier = Modifier.height(2.dp))
+        Spacer(modifier = Modifier.height(TandemSpacing.xxxs))
 
         // Subtitle (date range · task count)
         Text(
             text = subtitle,
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontSize = 14.sp
-            ),
+            style = TandemTypography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         // Season context chip
         if (seasonInfo != null) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(TandemSpacing.xs))
             SeasonContextChip(
                 text = seasonInfo,
                 onClick = onSeasonClick
@@ -87,27 +87,27 @@ private fun SeasonContextChip(
 ) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(50))
+            .clip(TandemShapes.pill)
             .background(TandemPrimaryContainer)
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 4.dp),
+            .padding(
+                horizontal = TandemSpacing.Chip.horizontalPadding,
+                vertical = TandemSpacing.Chip.verticalPaddingCompact
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.Medium,
-                fontSize = 12.sp
-            ),
+            style = TandemTextStyles.Label.small.copy(fontWeight = FontWeight.Medium),
             color = TandemOnPrimaryContainer
         )
 
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(TandemSpacing.xxs))
 
         Icon(
             imageVector = Icons.Default.ChevronRight,
             contentDescription = "View season",
-            modifier = Modifier.size(12.dp),
+            modifier = Modifier.size(TandemSizing.Icon.xs),
             tint = TandemOnPrimaryContainer
         )
     }

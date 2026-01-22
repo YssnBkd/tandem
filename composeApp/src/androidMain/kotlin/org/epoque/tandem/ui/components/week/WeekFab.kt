@@ -2,7 +2,6 @@ package org.epoque.tandem.ui.components.week
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -29,6 +28,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import org.epoque.tandem.ui.theme.CoralDark
+import org.epoque.tandem.ui.theme.TandemShapes
+import org.epoque.tandem.ui.theme.TandemSizing
 
 /**
  * Expandable FAB menu for Week screen actions.
@@ -119,8 +120,8 @@ fun WeekFab(
 ) {
     FloatingActionButton(
         onClick = onClick,
-        modifier = modifier.size(52.dp),
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.size(52.dp), // Intentionally smaller than standard 56dp FAB
+        shape = TandemShapes.lg,
         containerColor = CoralDark,
         contentColor = Color.White,
         elevation = FloatingActionButtonDefaults.elevation(
@@ -131,7 +132,7 @@ fun WeekFab(
         Icon(
             imageVector = Icons.Default.Add,
             contentDescription = "Add task",
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(TandemSizing.Icon.xl)
         )
     }
 }

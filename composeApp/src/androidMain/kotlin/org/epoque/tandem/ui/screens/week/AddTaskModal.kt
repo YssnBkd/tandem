@@ -57,6 +57,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.Clock
+import org.epoque.tandem.ui.theme.TandemShapes
+import org.epoque.tandem.ui.theme.TandemSizing
+import org.epoque.tandem.ui.theme.TandemSpacing
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -102,7 +105,7 @@ fun AddTaskModal(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         modifier = modifier,
-        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        shape = TandemShapes.Sheet.bottomSheet,
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = { WindowInsets.ime },
         dragHandle = { DragHandle() }
@@ -123,14 +126,14 @@ private fun DragHandle() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
+            .padding(vertical = TandemSpacing.sm),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
                 .width(36.dp)
                 .height(4.dp)
-                .clip(RoundedCornerShape(2.dp))
+                .clip(TandemShapes.xs)
                 .background(DragHandleColor)
         )
     }
@@ -187,8 +190,8 @@ private fun AddTaskContent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 16.dp)
+            .padding(horizontal = TandemSpacing.Sheet.horizontalPadding)
+            .padding(bottom = TandemSpacing.md)
     ) {
         // Project selector header (placeholder)
         ProjectSelectorRow(
@@ -196,7 +199,7 @@ private fun AddTaskContent(
             onProjectClick = { /* TODO: Open project picker */ }
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(TandemSpacing.xs))
 
         // Task name input
         TaskNameInput(
@@ -206,7 +209,7 @@ private fun AddTaskContent(
             error = state.titleError
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(TandemSpacing.xs))
 
         // Description input
         DescriptionInput(
@@ -214,7 +217,7 @@ private fun AddTaskContent(
             onValueChange = { onEvent(WeekEvent.AddTaskDescriptionChanged(it)) }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(TandemSpacing.md))
 
         // Compact metadata row
         CompactMetadataRow(
@@ -233,7 +236,7 @@ private fun AddTaskContent(
             onLabelsClick = { showLabelSelector = true }
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(TandemSpacing.xs))
 
         // Goal row
         GoalRow(
@@ -241,7 +244,7 @@ private fun AddTaskContent(
             onClick = { showGoalSelector = true }
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(TandemSpacing.xs))
 
         // Options chips row
         OptionsChipRow(
@@ -255,7 +258,7 @@ private fun AddTaskContent(
             repeatSet = repeatSet
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(TandemSpacing.md))
 
         // Submit button
         Button(
@@ -369,10 +372,10 @@ private fun ProjectSelectorRow(
         Icon(
             imageVector = Icons.Outlined.FolderOpen,
             contentDescription = null,
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(TandemSizing.Icon.md),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(TandemSpacing.xs))
         Text(
             text = selectedProject,
             style = MaterialTheme.typography.bodyMedium,
@@ -381,7 +384,7 @@ private fun ProjectSelectorRow(
         Icon(
             imageVector = Icons.Default.ChevronRight,
             contentDescription = null,
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(TandemSizing.Icon.md),
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
         )
     }
@@ -405,8 +408,7 @@ private fun TaskNameInput(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
-            textStyle = TextStyle(
-                fontSize = 18.sp,
+            textStyle = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface
             ),
@@ -417,8 +419,7 @@ private fun TaskNameInput(
                     if (value.isEmpty()) {
                         Text(
                             text = "Task name",
-                            style = TextStyle(
-                                fontSize = 18.sp,
+                            style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Medium,
                                 color = PlaceholderColor
                             )
@@ -433,7 +434,7 @@ private fun TaskNameInput(
                 text = error,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = TandemSpacing.xxs)
             )
         }
     }
@@ -452,11 +453,9 @@ private fun DescriptionInput(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier.fillMaxWidth(),
-        textStyle = TextStyle(
-            fontSize = 14.sp,
+        textStyle = MaterialTheme.typography.bodyMedium.copy(
             fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.onSurface,
-            lineHeight = 20.sp
+            color = MaterialTheme.colorScheme.onSurface
         ),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         singleLine = false,
@@ -466,8 +465,7 @@ private fun DescriptionInput(
                 if (value.isEmpty()) {
                     Text(
                         text = "Description",
-                        style = TextStyle(
-                            fontSize = 14.sp,
+                        style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Normal,
                             color = PlaceholderColor
                         )
@@ -504,7 +502,7 @@ private fun CompactMetadataRow(
         modifier = modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(TandemSpacing.sm),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Owner chip with anchored popover
@@ -590,18 +588,21 @@ private fun MetadataChip(
 ) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(TandemShapes.lg)
             .background(ChipBackground)
             .focusProperties { canFocus = false }
             .clickable(onClick = onClick)
-            .padding(horizontal = 10.dp, vertical = 6.dp),
+            .padding(
+                horizontal = TandemSpacing.Chip.horizontalPadding,
+                vertical = TandemSpacing.Chip.verticalPaddingCompact
+            ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(TandemSpacing.xxs)
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(14.dp),
+            modifier = Modifier.size(TandemSizing.Icon.sm),
             tint = iconTint
         )
         Text(
@@ -624,17 +625,20 @@ private fun MetadataChipWithEmoji(
 ) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(TandemShapes.lg)
             .background(ChipBackground)
             .focusProperties { canFocus = false }
             .clickable(onClick = onClick)
-            .padding(horizontal = 10.dp, vertical = 6.dp),
+            .padding(
+                horizontal = TandemSpacing.Chip.horizontalPadding,
+                vertical = TandemSpacing.Chip.verticalPaddingCompact
+            ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(TandemSpacing.xxs)
     ) {
         Text(
             text = emoji,
-            fontSize = 12.sp
+            style = MaterialTheme.typography.labelSmall
         )
         Text(
             text = text,
@@ -655,19 +659,22 @@ private fun LabelChip(
 ) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(TandemShapes.lg)
             .background(ChipBackground)
             .focusProperties { canFocus = false }
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .padding(
+                horizontal = TandemSpacing.Chip.horizontalPadding,
+                vertical = TandemSpacing.Chip.verticalPaddingCompact
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(8.dp)
-                .background(label.color, RoundedCornerShape(4.dp))
+                .size(TandemSizing.Indicator.badge)
+                .background(label.color, TandemShapes.xs)
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(TandemSpacing.Inline.iconTextGap))
         Text(
             text = label.name,
             style = MaterialTheme.typography.labelMedium,
@@ -696,7 +703,7 @@ private fun OptionsChipRow(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(1.dp)
+                .height(TandemSizing.Border.hairline)
                 .background(DividerColor)
         )
 
@@ -704,8 +711,8 @@ private fun OptionsChipRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
-                .padding(vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(vertical = TandemSpacing.sm),
+            horizontalArrangement = Arrangement.spacedBy(TandemSpacing.xs)
         ) {
             OptionChip(
                 label = if (deadlineSet) "10:00 AM" else "Deadline",
@@ -759,20 +766,23 @@ private fun OptionChip(
 
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(20.dp))
+            .clip(TandemShapes.xl)
             .background(backgroundColor)
             .focusProperties { canFocus = false }
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(
+                horizontal = TandemSpacing.Chip.horizontalPadding,
+                vertical = TandemSpacing.Chip.verticalPadding
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(14.dp),
+            modifier = Modifier.size(TandemSizing.Icon.sm),
             tint = contentColor
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(TandemSpacing.Inline.iconTextGap))
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
@@ -796,17 +806,17 @@ private fun GoalRow(
             .fillMaxWidth()
             .focusProperties { canFocus = false }
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
+            .padding(vertical = TandemSpacing.xs),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (selectedGoal != null) {
             // Show selected goal
             Text(
                 text = selectedGoal.emoji,
-                fontSize = 18.sp,
-                modifier = Modifier.width(24.dp)
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.width(TandemSizing.Icon.xl)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(TandemSpacing.xs))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = selectedGoal.name,
@@ -827,10 +837,10 @@ private fun GoalRow(
             // Show placeholder
             Text(
                 text = "\uD83C\uDFAF", // 🎯 target emoji
-                fontSize = 18.sp,
-                modifier = Modifier.width(24.dp)
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.width(TandemSizing.Icon.xl)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(TandemSpacing.xs))
             Text(
                 text = "Add goal",
                 style = MaterialTheme.typography.bodyMedium,
@@ -841,7 +851,7 @@ private fun GoalRow(
         Icon(
             imageVector = Icons.Default.ChevronRight,
             contentDescription = null,
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(TandemSizing.Icon.md),
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
         )
     }

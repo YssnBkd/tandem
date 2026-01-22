@@ -25,8 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import org.epoque.tandem.domain.model.TaskPriority
+import org.epoque.tandem.ui.theme.TandemSizing
 import org.epoque.tandem.ui.theme.PriorityP1
 import org.epoque.tandem.ui.theme.PriorityP1Light
 import org.epoque.tandem.ui.theme.PriorityP2
@@ -53,7 +53,7 @@ fun PriorityCheckbox(
     priority: TaskPriority,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    size: Dp = 20.dp,
+    size: Dp = TandemSizing.Checkbox.visualSize,
     enabled: Boolean = true
 ) {
     val haptic = LocalHapticFeedback.current
@@ -99,7 +99,7 @@ fun PriorityCheckbox(
             .clip(CircleShape)
             .background(color = backgroundColor)
             .border(
-                width = 2.dp,
+                width = TandemSizing.Border.emphasis,
                 color = borderColor,
                 shape = CircleShape
             )
@@ -140,7 +140,7 @@ fun LargePriorityCheckbox(
         priority = priority,
         onCheckedChange = onCheckedChange,
         modifier = modifier,
-        size = 32.dp,
+        size = TandemSizing.Checkbox.visualSizeLarge,
         enabled = enabled
     )
 }

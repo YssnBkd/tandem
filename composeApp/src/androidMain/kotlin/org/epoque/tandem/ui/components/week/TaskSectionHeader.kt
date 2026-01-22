@@ -6,10 +6,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.epoque.tandem.presentation.week.model.TaskSection
 import org.epoque.tandem.ui.theme.OverdueRed
+import org.epoque.tandem.ui.theme.TandemSpacing
+import org.epoque.tandem.ui.theme.TandemTextStyles
 
 /**
  * Section header for task groups (Overdue, Today, Tomorrow, Later this week).
@@ -37,16 +37,13 @@ fun TaskSectionHeader(
 
     Text(
         text = title,
-        style = MaterialTheme.typography.labelLarge.copy(
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        ),
+        style = TandemTextStyles.Title.listSection.copy(fontWeight = FontWeight.Bold),
         color = color,
         modifier = modifier.padding(
-            start = 16.dp,
-            end = 16.dp,
-            top = 16.dp,
-            bottom = 8.dp
+            start = TandemSpacing.List.itemHorizontalPadding,
+            end = TandemSpacing.List.itemHorizontalPadding,
+            top = TandemSpacing.List.sectionHeaderTopPadding,
+            bottom = TandemSpacing.List.sectionHeaderBottomPadding
         )
     )
 }

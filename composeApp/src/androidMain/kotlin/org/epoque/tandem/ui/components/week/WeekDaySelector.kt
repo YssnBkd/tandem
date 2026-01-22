@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -31,10 +30,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.epoque.tandem.ui.theme.TandemPrimary
 import org.epoque.tandem.ui.theme.TandemPrimaryContainer
+import org.epoque.tandem.ui.theme.TandemShapes
+import org.epoque.tandem.ui.theme.TandemSizing
+import org.epoque.tandem.ui.theme.TandemSpacing
+import org.epoque.tandem.ui.theme.TandemTextStyles
+import org.epoque.tandem.ui.theme.TandemTypography
 
 /**
  * Day item for the week selector.
@@ -63,18 +65,18 @@ fun WeekDaySelector(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp),
+            .padding(horizontal = TandemSpacing.xs, vertical = TandemSpacing.xs),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Previous week arrow
         IconButton(
             onClick = onPreviousWeek,
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(TandemSizing.minTouchTarget)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = "Previous week",
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(TandemSizing.Icon.lg),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -95,12 +97,12 @@ fun WeekDaySelector(
         // Next week arrow
         IconButton(
             onClick = onNextWeek,
-            modifier = Modifier.size(32.dp)
+            modifier = Modifier.size(TandemSizing.minTouchTarget)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Next week",
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(TandemSizing.Icon.lg),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -157,42 +159,37 @@ private fun DayChip(
 
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(TandemShapes.md)
             .background(backgroundColor)
             .clickable(onClick = onClick)
-            .padding(horizontal = 6.dp, vertical = 8.dp),
+            .padding(horizontal = TandemSpacing.xxs, vertical = TandemSpacing.xs),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Day abbreviation (SUN, MON, etc.)
         Text(
             text = day.dayName,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.Medium,
-                fontSize = 10.sp,
-                letterSpacing = 0.5.sp
-            ),
+            style = TandemTextStyles.Label.tabBar.copy(fontWeight = FontWeight.Medium),
             color = dayNameColor,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(2.dp))
+        Spacer(modifier = Modifier.height(TandemSpacing.xxxs))
 
         // Day number
         Text(
             text = day.dayNumber.toString(),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = if (day.isSelected || day.isToday) FontWeight.Bold else FontWeight.SemiBold,
-                fontSize = 16.sp
+            style = TandemTypography.titleLarge.copy(
+                fontWeight = if (day.isSelected || day.isToday) FontWeight.Bold else FontWeight.SemiBold
             ),
             color = dayNumberColor,
             textAlign = TextAlign.Center
         )
 
         // Task indicator dot
-        Spacer(modifier = Modifier.height(2.dp))
+        Spacer(modifier = Modifier.height(TandemSpacing.xxxs))
         Box(
             modifier = Modifier
-                .size(4.dp)
+                .size(TandemSizing.Indicator.dot)
                 .background(color = dotColor, shape = CircleShape)
         )
     }

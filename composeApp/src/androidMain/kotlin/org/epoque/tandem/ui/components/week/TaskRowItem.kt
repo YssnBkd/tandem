@@ -22,11 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.ui.theme.OverdueRed
 import org.epoque.tandem.ui.theme.ScheduleGreen
+import org.epoque.tandem.ui.theme.TandemSizing
+import org.epoque.tandem.ui.theme.TandemSpacing
+import org.epoque.tandem.ui.theme.TandemTextStyles
+import org.epoque.tandem.ui.theme.TandemTypography
 
 /**
  * UI model for a task in the week view.
@@ -58,7 +60,10 @@ fun TaskRowItem(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(
+                horizontal = TandemSpacing.List.itemHorizontalPadding,
+                vertical = TandemSpacing.List.itemVerticalPadding
+            ),
         verticalAlignment = Alignment.Top
     ) {
         // Priority checkbox
@@ -66,10 +71,10 @@ fun TaskRowItem(
             checked = task.isCompleted,
             priority = task.priority,
             onCheckedChange = onCheckedChange,
-            modifier = Modifier.padding(top = 2.dp)
+            modifier = Modifier.padding(top = TandemSpacing.xxxs)
         )
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(TandemSpacing.Inline.checkboxGap))
 
         // Content column
         Column(
@@ -78,8 +83,7 @@ fun TaskRowItem(
             // Title
             Text(
                 text = task.title,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 15.sp,
+                style = TandemTypography.titleMedium.copy(
                     textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None
                 ),
                 color = if (task.isCompleted) {
@@ -93,10 +97,10 @@ fun TaskRowItem(
 
             // Metadata row - only show if there's metadata
             if (task.schedule != null || task.isRecurring || task.subtaskCount != null || task.projectOrGoal != null) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(TandemSpacing.xxs))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(TandemSpacing.Inline.metadataGap),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Schedule time/date
@@ -112,7 +116,7 @@ fun TaskRowItem(
                         Icon(
                             imageVector = Icons.Outlined.Repeat,
                             contentDescription = "Recurring",
-                            modifier = Modifier.size(12.dp),
+                            modifier = Modifier.size(TandemSizing.Icon.xs),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -150,17 +154,17 @@ private fun ScheduleIndicator(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(TandemSpacing.Inline.iconTextGap)
     ) {
         Icon(
             imageVector = Icons.Outlined.CalendarToday,
             contentDescription = null,
-            modifier = Modifier.size(12.dp),
+            modifier = Modifier.size(TandemSizing.Icon.xs),
             tint = color
         )
         Text(
             text = schedule,
-            style = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp),
+            style = TandemTextStyles.Label.small,
             color = color
         )
     }
@@ -177,17 +181,17 @@ private fun SubtaskIndicator(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(TandemSpacing.Inline.iconTextGap)
     ) {
         Icon(
             imageVector = Icons.Outlined.Checklist,
             contentDescription = null,
-            modifier = Modifier.size(12.dp),
+            modifier = Modifier.size(TandemSizing.Icon.xs),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = "$count items",
-            style = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp),
+            style = TandemTextStyles.Label.small,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -204,7 +208,7 @@ private fun ProjectTag(
 ) {
     Text(
         text = "$name #",
-        style = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp),
+        style = TandemTextStyles.Label.small,
         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
         modifier = modifier
     )

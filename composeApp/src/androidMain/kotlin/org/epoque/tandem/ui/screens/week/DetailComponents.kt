@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -35,9 +34,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.epoque.tandem.domain.model.TaskPriority
+import org.epoque.tandem.ui.theme.TandemShapes
+import org.epoque.tandem.ui.theme.TandemSizing
+import org.epoque.tandem.ui.theme.TandemSpacing
 import org.epoque.tandem.ui.theme.CoralPrimary
 import org.epoque.tandem.ui.theme.ScheduleGreen
 import org.epoque.tandem.ui.components.week.LargePriorityCheckbox
@@ -61,16 +61,16 @@ fun DetailRow(
                 if (onClick != null) Modifier.clickable(onClick = onClick)
                 else Modifier
             )
-            .padding(vertical = 12.dp),
+            .padding(vertical = TandemSpacing.sm),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(TandemSizing.Icon.xl),
             tint = iconTint
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(TandemSpacing.md))
         Box(modifier = Modifier.weight(1f)) {
             content()
         }
@@ -92,7 +92,7 @@ fun TaskTitleRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(vertical = TandemSpacing.md),
         verticalAlignment = Alignment.Top
     ) {
         LargePriorityCheckbox(
@@ -101,7 +101,7 @@ fun TaskTitleRow(
             onCheckedChange = onCheckedChange
         )
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(TandemSpacing.md))
 
         Text(
             text = title,
@@ -150,7 +150,7 @@ fun GoalProgressRow(
                         text = goalIcon,
                         style = MaterialTheme.typography.bodyMedium
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(TandemSpacing.xs))
                 }
                 Text(
                     text = goalName,
@@ -185,12 +185,12 @@ private fun ProgressDots(
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(TandemSpacing.xxs)
     ) {
         repeat(total.coerceAtMost(5)) { index ->
             Box(
                 modifier = Modifier
-                    .size(8.dp)
+                    .size(TandemSizing.Indicator.badge)
                     .clip(CircleShape)
                     .background(
                         if (index < completed) CoralPrimary
@@ -225,8 +225,8 @@ fun OptionChipsRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(vertical = TandemSpacing.xs),
+        horizontalArrangement = Arrangement.spacedBy(TandemSpacing.xs)
     ) {
         // Deadline chip
         OptionChip(
@@ -279,19 +279,22 @@ private fun OptionChip(
 
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(TandemShapes.lg)
             .background(backgroundColor)
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(
+                horizontal = TandemSpacing.Chip.horizontalPadding,
+                vertical = TandemSpacing.Chip.verticalPadding
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(TandemSizing.Icon.md),
             tint = contentColor
         )
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(TandemSpacing.xxs))
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
@@ -315,7 +318,7 @@ fun SubtasksSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = TandemSpacing.xs),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -346,18 +349,18 @@ fun SubtasksSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
+                .clip(TandemShapes.sm)
                 .clickable(onClick = onAddSubtask)
-                .padding(vertical = 12.dp),
+                .padding(vertical = TandemSpacing.sm),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = "Add subtask",
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(TandemSizing.Icon.lg),
                 tint = CoralPrimary
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(TandemSpacing.sm))
             Text(
                 text = "Add subtask",
                 style = MaterialTheme.typography.bodyMedium,
@@ -388,16 +391,16 @@ private fun SubtaskRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = TandemSpacing.xs),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Small checkbox
         Box(
             modifier = Modifier
-                .size(20.dp)
+                .size(TandemSizing.Checkbox.visualSize)
                 .clip(CircleShape)
                 .border(
-                    width = 1.5.dp,
+                    width = TandemSizing.Border.standard,
                     color = if (subtask.isCompleted) ScheduleGreen else MaterialTheme.colorScheme.outline,
                     shape = CircleShape
                 )
@@ -411,13 +414,13 @@ private fun SubtaskRow(
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Completed",
-                    modifier = Modifier.size(14.dp),
+                    modifier = Modifier.size(TandemSizing.Icon.sm),
                     tint = Color.White
                 )
             }
         }
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(TandemSpacing.sm))
 
         Text(
             text = subtask.title,
@@ -445,29 +448,29 @@ fun TaskActionButtons(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(TandemSpacing.sm)
     ) {
         // Complete button
         Box(
             modifier = Modifier
                 .weight(1f)
-                .clip(RoundedCornerShape(12.dp))
+                .clip(TandemShapes.md)
                 .background(
                     if (isCompleted) ScheduleGreen.copy(alpha = 0.1f)
                     else CoralPrimary
                 )
                 .clickable(onClick = onCompleteClick)
-                .padding(vertical = 14.dp),
+                .padding(vertical = TandemSpacing.sm),
             contentAlignment = Alignment.Center
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(TandemSizing.Icon.lg),
                     tint = if (isCompleted) ScheduleGreen else Color.White
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(TandemSpacing.xs))
                 Text(
                     text = if (isCompleted) "Completed" else "Complete",
                     style = MaterialTheme.typography.labelLarge.copy(
@@ -483,14 +486,14 @@ fun TaskActionButtons(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(TandemShapes.md)
                     .border(
-                        width = 1.dp,
+                        width = TandemSizing.Border.hairline,
                         color = MaterialTheme.colorScheme.outline,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = TandemShapes.md
                     )
                     .clickable(onClick = onSkipClick)
-                    .padding(vertical = 14.dp),
+                    .padding(vertical = TandemSpacing.sm),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
