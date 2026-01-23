@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Season Detail - Tandem</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    .detail-header {
+      padding: calc(var(--status-bar-height) + var(--space-2)) var(--space-4) var(--space-4);
+      background: var(--color-background);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .back-button {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--color-on-surface);
+      cursor: pointer;
+      border-radius: var(--radius-full);
+      transition: background var(--duration-fast) var(--ease-in-out);
+      margin-left: calc(var(--space-2) * -1);
+    }
+
+    .back-button:hover {
+      background: var(--color-surface-variant);
+    }
+
+    .season-title-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .season-emoji {
+      font-size: 24px;
+    }
+
+    .season-title {
+      font-size: var(--text-xl);
+      font-weight: var(--font-bold);
+      color: var(--color-on-surface);
+    }
+
+    .overflow-button {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--color-muted);
+      cursor: pointer;
+      border-radius: var(--radius-full);
+      transition: background var(--duration-fast) var(--ease-in-out);
+    }
+
+    .overflow-button:hover {
+      background: var(--color-surface-variant);
+    }
+
+    /* Season Info */
+    .season-info {
+      padding: 0 var(--space-4) var(--space-4);
+    }
+
+    .week-counter {
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      color: var(--color-primary);
+      margin-bottom: var(--space-1);
+    }
+
+    .date-range {
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+    }
+
+    /* Timeline Section */
+    .timeline-section {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      margin: 0 var(--space-4);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .timeline-label {
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      color: var(--color-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: var(--space-3);
+    }
+
+    .timeline-container {
+      overflow-x: auto;
+      padding-bottom: var(--space-2);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .timeline-wrapper {
+      display: flex;
+      flex-direction: column;
+      min-width: max-content;
+      gap: var(--space-2);
+    }
+
+    /* Milestone Cards Row */
+    .milestones-row {
+      display: flex;
+      align-items: flex-end;
+      height: 60px;
+      position: relative;
+    }
+
+    .milestone-card {
+      position: absolute;
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--space-2) var(--space-3);
+      box-shadow: var(--shadow-md);
+      border-left: 3px solid var(--color-primary);
+      cursor: pointer;
+      transition: transform var(--duration-fast) var(--ease-in-out);
+      white-space: nowrap;
+    }
+
+    .milestone-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .milestone-card.completed {
+      border-left-color: var(--color-success);
+      opacity: 0.8;
+    }
+
+    .milestone-name {
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .milestone-date {
+      font-size: 10px;
+      color: var(--color-muted);
+    }
+
+    .milestone-connector {
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 8px;
+      background: var(--color-primary);
+    }
+
+    .milestone-card.completed .milestone-connector {
+      background: var(--color-success);
+    }
+
+    /* Week Segments Row */
+    .weeks-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .week-segment {
+      width: 28px;
+      height: 24px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: var(--font-medium);
+      color: var(--color-muted);
+      background: var(--color-surface-variant);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-in-out);
+    }
+
+    .week-segment.completed {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .week-segment.current {
+      background: linear-gradient(to right, var(--color-primary) 50%, var(--color-surface-variant) 50%);
+      border: 2px solid var(--color-primary);
+      color: var(--color-primary);
+      font-weight: var(--font-bold);
+    }
+
+    .week-segment:hover {
+      transform: scale(1.1);
+    }
+
+    /* Today Marker */
+    .today-marker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: absolute;
+      bottom: -20px;
+    }
+
+    .today-arrow {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 6px solid var(--color-primary);
+    }
+
+    .today-label {
+      font-size: 9px;
+      color: var(--color-primary);
+      font-weight: var(--font-semibold);
+      margin-top: 2px;
+    }
+
+    /* Add Milestone Action */
+    .add-milestone-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+      padding: var(--space-2) var(--space-3);
+      background: transparent;
+      border: 1px dashed var(--color-primary-light);
+      border-radius: var(--radius-lg);
+      color: var(--color-primary);
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-in-out);
+      width: 100%;
+      justify-content: center;
+    }
+
+    .add-milestone-btn:hover {
+      background: var(--color-primary-light);
+      border-style: solid;
+    }
+
+    /* Content Sections */
+    .content-section {
+      padding: var(--space-4);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-3);
+    }
+
+    .section-title {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .section-count {
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+    }
+
+    .section-chevron {
+      color: var(--color-muted);
+    }
+
+    /* Goals List */
+    .goals-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .goal-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-in-out);
+    }
+
+    .goal-row:hover {
+      box-shadow: var(--shadow-sm);
+    }
+
+    .goal-icon {
+      font-size: 20px;
+    }
+
+    .goal-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .goal-name {
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-on-surface);
+    }
+
+    .goal-progress-text {
+      font-size: var(--text-xs);
+      color: var(--color-muted);
+    }
+
+    .goal-progress-badge {
+      font-size: var(--text-xs);
+      font-weight: var(--font-medium);
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-full);
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
+    }
+
+    .goal-progress-badge.complete {
+      background: var(--color-success-light);
+      color: var(--color-success);
+    }
+
+    /* Link Goal Action */
+    .link-goal-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+      padding: var(--space-3);
+      background: transparent;
+      border: 1px dashed var(--color-divider);
+      border-radius: var(--radius-lg);
+      color: var(--color-muted);
+      font-size: var(--text-sm);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-in-out);
+      width: 100%;
+      justify-content: center;
+    }
+
+    .link-goal-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+    }
+
+    /* This Week Card */
+    .week-summary-card {
+      margin: 0 var(--space-4) var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-in-out);
+    }
+
+    .week-summary-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .week-summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-2);
+    }
+
+    .week-summary-title {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .week-summary-stats {
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+    }
+
+    .week-progress-bar {
+      height: 8px;
+      background: var(--color-surface-variant);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .week-progress-fill {
+      height: 100%;
+      background: var(--gradient-primary);
+      border-radius: 4px;
+      transition: width 0.6s var(--ease-out);
+    }
+
+    .week-summary-actions {
+      display: flex;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+    }
+
+    .week-summary-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-lg);
+      font-size: var(--text-xs);
+      font-weight: var(--font-medium);
+      text-decoration: none;
+      transition: all var(--duration-fast) var(--ease-in-out);
+    }
+
+    .week-summary-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .week-summary-btn.view-tasks {
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
+    }
+
+    .week-summary-btn.view-tasks:hover {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .week-summary-btn.review {
+      background: var(--gradient-streak);
+      color: white;
+    }
+
+    .week-summary-btn.review:hover {
+      opacity: 0.9;
+    }
+
+    /* Divider */
+    .section-divider {
+      height: 1px;
+      background: var(--color-divider);
+      margin: 0 var(--space-4);
+    }
+
+    /* 4-tab navigation */
+    .bottom-nav-4 {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: var(--bottom-nav-height);
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-divider);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .bottom-nav-4 .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: var(--space-2) 0;
+      text-decoration: none;
+      color: var(--color-muted);
+      transition: color var(--duration-fast) var(--ease-in-out);
+    }
+
+    .bottom-nav-4 .nav-item.active {
+      color: var(--color-primary);
+    }
+
+    .bottom-nav-4 .nav-icon-bg {
+      width: 40px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      transition: background var(--duration-fast) var(--ease-in-out);
+    }
+
+    .bottom-nav-4 .nav-item.active .nav-icon-bg {
+      background: var(--color-primary-light);
+    }
+
+    .bottom-nav-4 .nav-icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    .bottom-nav-4 .nav-label {
+      font-size: 11px;
+      font-weight: var(--font-medium);
+    }
+
+    /* Scroll area */
+    .scroll-content {
+      padding-bottom: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span class="status-bar-time">9:41</span>
+        <div class="status-bar-icons">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor">
+            <path d="M1 4.5h2v7H1v-7zm4-3h2v10H5v-10zm4 5h2v5H9v-5zm4-2h2v7h-2v-7zm4-3h1v10h-1v-10z"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
+            <path d="M8 0C5.2 0 2.7 1.1.9 2.9l1.4 1.4C3.7 2.9 5.7 2 8 2s4.3.9 5.7 2.3l1.4-1.4C13.3 1.1 10.8 0 8 0zm0 4c-1.7 0-3.2.6-4.4 1.7l1.4 1.4c.8-.7 1.9-1.1 3-1.1s2.2.4 3 1.1l1.4-1.4C11.2 4.6 9.7 4 8 4zm0 4c-.8 0-1.6.3-2.1.9l2.1 2.1 2.1-2.1c-.5-.6-1.3-.9-2.1-.9z"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor">
+            <rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/>
+            <rect x="2" y="3" width="16" height="6" rx="1" fill="currentColor"/>
+            <path d="M23 4v4c.6 0 1-.7 1-2s-.4-2-1-2z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="phone-screen">
+        <div class="screen-content" style="padding-top: 0; padding-bottom: 0;">
+          <!-- Header -->
+          <div class="detail-header">
+            <div class="header-left">
+              <button class="back-button" data-nav="21-seasons-list.html">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+              </button>
+              <div class="season-title-row">
+                <span class="season-emoji">🌱</span>
+                <h1 class="season-title">Q1 2026</h1>
+              </div>
+            </div>
+            <button class="overflow-button">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="6" r="2"/>
+                <circle cx="12" cy="12" r="2"/>
+                <circle cx="12" cy="18" r="2"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="scroll-content">
+            <!-- Season Info -->
+            <div class="season-info">
+              <div class="week-counter">Week 3 of 12</div>
+              <div class="date-range">Jan 1 - Mar 31, 2026</div>
+            </div>
+
+            <!-- Timeline Section -->
+            <div class="timeline-section animate-card-1">
+              <div class="timeline-label">Timeline</div>
+              <div class="timeline-container">
+                <div class="timeline-wrapper">
+                  <!-- Milestone Cards Row -->
+                  <div class="milestones-row" style="width: 408px;">
+                    <!-- Milestone 1: Week 2 -->
+                    <div class="milestone-card completed" style="left: 32px;" data-nav="24-add-milestone.html">
+                      <div class="milestone-name">Kickoff</div>
+                      <div class="milestone-date">Jan 8</div>
+                      <div class="milestone-connector"></div>
+                    </div>
+                    <!-- Milestone 2: Week 7 -->
+                    <div class="milestone-card" style="left: 192px;" data-nav="24-add-milestone.html">
+                      <div class="milestone-name">Ship v1</div>
+                      <div class="milestone-date">Feb 15</div>
+                      <div class="milestone-connector"></div>
+                    </div>
+                    <!-- Milestone 3: Week 11 -->
+                    <div class="milestone-card" style="left: 320px;" data-nav="24-add-milestone.html">
+                      <div class="milestone-name">Conference</div>
+                      <div class="milestone-date">Mar 20</div>
+                      <div class="milestone-connector"></div>
+                    </div>
+                  </div>
+
+                  <!-- Week Segments Row -->
+                  <div class="weeks-row" style="position: relative;">
+                    <div class="week-segment completed">1</div>
+                    <div class="week-segment completed">2</div>
+                    <div class="week-segment current">3</div>
+                    <div class="week-segment">4</div>
+                    <div class="week-segment">5</div>
+                    <div class="week-segment">6</div>
+                    <div class="week-segment">7</div>
+                    <div class="week-segment">8</div>
+                    <div class="week-segment">9</div>
+                    <div class="week-segment">10</div>
+                    <div class="week-segment">11</div>
+                    <div class="week-segment">12</div>
+                    <!-- Today marker under week 3 -->
+                    <div class="today-marker" style="left: 78px;">
+                      <div class="today-arrow"></div>
+                      <span class="today-label">today</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Add Milestone -->
+              <button class="add-milestone-btn" data-nav="24-add-milestone.html">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Add milestone
+              </button>
+            </div>
+
+            <div class="section-divider" style="margin-top: var(--space-4);"></div>
+
+            <!-- Goals Section -->
+            <div class="content-section">
+              <div class="section-header" data-nav="04-goals.html">
+                <div style="display: flex; align-items: center; gap: var(--space-2);">
+                  <span class="section-title">Goals</span>
+                  <span class="section-count">(3)</span>
+                </div>
+                <svg class="section-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </div>
+
+              <div class="goals-list">
+                <div class="goal-row animate-card-2" data-nav="16-goal-detail.html">
+                  <span class="goal-icon">💪</span>
+                  <div class="goal-info">
+                    <div class="goal-name">Exercise 3x/week</div>
+                    <div class="goal-progress-text">2 of 3 this week</div>
+                  </div>
+                  <span class="goal-progress-badge">67%</span>
+                </div>
+
+                <div class="goal-row animate-card-3" data-nav="16-goal-detail.html">
+                  <span class="goal-icon">📚</span>
+                  <div class="goal-info">
+                    <div class="goal-name">Read 12 books</div>
+                    <div class="goal-progress-text">3 of 12 complete</div>
+                  </div>
+                  <span class="goal-progress-badge">25%</span>
+                </div>
+
+                <div class="goal-row animate-card-4" data-nav="16-goal-detail.html">
+                  <span class="goal-icon">🎯</span>
+                  <div class="goal-info">
+                    <div class="goal-name">Ship project</div>
+                    <div class="goal-progress-text">In progress</div>
+                  </div>
+                  <span class="goal-progress-badge">75%</span>
+                </div>
+              </div>
+
+              <button class="link-goal-btn" data-nav="04-goals.html">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Link a goal
+              </button>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- This Week Summary -->
+            <div class="week-summary-card">
+              <div class="week-summary-header">
+                <span class="week-summary-title">This Week</span>
+                <span class="week-summary-stats">5 of 8 · 62%</span>
+              </div>
+              <div class="week-progress-bar">
+                <div class="week-progress-fill" style="width: 62%;"></div>
+              </div>
+              <div class="week-summary-actions">
+                <a href="01-week-view-v2.html" class="week-summary-btn view-tasks" data-nav="01-week-view-v2.html">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>
+                  </svg>
+                  View Tasks
+                </a>
+                <a href="13-review-start.html" class="week-summary-btn review" data-nav="13-review-start.html">
+                  🌇 Review
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Navigation - 4 tabs -->
+        <nav class="bottom-nav-4">
+          <a href="01-week-view-v2.html" class="nav-item">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Week</span>
+          </a>
+          <a href="03-progress.html" class="nav-item">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3.5 18.5l6-6 4 4L22 6.92 20.59 5.5l-7.09 8-4-4L2 17l1.5 1.5z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Progress</span>
+          </a>
+          <a href="04-goals.html" class="nav-item">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Goals</span>
+          </a>
+          <a href="21-seasons-list.html" class="nav-item active">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Seasons</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="phone-home-indicator"></div>
+    </div>
+  </div>
+  <script src="../scripts/navigation.js"></script>
+</body>
+</html>

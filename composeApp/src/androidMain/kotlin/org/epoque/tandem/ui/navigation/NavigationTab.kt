@@ -5,13 +5,16 @@ import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.ViewTimeline
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.material.icons.outlined.ViewTimeline
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
  * Represents the bottom navigation tabs in the main app screen.
+ * Updated for Feature 009: UI Redesign - now includes 4 tabs.
  */
 sealed class NavigationTab(
     val route: Routes.Main,
@@ -40,8 +43,16 @@ sealed class NavigationTab(
         unselectedIcon = Icons.Outlined.Flag
     )
 
+    /** Timeline tab - shows all weeks history */
+    data object Timeline : NavigationTab(
+        route = Routes.Main.Timeline,
+        title = "Timeline",
+        selectedIcon = Icons.Filled.ViewTimeline,
+        unselectedIcon = Icons.Outlined.ViewTimeline
+    )
+
     companion object {
-        val entries = listOf(Week, Progress, Goals)
+        val entries = listOf(Week, Progress, Goals, Timeline)
 
         /** Saver for use with rememberSaveable */
         val Saver: Saver<NavigationTab, String> = Saver(

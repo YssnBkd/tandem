@@ -9,10 +9,10 @@ import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.presentation.review.ReviewEvent
 import org.epoque.tandem.presentation.review.ReviewMode
 import org.epoque.tandem.presentation.review.ReviewUiState
-import org.epoque.tandem.ui.review.OverallRatingStepScreen
-import org.epoque.tandem.ui.review.ReviewModeSelectionScreen
-import org.epoque.tandem.ui.review.ReviewSummaryScreen
-import org.epoque.tandem.ui.review.TaskReviewStepScreen
+import org.epoque.tandem.ui.legacy.review.OverallRatingStepScreen
+import org.epoque.tandem.ui.legacy.review.ReviewModeSelectionScreen
+import org.epoque.tandem.ui.legacy.review.ReviewSummaryScreen
+import org.epoque.tandem.ui.legacy.review.TaskReviewStepScreen
 
 /**
  * Navigation graph for weekly review wizard.

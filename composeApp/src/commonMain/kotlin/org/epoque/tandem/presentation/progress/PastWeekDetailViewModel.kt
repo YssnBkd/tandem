@@ -118,16 +118,11 @@ class PastWeekDetailViewModel(
         return TaskOutcomeUiModel(
             taskId = taskId,
             title = title,
-            userStatusIcon = TaskStatusDisplay.emojiFor(userStatus),
-            userStatusColor = userStatus.toColor(),
-            partnerStatusIcon = partnerStatus?.let { TaskStatusDisplay.emojiFor(it) },
-            partnerStatusColor = partnerStatus?.toColor()
+            priority = priority,
+            isCompleted = userStatus == TaskStatus.COMPLETED,
+            isSkipped = userStatus == TaskStatus.SKIPPED || userStatus == TaskStatus.DECLINED,
+            partnerCompleted = partnerStatus?.let { it == TaskStatus.COMPLETED },
+            partnerSkipped = partnerStatus?.let { it == TaskStatus.SKIPPED || it == TaskStatus.DECLINED }
         )
-    }
-
-    private fun TaskStatus.toColor(): TaskStatusColor = when (this) {
-        TaskStatus.COMPLETED -> TaskStatusColor.COMPLETED
-        TaskStatus.SKIPPED, TaskStatus.DECLINED -> TaskStatusColor.SKIPPED
-        else -> TaskStatusColor.PENDING
     }
 }

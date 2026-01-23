@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Task - Tandem</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    /* ========================================
+       TODOIST-STYLE ADD TASK MODAL
+       Bottom sheet with drag gestures
+       ======================================== */
+
+    /* Background content (dimmed) */
+    .background-content {
+      filter: blur(2px);
+      opacity: 0.5;
+    }
+
+    .week-header-bg {
+      background: var(--gradient-primary-soft);
+      padding: calc(var(--status-bar-height) + var(--space-2)) var(--space-4) var(--space-5);
+    }
+
+    .week-title-bg {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      color: var(--color-on-surface);
+    }
+
+    .task-preview {
+      padding: var(--space-4);
+      background: var(--color-surface);
+      margin: var(--space-4);
+      border-radius: var(--radius-xl);
+      height: 60px;
+      background: var(--color-surface-variant);
+    }
+
+    /* ========================================
+       BOTTOM SHEET MODAL
+       ======================================== */
+
+    .add-task-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--color-surface);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+      min-height: 280px;
+      max-height: 85%;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+      z-index: 20;
+    }
+
+    .add-task-sheet.expanded {
+      max-height: 100%;
+      border-radius: 0;
+    }
+
+    /* Drag Handle */
+    .drag-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--color-outline-variant);
+      border-radius: var(--radius-full);
+      margin: var(--space-3) auto var(--space-2);
+      cursor: grab;
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    /* ========================================
+       INPUT SECTION WITH CORAL BORDER
+       ======================================== */
+
+    .task-input-section {
+      border-left: 4px solid #E07A5F;
+      margin: 0 var(--space-4);
+      padding: var(--space-3) 0 var(--space-3) var(--space-4);
+    }
+
+    .task-name-input {
+      width: 100%;
+      padding: 0;
+      font-size: var(--text-lg);
+      font-family: inherit;
+      font-weight: var(--font-medium);
+      color: var(--color-on-surface);
+      background: transparent;
+      border: none;
+      outline: none;
+    }
+
+    .task-name-input::placeholder {
+      color: var(--color-placeholder);
+      font-weight: normal;
+    }
+
+    .task-description-input {
+      width: 100%;
+      padding: 0;
+      margin-top: var(--space-2);
+      font-size: var(--text-sm);
+      font-family: inherit;
+      color: var(--color-on-surface-variant);
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+      min-height: 20px;
+      max-height: 80px;
+    }
+
+    .task-description-input::placeholder {
+      color: var(--color-placeholder);
+    }
+
+    /* ========================================
+       SCROLLABLE ACTION PILLS
+       ======================================== */
+
+    .quick-actions-scroll {
+      display: flex;
+      gap: var(--space-2);
+      overflow-x: auto;
+      padding: var(--space-3) var(--space-4);
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      border-top: 1px solid var(--color-divider);
+      border-bottom: 1px solid var(--color-divider);
+    }
+
+    .quick-actions-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .action-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--color-surface-variant);
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-family: inherit;
+      font-weight: var(--font-medium);
+      color: var(--color-on-surface-variant);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-in-out);
+      flex-shrink: 0;
+    }
+
+    .action-pill:hover {
+      background: var(--color-primary-lighter);
+    }
+
+    .action-pill:active {
+      transform: scale(0.97);
+    }
+
+    .action-pill.selected {
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
+    }
+
+    .action-pill .pill-icon {
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .action-pill .pill-icon svg {
+      width: 14px;
+      height: 14px;
+      display: block;
+    }
+
+    /* Priority colors */
+    .action-pill.priority-p1 {
+      background: rgba(209, 69, 59, 0.15);
+      color: #d1453b;
+    }
+    .action-pill.priority-p2 {
+      background: rgba(235, 137, 9, 0.15);
+      color: #eb8909;
+    }
+    .action-pill.priority-p3 {
+      background: rgba(36, 111, 224, 0.15);
+      color: #246fe0;
+    }
+
+    /* Dropdown indicator */
+    .pill-dropdown {
+      margin-left: 2px;
+      opacity: 0.6;
+    }
+
+    .pill-dropdown svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* ========================================
+       BOTTOM TOOLBAR
+       ======================================== */
+
+    .bottom-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      margin-top: auto;
+    }
+
+    .toolbar-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      color: var(--color-on-surface-variant);
+      font-size: 18px;
+      transition: all var(--duration-fast) var(--ease-in-out);
+    }
+
+    .toolbar-btn:hover {
+      background: var(--color-surface-variant);
+    }
+
+    .toolbar-btn:active {
+      transform: scale(0.95);
+    }
+
+    .toolbar-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* AI Assist button with coral gradient */
+    .toolbar-btn.ai-assist {
+      background: linear-gradient(135deg, #E07A5F, #F4A261);
+      color: white;
+      box-shadow: 0 2px 8px rgba(224, 122, 95, 0.4);
+    }
+
+    .toolbar-btn.ai-assist:hover {
+      box-shadow: 0 4px 12px rgba(224, 122, 95, 0.5);
+      transform: scale(1.05);
+    }
+
+    /* Submit button */
+    .submit-btn {
+      padding: var(--space-2) var(--space-5);
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-in-out);
+    }
+
+    .submit-btn:hover {
+      background: var(--color-primary-dark);
+    }
+
+    .submit-btn:active {
+      transform: scale(0.97);
+    }
+
+    .submit-btn:disabled {
+      background: var(--color-outline-variant);
+      cursor: not-allowed;
+    }
+
+    /* ========================================
+       POPOVERS / SELECTORS
+       ======================================== */
+
+    .popover {
+      position: absolute;
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: var(--space-2);
+      z-index: 100;
+      min-width: 160px;
+      display: none;
+    }
+
+    .popover.visible {
+      display: block;
+      animation: fadeIn 0.15s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .popover-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background var(--duration-fast) var(--ease-in-out);
+    }
+
+    .popover-item:hover {
+      background: var(--color-surface-variant);
+    }
+
+    .popover-item.selected {
+      background: var(--color-primary-light);
+    }
+
+    .popover-item-icon {
+      font-size: 16px;
+    }
+
+    .popover-item-label {
+      font-size: var(--text-sm);
+      color: var(--color-on-surface);
+    }
+
+    /* Priority colors in popover */
+    .popover-item.priority-1 .popover-item-icon { color: #d1453b; }
+    .popover-item.priority-2 .popover-item-icon { color: #eb8909; }
+    .popover-item.priority-3 .popover-item-icon { color: #246fe0; }
+    .popover-item.priority-4 .popover-item-icon { color: var(--color-muted); }
+
+    /* ========================================
+       GOAL SELECTOR SHEET
+       ======================================== */
+
+    .selector-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--color-surface);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+      max-height: 60%;
+      display: none;
+      flex-direction: column;
+      z-index: 200;
+    }
+
+    .selector-sheet.visible {
+      display: flex;
+      animation: slideUp 0.25s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .selector-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--color-divider);
+    }
+
+    .selector-title {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .selector-done {
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      color: var(--color-primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: var(--space-2);
+    }
+
+    .selector-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-2);
+    }
+
+    .selector-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: background var(--duration-fast) var(--ease-in-out);
+    }
+
+    .selector-item:hover {
+      background: var(--color-surface-variant);
+    }
+
+    .selector-item.selected {
+      background: var(--color-primary-light);
+    }
+
+    .selector-item-emoji {
+      font-size: 20px;
+    }
+
+    .selector-item-content {
+      flex: 1;
+    }
+
+    .selector-item-name {
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-on-surface);
+    }
+
+    .selector-item-meta {
+      font-size: var(--text-xs);
+      color: var(--color-muted);
+    }
+
+    .selector-item-check {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+    }
+
+    /* Selector backdrop */
+    .selector-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 150;
+      display: none;
+    }
+
+    .selector-backdrop.visible {
+      display: block;
+    }
+
+    /* ========================================
+       BOTTOM SHEET OVERLAY (dismiss area)
+       ======================================== */
+    .bottom-sheet-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span class="status-bar-time">9:41</span>
+        <div class="status-bar-icons">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor">
+            <path d="M1 4.5h2v7H1v-7zm4-3h2v10H5v-10zm4 5h2v5H9v-5zm4-2h2v7h-2v-7zm4-3h1v10h-1v-10z"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
+            <path d="M8 0C5.2 0 2.7 1.1.9 2.9l1.4 1.4C3.7 2.9 5.7 2 8 2s4.3.9 5.7 2.3l1.4-1.4C13.3 1.1 10.8 0 8 0zm0 4c-1.7 0-3.2.6-4.4 1.7l1.4 1.4c.8-.7 1.9-1.1 3-1.1s2.2.4 3 1.1l1.4-1.4C11.2 4.6 9.7 4 8 4zm0 4c-.8 0-1.6.3-2.1.9l2.1 2.1 2.1-2.1c-.5-.6-1.3-.9-2.1-.9z"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor">
+            <rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/>
+            <rect x="2" y="3" width="16" height="6" rx="1" fill="currentColor"/>
+            <path d="M23 4v4c.6 0 1-.7 1-2s-.4-2-1-2z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="phone-screen">
+        <!-- Background Content (Dimmed) -->
+        <div class="background-content">
+          <div class="week-header-bg">
+            <h1 class="week-title-bg">This Week</h1>
+          </div>
+          <div class="task-preview"></div>
+          <div class="task-preview"></div>
+        </div>
+
+        <!-- Bottom Sheet Overlay -->
+        <div class="bottom-sheet-overlay" data-nav="01-week-view-v2.html"></div>
+
+        <!-- Add Task Bottom Sheet -->
+        <div class="add-task-sheet" id="addTaskSheet">
+          <div class="drag-handle"></div>
+
+          <!-- Input Section with Coral Border -->
+          <div class="task-input-section">
+            <input
+              type="text"
+              class="task-name-input"
+              placeholder="Task name"
+              id="taskNameInput"
+              autofocus
+            >
+            <textarea
+              class="task-description-input"
+              placeholder="Description"
+              rows="1"
+              id="taskDescInput"
+            ></textarea>
+          </div>
+
+          <!-- Scrollable Action Pills -->
+          <div class="quick-actions-scroll">
+            <!-- Owner Pill -->
+            <button class="action-pill selected" id="ownerPill" data-value="me">
+              <span class="pill-icon">👤</span>
+              <span class="pill-label">Me</span>
+              <span class="pill-dropdown">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </span>
+            </button>
+
+            <!-- Date Pill -->
+            <button class="action-pill" id="datePill">
+              <span class="pill-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>
+                </svg>
+              </span>
+              <span class="pill-label">Date</span>
+            </button>
+
+            <!-- Priority Pill -->
+            <button class="action-pill" id="priorityPill">
+              <span class="pill-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+                </svg>
+              </span>
+              <span class="pill-label">Priority</span>
+            </button>
+
+            <!-- Goal Pill -->
+            <button class="action-pill" id="goalPill">
+              <span class="pill-icon">🎯</span>
+              <span class="pill-label">Goal</span>
+            </button>
+
+            <!-- Label Pill -->
+            <button class="action-pill" id="labelPill">
+              <span class="pill-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/>
+                </svg>
+              </span>
+              <span class="pill-label">Label</span>
+            </button>
+
+            <!-- Deadline Pill -->
+            <button class="action-pill" id="deadlinePill">
+              <span class="pill-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                </svg>
+              </span>
+              <span class="pill-label">Deadline</span>
+            </button>
+          </div>
+
+          <!-- Bottom Toolbar -->
+          <div class="bottom-toolbar">
+            <!-- AI Assist Button (wiggly line) - Placeholder -->
+            <button class="toolbar-btn ai-assist" title="AI assist (coming soon)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <path d="M3 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/>
+              </svg>
+            </button>
+
+            <!-- Submit Button -->
+            <button class="submit-btn" id="submitBtn" data-nav="01-week-view-v2.html">
+              Add Task
+            </button>
+          </div>
+        </div>
+
+        <!-- Owner Popover -->
+        <div class="popover" id="ownerPopover" style="bottom: 200px; left: 16px;">
+          <div class="popover-item selected" data-value="me">
+            <span class="popover-item-icon">👤</span>
+            <span class="popover-item-label">Me</span>
+          </div>
+          <div class="popover-item" data-value="partner">
+            <span class="popover-item-icon">💑</span>
+            <span class="popover-item-label">Partner</span>
+          </div>
+          <div class="popover-item" data-value="together">
+            <span class="popover-item-icon">👥</span>
+            <span class="popover-item-label">Together</span>
+          </div>
+        </div>
+
+        <!-- Date Popover -->
+        <div class="popover" id="datePopover" style="bottom: 200px; left: 80px;">
+          <div class="popover-item" data-value="today">
+            <span class="popover-item-icon">📅</span>
+            <span class="popover-item-label">Today</span>
+          </div>
+          <div class="popover-item" data-value="tomorrow">
+            <span class="popover-item-icon">🌅</span>
+            <span class="popover-item-label">Tomorrow</span>
+          </div>
+          <div class="popover-item" data-value="next-week">
+            <span class="popover-item-icon">📆</span>
+            <span class="popover-item-label">Next week</span>
+          </div>
+          <div class="popover-item" data-value="pick">
+            <span class="popover-item-icon">🗓️</span>
+            <span class="popover-item-label">Pick a date...</span>
+          </div>
+        </div>
+
+        <!-- Priority Popover -->
+        <div class="popover" id="priorityPopover" style="bottom: 200px; left: 150px;">
+          <div class="popover-item priority-1" data-value="p1">
+            <span class="popover-item-icon">🚩</span>
+            <span class="popover-item-label">Priority 1</span>
+          </div>
+          <div class="popover-item priority-2" data-value="p2">
+            <span class="popover-item-icon">🚩</span>
+            <span class="popover-item-label">Priority 2</span>
+          </div>
+          <div class="popover-item priority-3" data-value="p3">
+            <span class="popover-item-icon">🚩</span>
+            <span class="popover-item-label">Priority 3</span>
+          </div>
+          <div class="popover-item priority-4" data-value="p4">
+            <span class="popover-item-icon">⚪</span>
+            <span class="popover-item-label">No priority</span>
+          </div>
+        </div>
+
+        <!-- Goal Selector Sheet -->
+        <div class="selector-backdrop" id="goalBackdrop"></div>
+        <div class="selector-sheet" id="goalSelector">
+          <div class="selector-header">
+            <span class="selector-title">Select Goal</span>
+            <button class="selector-done" id="goalDone">Done</button>
+          </div>
+          <div class="selector-list">
+            <div class="selector-item" data-value="none">
+              <span class="selector-item-emoji">➖</span>
+              <div class="selector-item-content">
+                <div class="selector-item-name">No goal</div>
+              </div>
+              <div class="selector-item-check"></div>
+            </div>
+            <div class="selector-item" data-value="fitness">
+              <span class="selector-item-emoji">💪</span>
+              <div class="selector-item-content">
+                <div class="selector-item-name">Get fit together</div>
+                <div class="selector-item-meta">45% complete</div>
+              </div>
+              <div class="selector-item-check"></div>
+            </div>
+            <div class="selector-item" data-value="healthy-eating">
+              <span class="selector-item-emoji">🥗</span>
+              <div class="selector-item-content">
+                <div class="selector-item-name">Healthy eating</div>
+                <div class="selector-item-meta">30% complete</div>
+              </div>
+              <div class="selector-item-check"></div>
+            </div>
+            <div class="selector-item" data-value="reading">
+              <span class="selector-item-emoji">📚</span>
+              <div class="selector-item-content">
+                <div class="selector-item-name">Read more books</div>
+                <div class="selector-item-meta">60% complete</div>
+              </div>
+              <div class="selector-item-check"></div>
+            </div>
+            <div class="selector-item" data-value="savings">
+              <span class="selector-item-emoji">💰</span>
+              <div class="selector-item-content">
+                <div class="selector-item-name">Save for vacation</div>
+                <div class="selector-item-meta">25% complete</div>
+              </div>
+              <div class="selector-item-check"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Label Selector Sheet -->
+        <div class="selector-backdrop" id="labelBackdrop"></div>
+        <div class="selector-sheet" id="labelSelector">
+          <div class="selector-header">
+            <span class="selector-title">Select Labels</span>
+            <button class="selector-done" id="labelDone">Done</button>
+          </div>
+          <div class="selector-list">
+            <div class="selector-item" data-value="work">
+              <span class="selector-item-emoji" style="color: #d1453b;">●</span>
+              <div class="selector-item-content">
+                <div class="selector-item-name">Work</div>
+              </div>
+              <div class="selector-item-check"></div>
+            </div>
+            <div class="selector-item" data-value="personal">
+              <span class="selector-item-emoji" style="color: #246fe0;">●</span>
+              <div class="selector-item-content">
+                <div class="selector-item-name">Personal</div>
+              </div>
+              <div class="selector-item-check"></div>
+            </div>
+            <div class="selector-item" data-value="urgent">
+              <span class="selector-item-emoji" style="color: #eb8909;">●</span>
+              <div class="selector-item-content">
+                <div class="selector-item-name">Urgent</div>
+              </div>
+              <div class="selector-item-check"></div>
+            </div>
+            <div class="selector-item" data-value="home">
+              <span class="selector-item-emoji" style="color: #058527;">●</span>
+              <div class="selector-item-content">
+                <div class="selector-item-name">Home</div>
+              </div>
+              <div class="selector-item-check"></div>
+            </div>
+            <div class="selector-item" data-value="create">
+              <span class="selector-item-emoji">➕</span>
+              <div class="selector-item-content">
+                <div class="selector-item-name" style="color: var(--color-primary);">Create new label</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-home-indicator"></div>
+    </div>
+  </div>
+
+  <script src="../scripts/navigation.js"></script>
+  <script>
+    // ========================================
+    // ADD TASK INTERACTIONS
+    // ========================================
+
+    // Auto-resize description textarea
+    const descInput = document.getElementById('taskDescInput');
+    descInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+    });
+
+    // Close all popovers
+    function closeAllPopovers() {
+      document.querySelectorAll('.popover').forEach(p => p.classList.remove('visible'));
+    }
+
+    // Close all selectors
+    function closeAllSelectors() {
+      document.querySelectorAll('.selector-sheet').forEach(s => s.classList.remove('visible'));
+      document.querySelectorAll('.selector-backdrop').forEach(b => b.classList.remove('visible'));
+    }
+
+    // Click outside to close
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.popover') && !e.target.closest('.action-pill')) {
+        closeAllPopovers();
+      }
+    });
+
+    // ========================================
+    // OWNER PILL
+    // ========================================
+    const ownerPill = document.getElementById('ownerPill');
+    const ownerPopover = document.getElementById('ownerPopover');
+
+    ownerPill.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeAllPopovers();
+      ownerPopover.classList.toggle('visible');
+    });
+
+    ownerPopover.querySelectorAll('.popover-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const value = item.dataset.value;
+        const icon = item.querySelector('.popover-item-icon').textContent;
+        const label = item.querySelector('.popover-item-label').textContent;
+
+        // Update pill
+        ownerPill.querySelector('.pill-icon').textContent = icon;
+        ownerPill.querySelector('.pill-label').textContent = label;
+        ownerPill.dataset.value = value;
+
+        // Update selected state
+        ownerPopover.querySelectorAll('.popover-item').forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+
+        closeAllPopovers();
+      });
+    });
+
+    // ========================================
+    // DATE PILL
+    // ========================================
+    const datePill = document.getElementById('datePill');
+    const datePopover = document.getElementById('datePopover');
+
+    datePill.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeAllPopovers();
+      datePopover.classList.toggle('visible');
+    });
+
+    datePopover.querySelectorAll('.popover-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const value = item.dataset.value;
+        const label = item.querySelector('.popover-item-label').textContent;
+
+        if (value !== 'pick') {
+          datePill.querySelector('.pill-label').textContent = label;
+          datePill.classList.add('selected');
+        }
+
+        closeAllPopovers();
+      });
+    });
+
+    // ========================================
+    // PRIORITY PILL
+    // ========================================
+    const priorityPill = document.getElementById('priorityPill');
+    const priorityPopover = document.getElementById('priorityPopover');
+
+    priorityPill.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeAllPopovers();
+      priorityPopover.classList.toggle('visible');
+    });
+
+    priorityPopover.querySelectorAll('.popover-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const value = item.dataset.value;
+
+        // Remove all priority classes
+        priorityPill.classList.remove('priority-p1', 'priority-p2', 'priority-p3', 'selected');
+
+        if (value !== 'p4') {
+          priorityPill.classList.add('priority-' + value, 'selected');
+          priorityPill.querySelector('.pill-label').textContent = value.toUpperCase();
+        } else {
+          priorityPill.querySelector('.pill-label').textContent = 'Priority';
+        }
+
+        closeAllPopovers();
+      });
+    });
+
+    // ========================================
+    // GOAL PILL
+    // ========================================
+    const goalPill = document.getElementById('goalPill');
+    const goalSelector = document.getElementById('goalSelector');
+    const goalBackdrop = document.getElementById('goalBackdrop');
+    const goalDone = document.getElementById('goalDone');
+
+    goalPill.addEventListener('click', () => {
+      closeAllPopovers();
+      goalSelector.classList.add('visible');
+      goalBackdrop.classList.add('visible');
+    });
+
+    goalBackdrop.addEventListener('click', closeAllSelectors);
+    goalDone.addEventListener('click', closeAllSelectors);
+
+    goalSelector.querySelectorAll('.selector-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const value = item.dataset.value;
+        const emoji = item.querySelector('.selector-item-emoji').textContent;
+        const name = item.querySelector('.selector-item-name').textContent;
+
+        // Update selection visuals
+        goalSelector.querySelectorAll('.selector-item').forEach(i => {
+          i.classList.remove('selected');
+          i.querySelector('.selector-item-check').innerHTML = '';
+        });
+
+        if (value !== 'none') {
+          item.classList.add('selected');
+          item.querySelector('.selector-item-check').innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+          `;
+          goalPill.querySelector('.pill-icon').textContent = emoji;
+          goalPill.querySelector('.pill-label').textContent = name.split(' ')[0]; // Short name
+          goalPill.classList.add('selected');
+        } else {
+          goalPill.querySelector('.pill-icon').textContent = '🎯';
+          goalPill.querySelector('.pill-label').textContent = 'Goal';
+          goalPill.classList.remove('selected');
+        }
+
+        closeAllSelectors();
+      });
+    });
+
+    // ========================================
+    // LABEL PILL
+    // ========================================
+    const labelPill = document.getElementById('labelPill');
+    const labelSelector = document.getElementById('labelSelector');
+    const labelBackdrop = document.getElementById('labelBackdrop');
+    const labelDone = document.getElementById('labelDone');
+    let selectedLabels = [];
+
+    labelPill.addEventListener('click', () => {
+      closeAllPopovers();
+      labelSelector.classList.add('visible');
+      labelBackdrop.classList.add('visible');
+    });
+
+    labelBackdrop.addEventListener('click', closeAllSelectors);
+    labelDone.addEventListener('click', () => {
+      // Update pill based on selection
+      if (selectedLabels.length > 0) {
+        labelPill.querySelector('.pill-label').textContent = selectedLabels.length + ' label' + (selectedLabels.length > 1 ? 's' : '');
+        labelPill.classList.add('selected');
+      } else {
+        labelPill.querySelector('.pill-label').textContent = 'Label';
+        labelPill.classList.remove('selected');
+      }
+      closeAllSelectors();
+    });
+
+    labelSelector.querySelectorAll('.selector-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const value = item.dataset.value;
+
+        if (value === 'create') {
+          // Would open create label flow
+          return;
+        }
+
+        // Toggle selection
+        item.classList.toggle('selected');
+
+        if (item.classList.contains('selected')) {
+          selectedLabels.push(value);
+          item.querySelector('.selector-item-check').innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+          `;
+        } else {
+          selectedLabels = selectedLabels.filter(l => l !== value);
+          item.querySelector('.selector-item-check').innerHTML = '';
+        }
+      });
+    });
+
+    // ========================================
+    // DEADLINE PILL
+    // ========================================
+    const deadlinePill = document.getElementById('deadlinePill');
+
+    deadlinePill.addEventListener('click', () => {
+      closeAllPopovers();
+      // Would open date/time picker
+      // For mockup, just toggle selected state
+      if (!deadlinePill.classList.contains('selected')) {
+        deadlinePill.classList.add('selected');
+        deadlinePill.querySelector('.pill-label').textContent = 'Jan 15, 5pm';
+      } else {
+        deadlinePill.classList.remove('selected');
+        deadlinePill.querySelector('.pill-label').textContent = 'Deadline';
+      }
+    });
+
+    // ========================================
+    // DRAG HANDLE (expand/collapse)
+    // ========================================
+    const sheet = document.getElementById('addTaskSheet');
+    const dragHandle = sheet.querySelector('.drag-handle');
+    let startY, startHeight;
+
+    dragHandle.addEventListener('mousedown', startDrag);
+    dragHandle.addEventListener('touchstart', startDrag);
+
+    function startDrag(e) {
+      e.preventDefault();
+      startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+      startHeight = sheet.offsetHeight;
+
+      document.addEventListener('mousemove', doDrag);
+      document.addEventListener('touchmove', doDrag);
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('touchend', endDrag);
+    }
+
+    function doDrag(e) {
+      const currentY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+      const delta = startY - currentY;
+
+      if (delta > 50) {
+        sheet.classList.add('expanded');
+      } else if (delta < -50) {
+        sheet.classList.remove('expanded');
+      }
+    }
+
+    function endDrag() {
+      document.removeEventListener('mousemove', doDrag);
+      document.removeEventListener('touchmove', doDrag);
+      document.removeEventListener('mouseup', endDrag);
+      document.removeEventListener('touchend', endDrag);
+    }
+
+    // ========================================
+    // AI BUTTON (placeholder)
+    // ========================================
+    document.querySelector('.toolbar-btn.ai-assist').addEventListener('click', () => {
+      // Show coming soon toast (simple alert for mockup)
+      const btn = document.querySelector('.toolbar-btn.ai-assist');
+      btn.style.transform = 'scale(1.1)';
+      setTimeout(() => {
+        btn.style.transform = '';
+      }, 150);
+    });
+  </script>
+</body>
+</html>

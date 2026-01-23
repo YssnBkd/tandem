@@ -60,6 +60,30 @@ actual class DriverFactory(private val context: Context) {
             safeAddColumn(db, "Task", "rolled_from_week_id", "TEXT")
         }
 
+        // Feature 009: UI Redesign columns
+        if (!columnExists(db, "Task", "priority")) {
+            safeAddColumn(db, "Task", "priority", "TEXT NOT NULL DEFAULT 'P4'")
+        }
+        if (!columnExists(db, "Task", "scheduled_date")) {
+            safeAddColumn(db, "Task", "scheduled_date", "TEXT")
+        }
+        if (!columnExists(db, "Task", "scheduled_time")) {
+            safeAddColumn(db, "Task", "scheduled_time", "TEXT")
+        }
+        if (!columnExists(db, "Task", "deadline")) {
+            safeAddColumn(db, "Task", "deadline", "INTEGER")
+        }
+        if (!columnExists(db, "Task", "parent_task_id")) {
+            safeAddColumn(db, "Task", "parent_task_id", "TEXT")
+        }
+        if (!columnExists(db, "Task", "labels")) {
+            safeAddColumn(db, "Task", "labels", "TEXT")
+        }
+
+        // Feature 009: Create indexes for new columns
+        safeCreateIndex(db, "task_parent_id", "Task", "parent_task_id")
+        safeCreateIndex(db, "task_scheduled_date", "Task", "scheduled_date")
+
         // Ensure all feature tables exist
         createPartnerTablesIfNeeded(db)
         createGoalTablesIfNeeded(db)
@@ -123,6 +147,22 @@ actual class DriverFactory(private val context: Context) {
             db.execSQL("ALTER TABLE $table ADD COLUMN $column $type")
         } catch (e: Exception) {
             // Column might already exist, which is fine
+        }
+    }
+
+    /**
+     * Safely creates an index if it doesn't exist.
+     */
+    private fun safeCreateIndex(
+        db: SupportSQLiteDatabase,
+        indexName: String,
+        table: String,
+        column: String
+    ) {
+        try {
+            db.execSQL("CREATE INDEX IF NOT EXISTS $indexName ON $table($column)")
+        } catch (e: Exception) {
+            // Index might already exist, which is fine
         }
     }
 

@@ -1,5 +1,7 @@
 package org.epoque.tandem.presentation.progress
 
+import org.epoque.tandem.domain.model.TaskPriority
+
 /**
  * UI state for Past Week Detail screen.
  */
@@ -27,21 +29,14 @@ data class ReviewSummaryUiModel(
 
 /**
  * UI model for task outcome display.
+ * Uses clean status fields instead of emoji icons.
  */
 data class TaskOutcomeUiModel(
     val taskId: String,
     val title: String,
-    val userStatusIcon: String,
-    val userStatusColor: TaskStatusColor,
-    val partnerStatusIcon: String?,
-    val partnerStatusColor: TaskStatusColor?
+    val priority: TaskPriority,
+    val isCompleted: Boolean,
+    val isSkipped: Boolean,
+    val partnerCompleted: Boolean?,
+    val partnerSkipped: Boolean?
 )
-
-/**
- * Colors for task status display.
- */
-enum class TaskStatusColor {
-    COMPLETED,
-    SKIPPED,
-    PENDING
-}

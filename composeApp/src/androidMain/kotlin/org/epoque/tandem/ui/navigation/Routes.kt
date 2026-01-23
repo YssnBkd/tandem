@@ -43,6 +43,23 @@ sealed interface Routes {
         /** Goals tab content */
         @Serializable
         data object Goals : Main
+
+        /** Timeline tab content - shows all weeks history */
+        @Serializable
+        data object Timeline : Main
+    }
+
+    /**
+     * Goals feature routes.
+     */
+    sealed interface Goals : Routes {
+        /** Goal creation screen */
+        @Serializable
+        data object Create : Goals
+
+        /** Goal detail screen */
+        @Serializable
+        data class Detail(val goalId: String) : Goals
     }
 
     /**
@@ -111,5 +128,14 @@ sealed interface Routes {
         /** Partner settings screen */
         @Serializable
         data object Settings : Partner
+    }
+
+    /**
+     * Timeline feature routes.
+     */
+    sealed interface Timeline : Routes {
+        /** Timeline screen showing all weeks */
+        @Serializable
+        data object Home : Timeline
     }
 }

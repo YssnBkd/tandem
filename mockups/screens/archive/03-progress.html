@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progress - Tandem</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    .progress-header {
+      padding: calc(var(--status-bar-height) + var(--space-2)) var(--space-4) var(--space-4);
+      background: var(--color-background);
+    }
+
+    .progress-title {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      color: var(--color-on-surface);
+    }
+
+    /* Streak Card */
+    .streak-card {
+      margin: 0 var(--space-4) var(--space-4);
+      padding: var(--space-6);
+      background: var(--gradient-streak);
+      border-radius: var(--radius-2xl);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .streak-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+
+    .streak-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .streak-icon {
+      font-size: 48px;
+      animation: fireFlicker 0.5s var(--ease-in-out) infinite;
+    }
+
+    .streak-info {
+      flex: 1;
+    }
+
+    .streak-number {
+      font-size: 56px;
+      font-weight: var(--font-bold);
+      line-height: 1;
+    }
+
+    .streak-label {
+      font-size: var(--text-md);
+      opacity: 0.9;
+      margin-top: var(--space-1);
+    }
+
+    .streak-badge {
+      background: rgba(255,255,255,0.2);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+    }
+
+    /* This Week Card - CTA for review */
+    .this-week-card {
+      margin: 0 var(--space-4) var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-in-out);
+    }
+
+    .this-week-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .this-week-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-3);
+    }
+
+    .this-week-title {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .this-week-dates {
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+    }
+
+    .this-week-progress {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    .this-week-ring {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+    }
+
+    .this-week-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .this-week-ring-bg {
+      fill: none;
+      stroke: var(--color-surface-variant);
+      stroke-width: 6;
+    }
+
+    .this-week-ring-fill {
+      fill: none;
+      stroke: var(--color-secondary);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 163.36;
+      stroke-dashoffset: 40.84;
+    }
+
+    .this-week-ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-lg);
+      font-weight: var(--font-bold);
+      color: var(--color-on-surface);
+    }
+
+    .this-week-stats {
+      flex: 1;
+    }
+
+    .this-week-stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+      margin-bottom: var(--space-1);
+    }
+
+    .this-week-stat-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .this-week-stat-value {
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .this-week-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-3);
+      background: var(--gradient-streak);
+      border-radius: var(--radius-lg);
+      color: white;
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+    }
+
+    .this-week-cta svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* This Month Card */
+    .month-card {
+      margin: 0 var(--space-4) var(--space-4);
+      padding: var(--space-5);
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .month-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-4);
+    }
+
+    .month-card-title {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .month-card-period {
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+    }
+
+    .comparison-bars {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .comparison-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .comparison-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .comparison-name {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-on-surface);
+    }
+
+    .comparison-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-sm);
+    }
+
+    .comparison-avatar.you {
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
+    }
+
+    .comparison-avatar.partner {
+      background: var(--color-tertiary-light);
+      color: var(--color-tertiary-dark);
+    }
+
+    .comparison-stats {
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+    }
+
+    .comparison-bar {
+      height: 12px;
+      background: var(--color-surface-variant);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .comparison-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width 1s var(--ease-out);
+    }
+
+    .comparison-bar-fill.you {
+      background: var(--gradient-primary);
+      width: 78%;
+    }
+
+    .comparison-bar-fill.partner {
+      background: linear-gradient(135deg, var(--color-tertiary) 0%, #52A3A3 100%);
+      width: 65%;
+    }
+
+    /* Trends Card */
+    .trends-card {
+      margin: 0 var(--space-4) var(--space-4);
+      padding: var(--space-5);
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .trends-title {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+      margin-bottom: var(--space-4);
+    }
+
+    .chart-container {
+      height: 120px;
+      position: relative;
+    }
+
+    .chart-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .chart-line {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .chart-line.you {
+      stroke: var(--color-primary);
+    }
+
+    .chart-line.partner {
+      stroke: var(--color-tertiary);
+    }
+
+    .chart-dot {
+      r: 4;
+    }
+
+    .chart-dot.you {
+      fill: var(--color-primary);
+    }
+
+    .chart-dot.partner {
+      fill: var(--color-tertiary);
+    }
+
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-6);
+      margin-top: var(--space-3);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: var(--radius-full);
+    }
+
+    .legend-dot.you {
+      background: var(--color-primary);
+    }
+
+    .legend-dot.partner {
+      background: var(--color-tertiary);
+    }
+
+    /* Past Weeks Section */
+    .past-weeks-section {
+      padding: 0 var(--space-4) var(--space-4);
+    }
+
+    .past-weeks-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-3);
+    }
+
+    .past-weeks-title {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
+      color: var(--color-on-surface);
+    }
+
+    .past-weeks-link {
+      font-size: var(--text-sm);
+      color: var(--color-primary);
+      font-weight: var(--font-medium);
+      text-decoration: none;
+    }
+
+    .past-week-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-3);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-in-out);
+    }
+
+    .past-week-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .past-week-dates {
+      flex: 1;
+    }
+
+    .past-week-range {
+      font-size: var(--text-base);
+      font-weight: var(--font-medium);
+      color: var(--color-on-surface);
+    }
+
+    .past-week-stats {
+      font-size: var(--text-sm);
+      color: var(--color-muted);
+      margin-top: var(--space-1);
+    }
+
+    .past-week-rings {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .mini-ring {
+      position: relative;
+      width: 40px;
+      height: 40px;
+    }
+
+    .mini-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .mini-ring-bg {
+      fill: none;
+      stroke: var(--color-surface-variant);
+      stroke-width: 4;
+    }
+
+    .mini-ring-fill {
+      fill: none;
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+
+    .mini-ring-fill.you {
+      stroke: var(--color-primary);
+    }
+
+    .mini-ring-fill.partner {
+      stroke: var(--color-tertiary);
+    }
+
+    .past-week-emojis {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      font-size: var(--text-lg);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+
+      <!-- Status Bar -->
+      <div class="status-bar">
+        <span class="status-bar-time">9:41</span>
+        <div class="status-bar-icons">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor">
+            <path d="M1 4.5h2v7H1v-7zm4-3h2v10H5v-10zm4 5h2v5H9v-5zm4-2h2v7h-2v-7zm4-3h1v10h-1v-10z"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
+            <path d="M8 0C5.2 0 2.7 1.1.9 2.9l1.4 1.4C3.7 2.9 5.7 2 8 2s4.3.9 5.7 2.3l1.4-1.4C13.3 1.1 10.8 0 8 0zm0 4c-1.7 0-3.2.6-4.4 1.7l1.4 1.4c.8-.7 1.9-1.1 3-1.1s2.2.4 3 1.1l1.4-1.4C11.2 4.6 9.7 4 8 4zm0 4c-.8 0-1.6.3-2.1.9l2.1 2.1 2.1-2.1c-.5-.6-1.3-.9-2.1-.9z"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor">
+            <rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/>
+            <rect x="2" y="3" width="16" height="6" rx="1" fill="currentColor"/>
+            <path d="M23 4v4c.6 0 1-.7 1-2s-.4-2-1-2z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="phone-screen">
+        <div class="screen-content" style="padding-top: 0;">
+          <!-- Header -->
+          <div class="progress-header">
+            <h1 class="progress-title">Progress</h1>
+          </div>
+
+          <!-- Streak Card -->
+          <div class="streak-card animate-card-1">
+            <div class="streak-content">
+              <span class="streak-icon">🔥</span>
+              <div class="streak-info">
+                <div class="streak-number">12</div>
+                <div class="streak-label">week streak together</div>
+              </div>
+              <span class="streak-badge">Best: 15</span>
+            </div>
+          </div>
+
+          <!-- This Week Card - Entry point for Review -->
+          <div class="this-week-card animate-card-2" data-nav="13-review-start.html">
+            <div class="this-week-header">
+              <span class="this-week-title">This Week</span>
+              <span class="this-week-dates">Jan 5 - 11</span>
+            </div>
+            <div class="this-week-progress">
+              <div class="this-week-ring">
+                <svg width="64" height="64" viewBox="0 0 64 64">
+                  <circle class="this-week-ring-bg" cx="32" cy="32" r="26"/>
+                  <circle class="this-week-ring-fill" cx="32" cy="32" r="26"/>
+                </svg>
+                <span class="this-week-ring-center">75%</span>
+              </div>
+              <div class="this-week-stats">
+                <div class="this-week-stat-row">
+                  <span>Completed</span>
+                  <span class="this-week-stat-value">6 / 8</span>
+                </div>
+                <div class="this-week-stat-row">
+                  <span>Remaining</span>
+                  <span class="this-week-stat-value">2 tasks</span>
+                </div>
+                <div class="this-week-stat-row">
+                  <span>Days left</span>
+                  <span class="this-week-stat-value">2 days</span>
+                </div>
+              </div>
+            </div>
+            <div class="this-week-cta">
+              🌇 Review Your Week
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- This Month Comparison -->
+          <div class="month-card animate-card-3">
+            <div class="month-card-header">
+              <span class="month-card-title">This Month</span>
+              <span class="month-card-period">January</span>
+            </div>
+            <div class="comparison-bars">
+              <div class="comparison-row">
+                <div class="comparison-label">
+                  <span class="comparison-name">
+                    <span class="comparison-avatar you">Y</span>
+                    You
+                  </span>
+                  <span class="comparison-stats">78% · 18/23</span>
+                </div>
+                <div class="comparison-bar">
+                  <div class="comparison-bar-fill you"></div>
+                </div>
+              </div>
+              <div class="comparison-row">
+                <div class="comparison-label">
+                  <span class="comparison-name">
+                    <span class="comparison-avatar partner">A</span>
+                    Alex
+                  </span>
+                  <span class="comparison-stats">65% · 15/23</span>
+                </div>
+                <div class="comparison-bar">
+                  <div class="comparison-bar-fill partner"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Completion Trends -->
+          <div class="trends-card animate-card-4">
+            <h3 class="trends-title">Completion Trends</h3>
+            <div class="chart-container">
+              <svg class="chart-svg" viewBox="0 0 300 100" preserveAspectRatio="none">
+                <!-- Grid lines -->
+                <line x1="0" y1="25" x2="300" y2="25" stroke="var(--color-divider)" stroke-width="1" stroke-dasharray="4"/>
+                <line x1="0" y1="50" x2="300" y2="50" stroke="var(--color-divider)" stroke-width="1" stroke-dasharray="4"/>
+                <line x1="0" y1="75" x2="300" y2="75" stroke="var(--color-divider)" stroke-width="1" stroke-dasharray="4"/>
+
+                <!-- You Line -->
+                <polyline
+                  class="chart-line you"
+                  points="0,40 50,35 100,50 150,30 200,25 250,35 300,20"
+                />
+                <circle class="chart-dot you" cx="0" cy="40"/>
+                <circle class="chart-dot you" cx="50" cy="35"/>
+                <circle class="chart-dot you" cx="100" cy="50"/>
+                <circle class="chart-dot you" cx="150" cy="30"/>
+                <circle class="chart-dot you" cx="200" cy="25"/>
+                <circle class="chart-dot you" cx="250" cy="35"/>
+                <circle class="chart-dot you" cx="300" cy="20"/>
+
+                <!-- Partner Line -->
+                <polyline
+                  class="chart-line partner"
+                  points="0,50 50,45 100,60 150,45 200,40 250,50 300,35"
+                />
+                <circle class="chart-dot partner" cx="0" cy="50"/>
+                <circle class="chart-dot partner" cx="50" cy="45"/>
+                <circle class="chart-dot partner" cx="100" cy="60"/>
+                <circle class="chart-dot partner" cx="150" cy="45"/>
+                <circle class="chart-dot partner" cx="200" cy="40"/>
+                <circle class="chart-dot partner" cx="250" cy="50"/>
+                <circle class="chart-dot partner" cx="300" cy="35"/>
+              </svg>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <span class="legend-dot you"></span>
+                <span>You</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot partner"></span>
+                <span>Alex</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Past Weeks -->
+          <div class="past-weeks-section">
+            <div class="past-weeks-header">
+              <h3 class="past-weeks-title">Past Weeks</h3>
+              <a href="#" class="past-weeks-link">See all</a>
+            </div>
+
+            <div class="past-week-card animate-card-5">
+              <div class="past-week-dates">
+                <div class="past-week-range">Dec 29 - Jan 4</div>
+                <div class="past-week-stats">5/6 · 4/5</div>
+              </div>
+              <div class="past-week-rings">
+                <div class="mini-ring">
+                  <svg width="40" height="40" viewBox="0 0 40 40">
+                    <circle class="mini-ring-bg" cx="20" cy="20" r="16"/>
+                    <circle class="mini-ring-fill you" cx="20" cy="20" r="16" stroke-dasharray="100.53" stroke-dashoffset="16.76"/>
+                  </svg>
+                </div>
+                <div class="mini-ring">
+                  <svg width="40" height="40" viewBox="0 0 40 40">
+                    <circle class="mini-ring-bg" cx="20" cy="20" r="16"/>
+                    <circle class="mini-ring-fill partner" cx="20" cy="20" r="16" stroke-dasharray="100.53" stroke-dashoffset="20.11"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="past-week-emojis">
+                <span>😊</span>
+                <span>😄</span>
+              </div>
+            </div>
+
+            <div class="past-week-card animate-card-6">
+              <div class="past-week-dates">
+                <div class="past-week-range">Dec 22 - 28</div>
+                <div class="past-week-stats">6/7 · 5/6</div>
+              </div>
+              <div class="past-week-rings">
+                <div class="mini-ring">
+                  <svg width="40" height="40" viewBox="0 0 40 40">
+                    <circle class="mini-ring-bg" cx="20" cy="20" r="16"/>
+                    <circle class="mini-ring-fill you" cx="20" cy="20" r="16" stroke-dasharray="100.53" stroke-dashoffset="14.36"/>
+                  </svg>
+                </div>
+                <div class="mini-ring">
+                  <svg width="40" height="40" viewBox="0 0 40 40">
+                    <circle class="mini-ring-bg" cx="20" cy="20" r="16"/>
+                    <circle class="mini-ring-fill partner" cx="20" cy="20" r="16" stroke-dasharray="100.53" stroke-dashoffset="16.76"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="past-week-emojis">
+                <span>🎉</span>
+                <span>🙂</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Navigation - 4 tabs -->
+        <nav class="bottom-nav" style="display: flex; justify-content: space-around;">
+          <a href="01-week-view-v2.html" class="nav-item" style="flex: 1;">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Week</span>
+          </a>
+          <a href="#" class="nav-item active" style="flex: 1;">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3.5 18.5l6-6 4 4L22 6.92 20.59 5.5l-7.09 8-4-4L2 17l1.5 1.5z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Progress</span>
+          </a>
+          <a href="04-goals.html" class="nav-item" style="flex: 1;">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Goals</span>
+          </a>
+          <a href="21-seasons-list.html" class="nav-item" style="flex: 1;">
+            <div class="nav-icon-bg">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+              </svg>
+            </div>
+            <span class="nav-label">Seasons</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="phone-home-indicator"></div>
+    </div>
+  </div>
+  <script src="../scripts/navigation.js"></script>
+</body>
+</html>

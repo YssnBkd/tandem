@@ -66,15 +66,16 @@ private val DarkColorScheme = darkColorScheme(
 
 /**
  * Tandem Material Design 3 theme.
+ * Uses warm terracotta palette for consistent branding.
  *
  * @param darkTheme Whether to use dark theme, defaults to system setting
- * @param dynamicColor Whether to use dynamic colors on Android 12+, defaults to true
+ * @param dynamicColor Whether to use dynamic colors on Android 12+, defaults to false for brand consistency
  * @param content The composable content to be themed
  */
 @Composable
 fun TandemTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

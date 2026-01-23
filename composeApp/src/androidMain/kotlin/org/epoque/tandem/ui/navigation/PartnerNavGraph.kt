@@ -16,10 +16,10 @@ import kotlinx.coroutines.flow.Flow
 import org.epoque.tandem.presentation.partner.PartnerEvent
 import org.epoque.tandem.presentation.partner.PartnerSideEffect
 import org.epoque.tandem.presentation.partner.PartnerUiState
-import org.epoque.tandem.ui.partner.ConnectionConfirmationScreen
-import org.epoque.tandem.ui.partner.InvitePartnerScreen
-import org.epoque.tandem.ui.partner.PartnerLandingScreen
-import org.epoque.tandem.ui.partner.PartnerSettingsScreen
+import org.epoque.tandem.ui.legacy.partner.ConnectionConfirmationScreen
+import org.epoque.tandem.ui.legacy.partner.InvitePartnerScreen
+import org.epoque.tandem.ui.legacy.partner.PartnerLandingScreen
+import org.epoque.tandem.ui.legacy.partner.PartnerSettingsScreen
 
 /**
  * Navigation graph for partner-related screens.

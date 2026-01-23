@@ -1,5 +1,7 @@
 package org.epoque.tandem.presentation.week
 
+import org.epoque.tandem.presentation.week.model.TaskSection
+
 /**
  * One-time side effects from the Week View.
  * Consumed once by the UI layer.
@@ -34,4 +36,39 @@ sealed class WeekSideEffect {
      * Clear keyboard focus.
      */
     data object ClearFocus : WeekSideEffect()
+
+    /**
+     * Dismiss keyboard and clear focus.
+     */
+    data object DismissKeyboard : WeekSideEffect()
+
+    /**
+     * Scroll to specific section.
+     */
+    data class ScrollToSection(val section: TaskSection) : WeekSideEffect()
+
+    /**
+     * Show date picker dialog.
+     */
+    data object ShowDatePicker : WeekSideEffect()
+
+    /**
+     * Show time picker dialog.
+     */
+    data object ShowTimePicker : WeekSideEffect()
+
+    /**
+     * Show priority picker.
+     */
+    data object ShowPriorityPicker : WeekSideEffect()
+
+    /**
+     * Show labels picker.
+     */
+    data object ShowLabelsPicker : WeekSideEffect()
+
+    /**
+     * Show goal picker.
+     */
+    data object ShowGoalPicker : WeekSideEffect()
 }

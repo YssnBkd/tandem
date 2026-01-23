@@ -51,12 +51,14 @@ data class ReviewDetail(
  *
  * @property taskId Task identifier
  * @property title Task title
+ * @property priority Task priority for display
  * @property userStatus User's task status
  * @property partnerStatus Partner's status for shared tasks, or null if not shared
  */
 data class TaskOutcome(
     val taskId: String,
     val title: String,
+    val priority: TaskPriority,
     val userStatus: TaskStatus,
     val partnerStatus: TaskStatus?
 )

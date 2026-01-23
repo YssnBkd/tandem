@@ -4,9 +4,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import org.epoque.tandem.presentation.auth.AuthViewModel
-import org.epoque.tandem.ui.auth.RegisterScreen
-import org.epoque.tandem.ui.auth.SignInScreen
-import org.epoque.tandem.ui.auth.WelcomeScreen
+import org.epoque.tandem.ui.legacy.auth.RegisterScreen
+import org.epoque.tandem.ui.legacy.auth.SignInScreen
+import org.epoque.tandem.ui.legacy.auth.WelcomeScreen
 
 /**
  * Navigation graph for authentication screens.

@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6-Week Life Transition Plan | Jan 5 - Feb 13, 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2c5f4f;
+            --secondary: #d4a574;
+            --accent: #c75b4d;
+            --bg: #faf8f5;
+            --card-bg: #ffffff;
+            --text: #2a2a2a;
+            --text-light: #6a6a6a;
+            --border: #e8e4dd;
+            --shadow: rgba(44, 95, 79, 0.08);
+            
+            --project-moving: #2c5f4f;
+            --project-documentary: #c75b4d;
+            --project-social: #d4a574;
+            --project-learning: #6a8e7f;
+            --project-work: #8b7355;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: linear-gradient(135deg, #faf8f5 0%, #f5f1eb 100%);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--primary) 0%, #245144 100%);
+            color: white;
+            padding: 2rem 0;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 100;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-280px);
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .nav-section {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-section-title {
+            padding: 0 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--secondary);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+        }
+
+        .toggle-sidebar {
+            position: absolute;
+            top: 2rem;
+            right: -40px;
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border: none;
+            border-radius: 0 8px 8px 0;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-sidebar:hover {
+            background: #3a7360;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: 0;
+        }
+
+        .view {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        header {
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Overview Cards */
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .overview-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid var(--border);
+            animation: fadeIn 0.6s ease-out both;
+        }
+
+        .overview-card h3 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Timeline/Gantt View */
+        .timeline-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .timeline-legend {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .gantt-chart {
+            min-width: 800px;
+        }
+
+        .gantt-header {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .gantt-weeks {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .gantt-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            align-items: center;
+            min-height: 50px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .gantt-label {
+            font-weight: 500;
+            padding: 0.5rem;
+        }
+
+        .gantt-bars {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .gantt-bar {
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .gantt-bar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .gantt-bar.span-2 {
+            grid-column: span 2;
+        }
+
+        .gantt-bar.span-3 {
+            grid-column: span 3;
+        }
+
+        .gantt-bar.span-4 {
+            grid-column: span 4;
+        }
+
+        .gantt-bar.span-5 {
+            grid-column: span 5;
+        }
+
+        .gantt-bar.span-6 {
+            grid-column: span 6;
+        }
+
+        /* Projects View */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid var(--border);
+            animation: fadeIn 0.6s ease-out both;
+        }
+
+        .project-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .project-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .project-info h3 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.4rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-meta {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .project-progress {
+            margin-bottom: 1rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .project-tasks {
+            list-style: none;
+        }
+
+        .project-task {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .project-task:hover {
+            background: #f0ede6;
+        }
+
+        .project-task.completed {
+            opacity: 0.6;
+        }
+
+        .project-task.completed .task-text {
+            text-decoration: line-through;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+            flex-shrink: 0;
+            margin-top: 0.15rem;
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 0.95rem;
+        }
+
+        .task-week {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            background: rgba(0, 0, 0, 0.05);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        /* Weekly View */
+        .weeks-container {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .week-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-out both;
+        }
+
+        .week-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #3a7360 100%);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .week-header:hover {
+            background: linear-gradient(135deg, #3a7360 0%, var(--primary) 100%);
+        }
+
+        .week-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .week-dates {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .week-toggle {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .week-toggle.open {
+            transform: rotate(180deg);
+        }
+
+        .week-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .week-content.open {
+            max-height: 4000px;
+        }
+
+        .week-body {
+            padding: 2rem;
+        }
+
+        .theme {
+            background: var(--bg);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .theme-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .theme-text {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .day-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .day-header {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .location-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--accent);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .location-badge.lyon {
+            background: var(--primary);
+        }
+
+        .location-badge.gf {
+            background: var(--secondary);
+            color: var(--text);
+        }
+
+        .task-list {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            flex-wrap: wrap;
+        }
+
+        .task-item:hover {
+            background: #f0ede6;
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+        }
+
+        .project-tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .cal-btn {
+            background: var(--secondary);
+            color: var(--text);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .cal-btn:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .notes-section {
+            background: #fff9f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            border: 2px dashed var(--border);
+        }
+
+        .notes-label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 0.95rem;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100%;
+                z-index: 1000;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gantt-chart {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+            
+            <div class="sidebar-header">
+                <div class="sidebar-title">Life Transition</div>
+                <div class="sidebar-subtitle">Jan 5 - Feb 13, 2026</div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Views</div>
+                <div class="nav-item active" onclick="switchView('overview')" data-view="overview">
+                    <span class="nav-icon">🏠</span>
+                    <span>Overview</span>
+                </div>
+                <div class="nav-item" onclick="switchView('timeline')" data-view="timeline">
+                    <span class="nav-icon">📊</span>
+                    <span>Timeline</span>
+                </div>
+                <div class="nav-item" onclick="switchView('projects')" data-view="projects">
+                    <span class="nav-icon">📁</span>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item" onclick="switchView('weekly')" data-view="weekly">
+                    <span class="nav-icon">📅</span>
+                    <span>Weekly View</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Quick Jump</div>
+                <div class="nav-item" onclick="switchView('weekly'); setTimeout(() => scrollToWeek(1), 100)">
+                    <span class="nav-icon">1️⃣</span>
+                    <span>Week 1: Setup</span>
+                </div>
+                <div class="nav-item" onclick="switchView('weekly'); setTimeout(() => scrollToWeek(3), 100)">
+                    <span class="nav-icon">🎯</span>
+                    <span>Week 3: Focus</span>
+                </div>
+                <div class="nav-item" onclick="switchView('weekly'); setTimeout(() => scrollToWeek(6), 100)">
+                    <span class="nav-icon">📦</span>
+                    <span>Week 6: Final Move</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Overview View -->
+            <div class="view active" id="view-overview">
+                <header>
+                    <h1>Life Transition Dashboard</h1>
+                    <p class="subtitle">Paris → Lyon → Morocco | 6 Weeks to Transform</p>
+                </header>
+
+                <div class="overview-cards">
+                    <div class="overview-card">
+                        <h3>🎯 Core Priorities</h3>
+                        <div style="display: grid; gap: 0.75rem; margin-top: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 32px; height: 32px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">1</div>
+                                <div>Moving to Lyon with girlfriend</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 32px; height: 32px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">2</div>
+                                <div>Prepare & film documentaries in Morocco</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overview-card">
+                        <h3>📍 Key Dates</h3>
+                        <div style="display: grid; gap: 0.5rem; margin-top: 1rem; font-size: 0.95rem;">
+                            <div><strong>Jan 9-12:</strong> Lyon Trip #1</div>
+                            <div><strong>Jan 16-18:</strong> Girlfriend in Paris</div>
+                            <div><strong>Jan 19-25:</strong> Solo Focus Week 🎯</div>
+                            <div><strong>Jan 30-Feb 2:</strong> Lyon Trip #2</div>
+                            <div><strong>Feb 6-8:</strong> Girlfriend in Paris</div>
+                            <div><strong>Feb 13:</strong> Job Ends! Final Move</div>
+                            <div><strong>Feb 16-28:</strong> Morocco Documentary</div>
+                            <div><strong>Mar 2:</strong> New Job Starts</div>
+                        </div>
+                    </div>
+
+                    <div class="overview-card">
+                        <h3>📦 Projects Overview</h3>
+                        <div style="display: grid; gap: 0.5rem; margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>🏠 Moving to Lyon</span>
+                                <span style="font-weight: 600; color: var(--project-moving);" id="moving-progress">0%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>🎥 Documentary Prep</span>
+                                <span style="font-weight: 600; color: var(--project-documentary);" id="doc-progress">0%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>💕 Social & Friends</span>
+                                <span style="font-weight: 600; color: var(--project-social);" id="social-progress">0%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>📚 Tachelhit Learning</span>
+                                <span style="font-weight: 600; color: var(--project-learning);" id="learning-progress">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overview-card" style="margin-top: 1.5rem;">
+                    <h3>🗺️ The Journey Ahead</h3>
+                    <div style="display: grid; gap: 1rem; margin-top: 1rem;">
+                        <div style="padding: 1rem; background: var(--bg); border-radius: 8px; border-left: 4px solid var(--primary);">
+                            <strong>Phase 1: Transition & Preparation (Jan 5 - Feb 13)</strong>
+                            <div style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.25rem;">Notice period + moving to Lyon</div>
+                        </div>
+                        <div style="padding: 1rem; background: var(--bg); border-radius: 8px; border-left: 4px solid var(--accent);">
+                            <strong>Phase 2: Documentary Window (Feb 16 - Feb 28)</strong>
+                            <div style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.25rem;">Morocco filming trip - capture those interviews!</div>
+                        </div>
+                        <div style="padding: 1rem; background: var(--bg); border-radius: 8px; border-left: 4px solid var(--secondary);">
+                            <strong>Phase 3: New Beginning (March 2)</strong>
+                            <div style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.25rem;">New job starts in Lyon</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline View -->
+            <div class="view" id="view-timeline">
+                <header>
+                    <h1>Timeline View</h1>
+                    <p class="subtitle">Visual overview of all projects and milestones</p>
+                </header>
+
+                <div class="timeline-container">
+                    <div class="timeline-header">
+                        <h2 class="timeline-title">Gantt Chart</h2>
+                        <div class="timeline-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--project-moving);"></div>
+                                <span>Moving</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--project-documentary);"></div>
+                                <span>Documentary</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--project-social);"></div>
+                                <span>Social</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--project-learning);"></div>
+                                <span>Learning</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--project-work);"></div>
+                                <span>Work</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gantt-chart">
+                        <div class="gantt-header">
+                            <div style="font-weight: 600;">Task/Milestone</div>
+                            <div class="gantt-weeks">
+                                <div>Week 1<br><small>Jan 5-12</small></div>
+                                <div>Week 2<br><small>Jan 13-18</small></div>
+                                <div>Week 3<br><small>Jan 19-25</small></div>
+                                <div>Week 4<br><small>Jan 26-Feb 1</small></div>
+                                <div>Week 5<br><small>Feb 2-8</small></div>
+                                <div>Week 6<br><small>Feb 9-15</small></div>
+                            </div>
+                        </div>
+
+                        <!-- Moving Project -->
+                        <div class="gantt-row">
+                            <div class="gantt-label">🏠 Notice Period</div>
+                            <div class="gantt-bars">
+                                <div class="gantt-bar span-6" style="background: var(--project-work);">Working</div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">🏠 Lyon Trip #1</div>
+                            <div class="gantt-bars">
+                                <div class="gantt-bar" style="background: var(--project-moving);">Jan 9-12</div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">🏠 Lyon Trip #2</div>
+                            <div class="gantt-bars">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div class="gantt-bar" style="background: var(--project-moving);">Jan 30-Feb 2</div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">🏠 Final Move</div>
+                            <div class="gantt-bars">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div class="gantt-bar" style="background: var(--project-moving);">Feb 13-15</div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">🏠 Packing & Sorting</div>
+                            <div class="gantt-bars">
+                                <div class="gantt-bar span-6" style="background: linear-gradient(90deg, var(--project-moving), rgba(44, 95, 79, 0.3));">Continuous</div>
+                            </div>
+                        </div>
+
+                        <!-- Documentary Project -->
+                        <div class="gantt-row">
+                            <div class="gantt-label">🎥 Family Outreach</div>
+                            <div class="gantt-bars">
+                                <div class="gantt-bar span-2" style="background: var(--project-documentary);">Contact</div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">🎥 Documentary Research</div>
+                            <div class="gantt-bars">
+                                <div></div>
+                                <div class="gantt-bar span-3" style="background: var(--project-documentary);">Research & Plan</div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">🎥 Camera Practice</div>
+                            <div class="gantt-bars">
+                                <div></div>
+                                <div></div>
+                                <div class="gantt-bar span-2" style="background: var(--project-documentary);">Practice</div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">🎥 Equipment Prep</div>
+                            <div class="gantt-bars">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div class="gantt-bar span-2" style="background: var(--project-documentary);">Final Prep</div>
+                            </div>
+                        </div>
+
+                        <!-- Social Events -->
+                        <div class="gantt-row">
+                            <div class="gantt-label">💕 GF in Paris #1</div>
+                            <div class="gantt-bars">
+                                <div></div>
+                                <div class="gantt-bar" style="background: var(--project-social);">Jan 16-18</div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">💕 GF in Paris #2</div>
+                            <div class="gantt-bars">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div class="gantt-bar" style="background: var(--project-social);">Feb 6-8</div>
+                            </div>
+                        </div>
+                        <div class="gantt-row">
+                            <div class="gantt-label">💕 Friends Goodbye</div>
+                            <div class="gantt-bars">
+                                <div></div>
+                                <div></div>
+                                <div class="gantt-bar span-3" style="background: var(--project-social);">Schedule & Meet</div>
+                            </div>
+                        </div>
+
+                        <!-- Learning -->
+                        <div class="gantt-row">
+                            <div class="gantt-label">📚 Tachelhit Learning</div>
+                            <div class="gantt-bars">
+                                <div class="gantt-bar span-6" style="background: linear-gradient(90deg, rgba(106, 142, 127, 0.3), var(--project-learning));">Daily Practice</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects View -->
+            <div class="view" id="view-projects">
+                <header>
+                    <h1>Projects</h1>
+                    <p class="subtitle">Organized by focus area with progress tracking</p>
+                </header>
+
+                <div class="projects-grid" id="projectsContainer"></div>
+            </div>
+
+            <!-- Weekly View -->
+            <div class="view" id="view-weekly">
+                <header>
+                    <h1>Weekly Breakdown</h1>
+                    <p class="subtitle">Detailed week-by-week tasks and planning</p>
+                </header>
+
+                <div class="weeks-container" id="weeksContainer"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Data Structure
+        const projectsData = {
+            moving: {
+                id: 'moving',
+                name: 'Moving to Lyon',
+                icon: '🏠',
+                color: 'var(--project-moving)',
+                description: 'Priority #1: Transition from Paris to Lyon',
+                tasks: []
+            },
+            documentary: {
+                id: 'documentary',
+                name: 'Documentary Preparation',
+                icon: '🎥',
+                color: 'var(--project-documentary)',
+                description: 'Priority #2: Prepare for Morocco filming',
+                tasks: []
+            },
+            social: {
+                id: 'social',
+                name: 'Social & Relationships',
+                icon: '💕',
+                color: 'var(--project-social)',
+                description: 'Time with girlfriend and friends',
+                tasks: []
+            },
+            learning: {
+                id: 'learning',
+                name: 'Tachelhit Learning',
+                icon: '📚',
+                color: 'var(--project-learning)',
+                description: 'Language preparation for Morocco',
+                tasks: []
+            },
+            work: {
+                id: 'work',
+                name: 'Notice Period',
+                icon: '💼',
+                color: 'var(--project-work)',
+                description: 'Wrapping up current job',
+                tasks: []
+            }
+        };
+
+        const weeksData = [
+            {
+                number: 1,
+                dates: "Jan 5-12",
+                theme: "Setup Week: Assess and organize",
+                sections: [
+                    {
+                        title: "Jan 5-8 (Mon-Wed)",
+                        location: "Paris 🗼",
+                        tasks: [
+                            { text: "Create full apartment inventory (photograph room by room)", cal: true, date: "2026-01-06", project: 'moving' },
+                            { text: "Start posting items to sell/donate (Leboncoin, Facebook)", cal: true, date: "2026-01-06", project: 'moving' },
+                            { text: "Sort into 3 piles: Lyon / Sell / Trash", cal: false, project: 'moving' },
+                            { text: "Documentary: Start family outreach in Morocco", cal: true, date: "2026-01-07", project: 'documentary' }
+                        ]
+                    },
+                    {
+                        title: "Jan 9-12 (Thu-Sun)",
+                        location: "Lyon 🚄",
+                        tasks: [
+                            { text: "Bring first wave of items (books, off-season clothes)", cal: true, date: "2026-01-09", project: 'moving' },
+                            { text: "Measure/photograph girlfriend's apartment space", cal: false, project: 'moving' },
+                            { text: "Plan where your items will go", cal: false, project: 'moving' }
+                        ]
+                    }
+                ],
+                notes: ""
+            },
+            {
+                number: 2,
+                dates: "Jan 13-18",
+                theme: "Social + Moving Prep",
+                sections: [
+                    {
+                        title: "Jan 13-15 (Mon-Wed)",
+                        location: "Paris 🗼",
+                        tasks: [
+                            { text: "Continue selling/donating items", cal: false, project: 'moving' },
+                            { text: "Pack more boxes for next Lyon trip", cal: true, date: "2026-01-14", project: 'moving' },
+                            { text: "Documentary: Confirm Morocco interview schedule", cal: true, date: "2026-01-15", project: 'documentary' }
+                        ]
+                    },
+                    {
+                        title: "Jan 16-18 (Thu-Sat)",
+                        location: "Girlfriend in Paris 💕",
+                        tasks: [
+                            { text: "Plan: Dinner at favorite restaurant", cal: true, date: "2026-01-16", project: 'social' },
+                            { text: "Plan: Museum/exhibition visit", cal: true, date: "2026-01-17", project: 'social' },
+                            { text: "Plan: Walk through favorite neighborhoods", cal: true, date: "2026-01-18", project: 'social' },
+                            { text: "Plan: Cozy evening cooking together", cal: false, project: 'social' }
+                        ]
+                    }
+                ],
+                notes: ""
+            },
+            {
+                number: 3,
+                dates: "Jan 19-25",
+                theme: "SOLO FOCUS WEEK - Maximize this golden time! 🎯",
+                sections: [
+                    {
+                        title: "Jan 19-25 (All Week)",
+                        location: "Paris 🗼",
+                        tasks: [
+                            { text: "MAJOR packing session - dedicate full days", cal: true, date: "2026-01-19", project: 'moving' },
+                            { text: "Clear out/sell remaining unwanted items", cal: false, project: 'moving' },
+                            { text: "Handle apartment admin: notice, utilities, internet", cal: true, date: "2026-01-20", project: 'moving' },
+                            { text: "Deep cleaning as you pack", cal: false, project: 'moving' },
+                            { text: "Documentary: Finalize Morocco interview schedule", cal: true, date: "2026-01-22", project: 'documentary' },
+                            { text: "Documentary: Practice with GH5 camera", cal: true, date: "2026-01-23", project: 'documentary' },
+                            { text: "Schedule 2-3 goodbye dinners with friends", cal: true, date: "2026-01-21", project: 'social' },
+                            { text: "Download Tachelhit learning resources", cal: false, project: 'learning' },
+                            { text: "Start Tachelhit practice (15 min/day)", cal: false, project: 'learning' }
+                        ]
+                    }
+                ],
+                notes: ""
+            },
+            {
+                number: 4,
+                dates: "Jan 26 - Feb 2",
+                theme: "Second Move Wave + Final Work Push",
+                sections: [
+                    {
+                        title: "Jan 26-29 (Mon-Thu)",
+                        location: "Paris 🗼",
+                        tasks: [
+                            { text: "Final packing push (apartment 70% packed)", cal: true, date: "2026-01-27", project: 'moving' },
+                            { text: "Research moving options (train, rental van)", cal: true, date: "2026-01-28", project: 'moving' },
+                            { text: "Documentary: Watch interview technique tutorials", cal: false, project: 'documentary' },
+                            { text: "Tachelhit: Focus on interview phrases", cal: false, project: 'learning' }
+                        ]
+                    },
+                    {
+                        title: "Jan 30 - Feb 2 (Thu-Sun)",
+                        location: "Lyon 🚄",
+                        tasks: [
+                            { text: "Bring second major wave of belongings", cal: true, date: "2026-01-30", project: 'moving' },
+                            { text: "Start organizing items in Lyon apartment", cal: false, project: 'moving' }
+                        ]
+                    }
+                ],
+                notes: ""
+            },
+            {
+                number: 5,
+                dates: "Feb 3-8",
+                theme: "Countdown Week: Almost there!",
+                sections: [
+                    {
+                        title: "Feb 3-5 (Mon-Thu)",
+                        location: "Paris 🗼",
+                        tasks: [
+                            { text: "Pack remaining essentials", cal: true, date: "2026-02-03", project: 'moving' },
+                            { text: "Start final apartment deep cleaning", cal: true, date: "2026-02-04", project: 'moving' },
+                            { text: "Documentary: Final Morocco prep", cal: true, date: "2026-02-05", project: 'documentary' },
+                            { text: "Format SD cards, charge all batteries", cal: false, project: 'documentary' },
+                            { text: "Book Morocco flights if not done!", cal: true, date: "2026-02-03", project: 'documentary' }
+                        ]
+                    },
+                    {
+                        title: "Feb 6-8 (Fri-Sun)",
+                        location: "Girlfriend in Paris 💕",
+                        tasks: [
+                            { text: "Plan: Revisit favorite spots together", cal: true, date: "2026-02-06", project: 'social' },
+                            { text: "Plan: Take photos of meaningful places", cal: false, project: 'social' },
+                            { text: "Plan: Last meal at beloved restaurant", cal: true, date: "2026-02-07", project: 'social' },
+                            { text: "Plan: Going-away gathering with friends?", cal: true, date: "2026-02-08", project: 'social' }
+                        ]
+                    }
+                ],
+                notes: ""
+            },
+            {
+                number: 6,
+                dates: "Feb 9-15",
+                theme: "FINAL MOVE - The big transition! 📦",
+                sections: [
+                    {
+                        title: "Feb 9-12 (Mon-Thu)",
+                        location: "Paris 🗼",
+                        tasks: [
+                            { text: "Final packing of last items", cal: true, date: "2026-02-10", project: 'moving' },
+                            { text: "Deep clean entire apartment", cal: true, date: "2026-02-11", project: 'moving' },
+                            { text: "Wrap up final work duties (LAST DAYS!)", cal: true, date: "2026-02-12", project: 'work' },
+                            { text: "Final walk-through of empty apartment", cal: false, project: 'moving' }
+                        ]
+                    },
+                    {
+                        title: "Feb 13-15 (Thu-Sat)",
+                        location: "Lyon 🚄",
+                        tasks: [
+                            { text: "Move final belongings, hand over Paris keys", cal: true, date: "2026-02-13", project: 'moving' },
+                            { text: "Unpack and settle into Lyon", cal: true, date: "2026-02-14", project: 'moving' },
+                            { text: "Decompress and relax before Morocco", cal: true, date: "2026-02-15", project: 'social' },
+                            { text: "Spend quality time with girlfriend", cal: false, project: 'social' },
+                            { text: "Pack for Morocco trip (departing ~Feb 16)", cal: true, date: "2026-02-15", project: 'documentary' }
+                        ]
+                    }
+                ],
+                notes: ""
+            }
+        ];
+
+        // Populate projects data from weeks
+        weeksData.forEach(week => {
+            week.sections.forEach(section => {
+                section.tasks.forEach((task, taskIndex) => {
+                    const taskId = `w${week.number}-${section.title}-${taskIndex}`;
+                    const projectTask = {
+                        id: taskId,
+                        text: task.text,
+                        week: week.number,
+                        weekDates: week.dates,
+                        completed: false,
+                        cal: task.cal,
+                        date: task.date
+                    };
+                    if (task.project && projectsData[task.project]) {
+                        projectsData[task.project].tasks.push(projectTask);
+                    }
+                });
+            });
+        });
+
+        // Functions
+        function createGoogleCalendarLink(task, date) {
+            const startDate = new Date(date);
+            const endDate = new Date(startDate);
+            endDate.setHours(endDate.getHours() + 1);
+            
+            const formatDate = (d) => {
+                return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            };
+            
+            const title = encodeURIComponent(task);
+            const start = formatDate(startDate);
+            const end = formatDate(endDate);
+            
+            return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}`;
+        }
+
+        function saveToLocalStorage() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const state = {};
+            checkboxes.forEach(cb => {
+                state[cb.id] = cb.checked;
+            });
+            localStorage.setItem('plannerState', JSON.stringify(state));
+
+            const textareas = document.querySelectorAll('textarea');
+            const notesState = {};
+            textareas.forEach(ta => {
+                notesState[ta.id] = ta.value;
+            });
+            localStorage.setItem('plannerNotes', JSON.stringify(notesState));
+            
+            updateAllProgress();
+        }
+
+        function loadFromLocalStorage() {
+            const state = JSON.parse(localStorage.getItem('plannerState') || '{}');
+            Object.keys(state).forEach(id => {
+                const cb = document.getElementById(id);
+                if (cb) {
+                    cb.checked = state[id];
+                    if (state[id]) {
+                        cb.parentElement.classList.add('completed');
+                    }
+                }
+            });
+
+            const notesState = JSON.parse(localStorage.getItem('plannerNotes') || '{}');
+            Object.keys(notesState).forEach(id => {
+                const ta = document.getElementById(id);
+                if (ta) {
+                    ta.value = notesState[id];
+                }
+            });
+
+            updateAllProgress();
+        }
+
+        function updateProgress(weekNumber) {
+            const weekCard = document.querySelector(`[data-week="${weekNumber}"]`);
+            if (!weekCard) return;
+            
+            const checkboxes = weekCard.querySelectorAll('input[type="checkbox"]');
+            const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const total = checkboxes.length;
+            const percentage = total > 0 ? (checked / total) * 100 : 0;
+            
+            const progressBar = weekCard.querySelector('.progress-fill');
+            if (progressBar) {
+                progressBar.style.width = `${percentage}%`;
+            }
+        }
+
+        function updateProjectProgress(projectId) {
+            const project = projectsData[projectId];
+            if (!project) return;
+            
+            const total = project.tasks.length;
+            const completed = project.tasks.filter(task => {
+                const cb = document.getElementById(task.id);
+                return cb && cb.checked;
+            }).length;
+            
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            const progressEl = document.getElementById(`${projectId}-progress`);
+            if (progressEl) {
+                progressEl.textContent = `${percentage}%`;
+            }
+            
+            const progressBar = document.querySelector(`[data-project="${projectId}"] .progress-fill`);
+            if (progressBar) {
+                progressBar.style.width = `${percentage}%`;
+            }
+        }
+
+        function updateAllProgress() {
+            weeksData.forEach((_, index) => {
+                updateProgress(index + 1);
+            });
+            
+            Object.keys(projectsData).forEach(projectId => {
+                updateProjectProgress(projectId);
+            });
+        }
+
+        function renderProjects() {
+            const container = document.getElementById('projectsContainer');
+            container.innerHTML = '';
+            
+            Object.values(projectsData).forEach(project => {
+                if (project.tasks.length === 0) return;
+                
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                card.setAttribute('data-project', project.id);
+                
+                let tasksHTML = '';
+                project.tasks.forEach(task => {
+                    const calButton = task.cal ? 
+                        `<button class="cal-btn" onclick="window.open('${createGoogleCalendarLink(task.text, task.date)}', '_blank')">📅</button>` : '';
+                    
+                    tasksHTML += `
+                        <li class="project-task" data-task-id="${task.id}">
+                            <input type="checkbox" id="${task.id}" onchange="handleCheckboxChange(this)">
+                            <span class="task-text">${task.text}</span>
+                            <span class="task-week">W${task.week}</span>
+                            ${calButton}
+                        </li>
+                    `;
+                });
+                
+                card.innerHTML = `
+                    <div class="project-header">
+                        <div class="project-icon" style="background: ${project.color};">
+                            ${project.icon}
+                        </div>
+                        <div class="project-info">
+                            <h3>${project.name}</h3>
+                            <div class="project-meta">${project.description}</div>
+                        </div>
+                    </div>
+                    <div class="project-progress">
+                        <div class="progress-label">
+                            <span>Progress</span>
+                            <span id="${project.id}-progress">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="background: ${project.color}; width: 0%;"></div>
+                        </div>
+                    </div>
+                    <ul class="project-tasks">
+                        ${tasksHTML}
+                    </ul>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function renderWeeks() {
+            const container = document.getElementById('weeksContainer');
+            container.innerHTML = '';
+            
+            weeksData.forEach((week, weekIndex) => {
+                const weekCard = document.createElement('div');
+                weekCard.className = 'week-card';
+                weekCard.setAttribute('data-week', week.number);
+                weekCard.id = `week-${week.number}`;
+                
+                let sectionsHTML = '';
+                week.sections.forEach((section, sectionIndex) => {
+                    const locationClass = section.location.includes('Lyon') ? 'lyon' : 
+                                         section.location.includes('Girlfriend') ? 'gf' : 'paris';
+                    
+                    let tasksHTML = '';
+                    section.tasks.forEach((task, taskIndex) => {
+                        const taskId = `task-w${week.number}-s${sectionIndex}-t${taskIndex}`;
+                        const projectColor = task.project ? projectsData[task.project].color : 'var(--text-light)';
+                        const projectName = task.project ? projectsData[task.project].name : '';
+                        const projectTag = task.project ? 
+                            `<span class="project-tag" style="background: ${projectColor};">${projectsData[task.project].icon}</span>` : '';
+                        
+                        const calButton = task.cal ? 
+                            `<button class="cal-btn" onclick="window.open('${createGoogleCalendarLink(task.text, task.date)}', '_blank')">📅 Add</button>` : '';
+                        
+                        tasksHTML += `
+                            <li class="task-item" data-task-id="${taskId}">
+                                <input type="checkbox" id="${taskId}" onchange="handleCheckboxChange(this)">
+                                <span class="task-text">${task.text}</span>
+                                ${projectTag}
+                                ${calButton}
+                            </li>
+                        `;
+                    });
+                    
+                    sectionsHTML += `
+                        <div class="day-section">
+                            <div class="day-header">
+                                ${section.title}
+                                <span class="location-badge ${locationClass}">${section.location}</span>
+                            </div>
+                            <ul class="task-list">
+                                ${tasksHTML}
+                            </ul>
+                        </div>
+                    `;
+                });
+                
+                weekCard.innerHTML = `
+                    <div class="week-header" onclick="toggleWeek(${week.number})">
+                        <div>
+                            <div class="week-title">Week ${week.number}</div>
+                            <div class="week-dates">${week.dates}</div>
+                        </div>
+                        <div class="week-toggle" id="toggle-${week.number}">▼</div>
+                    </div>
+                    <div class="week-content" id="content-${week.number}">
+                        <div class="week-body">
+                            <div class="theme">
+                                <div class="theme-label">Week Theme</div>
+                                <div class="theme-text">${week.theme}</div>
+                            </div>
+                            ${sectionsHTML}
+                            <div class="notes-section">
+                                <div class="notes-label">📝 Week Notes & Reflections</div>
+                                <textarea id="notes-w${week.number}" placeholder="Add your notes, thoughts, adjustments..." onchange="saveToLocalStorage()"></textarea>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(weekCard);
+            });
+        }
+
+        function toggleWeek(weekNumber) {
+            const content = document.getElementById(`content-${weekNumber}`);
+            const toggle = document.getElementById(`toggle-${weekNumber}`);
+            
+            content.classList.toggle('open');
+            toggle.classList.toggle('open');
+        }
+
+        function handleCheckboxChange(checkbox) {
+            const taskItem = checkbox.parentElement;
+            taskItem.classList.toggle('completed', checkbox.checked);
+            saveToLocalStorage();
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+
+        function switchView(viewName) {
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-view="${viewName}"]`)?.classList.add('active');
+            
+            // Update views
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(`view-${viewName}`).classList.add('active');
+            
+            // Scroll to top
+            document.querySelector('.main-content').scrollTop = 0;
+        }
+
+        function scrollToWeek(weekNumber) {
+            const weekElement = document.getElementById(`week-${weekNumber}`);
+            if (weekElement) {
+                weekElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Open the week if it's not already open
+                const content = document.getElementById(`content-${weekNumber}`);
+                if (!content.classList.contains('open')) {
+                    toggleWeek(weekNumber);
+                }
+            }
+        }
+
+        // Initialize
+        renderProjects();
+        renderWeeks();
+        loadFromLocalStorage();
+        
+        // Open first week by default
+        toggleWeek(1);
+    </script>
+</body>
+</html>

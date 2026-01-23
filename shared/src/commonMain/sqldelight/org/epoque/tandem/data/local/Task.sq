@@ -1,6 +1,8 @@
 import kotlinx.datetime.Instant;
 import kotlinx.datetime.LocalDate;
+import kotlinx.datetime.LocalTime;
 import org.epoque.tandem.domain.model.OwnerType;
+import org.epoque.tandem.domain.model.TaskPriority;
 import org.epoque.tandem.domain.model.TaskStatus;
 
 CREATE TABLE Task (
@@ -18,6 +20,13 @@ CREATE TABLE Task (
     linked_goal_id TEXT,
     review_note TEXT,
     rolled_from_week_id TEXT,
+    -- New fields for UI redesign (Feature 009)
+    priority TEXT AS TaskPriority NOT NULL DEFAULT 'P4',
+    scheduled_date TEXT AS LocalDate,
+    scheduled_time TEXT AS LocalTime,
+    deadline INTEGER AS Instant,
+    parent_task_id TEXT,
+    labels TEXT,  -- JSON array of label IDs
     created_at INTEGER AS Instant NOT NULL,
     updated_at INTEGER AS Instant NOT NULL
 );
@@ -26,14 +35,18 @@ CREATE INDEX task_week_id ON Task(week_id);
 CREATE INDEX task_owner_id ON Task(owner_id);
 CREATE INDEX task_status ON Task(status);
 CREATE INDEX task_owner_type ON Task(owner_type);
+-- New indexes for Feature 009
+CREATE INDEX task_parent_id ON Task(parent_task_id);
+CREATE INDEX task_scheduled_date ON Task(scheduled_date);
 
 -- Insert or replace a task
 upsertTask:
 INSERT OR REPLACE INTO Task (
     id, title, notes, owner_id, owner_type, week_id, status, created_by, request_note,
     repeat_target, repeat_completed, linked_goal_id, review_note, rolled_from_week_id,
+    priority, scheduled_date, scheduled_time, deadline, parent_task_id, labels,
     created_at, updated_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- Get all tasks
 getAllTasks:
@@ -43,21 +56,21 @@ SELECT * FROM Task;
 getTaskById:
 SELECT * FROM Task WHERE id = ?;
 
--- Get tasks by week ID
+-- Get tasks by week ID (excludes subtasks by default)
 getTasksByWeekId:
-SELECT * FROM Task WHERE week_id = ?;
+SELECT * FROM Task WHERE week_id = ? AND parent_task_id IS NULL;
 
 -- Get tasks by week ID and owner type
 getTasksByWeekIdAndOwnerType:
-SELECT * FROM Task WHERE week_id = ? AND owner_type = ?;
+SELECT * FROM Task WHERE week_id = ? AND owner_type = ? AND parent_task_id IS NULL;
 
 -- Get tasks by week ID and status
 getTasksByWeekIdAndStatus:
-SELECT * FROM Task WHERE week_id = ? AND status = ?;
+SELECT * FROM Task WHERE week_id = ? AND status = ? AND parent_task_id IS NULL;
 
 -- Get tasks by owner ID
 getTasksByOwnerId:
-SELECT * FROM Task WHERE owner_id = ?;
+SELECT * FROM Task WHERE owner_id = ? AND parent_task_id IS NULL;
 
 -- Delete task by ID
 deleteTaskById:
@@ -81,7 +94,7 @@ UPDATE Task SET review_note = ?, updated_at = ? WHERE id = ?;
 
 -- Count tasks by week and status
 countTasksByWeekAndStatus:
-SELECT COUNT(*) FROM Task WHERE week_id = ? AND status = ?;
+SELECT COUNT(*) FROM Task WHERE week_id = ? AND status = ? AND parent_task_id IS NULL;
 
 -- Get incomplete tasks for rollover (Feature 004: Week Planning)
 getIncompleteTasksByWeekId:
@@ -89,6 +102,7 @@ SELECT * FROM Task
 WHERE week_id = ?
   AND owner_id = ?
   AND status = 'PENDING'
+  AND parent_task_id IS NULL
 ORDER BY created_at ASC;
 
 -- Get tasks by status for current user (Feature 004: Week Planning)
@@ -96,6 +110,7 @@ getTasksByStatusAndOwnerId:
 SELECT * FROM Task
 WHERE status = ?
   AND owner_id = ?
+  AND parent_task_id IS NULL
 ORDER BY created_at DESC;
 
 -- Get tasks linked to a goal (Feature 007: Goals System)
@@ -111,3 +126,106 @@ UPDATE Task SET linked_goal_id = ?, updated_at = ? WHERE id = ?;
 -- Clear linked goal ID for all tasks linked to a specific goal (on goal deletion)
 clearLinkedGoalIdForGoal:
 UPDATE Task SET linked_goal_id = NULL, updated_at = ? WHERE linked_goal_id = ?;
+
+-- ============================================================================
+-- NEW QUERIES FOR UI REDESIGN (Feature 009)
+-- ============================================================================
+
+-- Get subtasks for a parent task
+getSubtasks:
+SELECT * FROM Task
+WHERE parent_task_id = ?
+ORDER BY created_at ASC;
+
+-- Count subtasks for a parent task
+countSubtasks:
+SELECT COUNT(*) FROM Task WHERE parent_task_id = ?;
+
+-- Count completed subtasks for a parent task
+countCompletedSubtasks:
+SELECT COUNT(*) FROM Task WHERE parent_task_id = ? AND status = 'COMPLETED';
+
+-- Get tasks by scheduled date for a week
+getTasksByScheduledDate:
+SELECT * FROM Task
+WHERE week_id = ?
+  AND scheduled_date = ?
+  AND parent_task_id IS NULL
+ORDER BY (CASE WHEN scheduled_time IS NULL THEN 1 ELSE 0 END), scheduled_time ASC, created_at ASC;
+
+-- Get tasks without scheduled date for a week (unscheduled tasks)
+getUnscheduledTasksByWeekId:
+SELECT * FROM Task
+WHERE week_id = ?
+  AND scheduled_date IS NULL
+  AND parent_task_id IS NULL
+ORDER BY created_at ASC;
+
+-- Update task priority
+updateTaskPriority:
+UPDATE Task SET priority = ?, updated_at = ? WHERE id = ?;
+
+-- Update task schedule (date and time)
+updateTaskSchedule:
+UPDATE Task SET scheduled_date = ?, scheduled_time = ?, updated_at = ? WHERE id = ?;
+
+-- Update task deadline
+updateTaskDeadline:
+UPDATE Task SET deadline = ?, updated_at = ? WHERE id = ?;
+
+-- Update task labels
+updateTaskLabels:
+UPDATE Task SET labels = ?, updated_at = ? WHERE id = ?;
+
+-- Get overdue tasks (scheduled date before today, not completed)
+getOverdueTasks:
+SELECT * FROM Task
+WHERE week_id = ?
+  AND scheduled_date < ?
+  AND status = 'PENDING'
+  AND parent_task_id IS NULL
+ORDER BY scheduled_date ASC, (CASE WHEN scheduled_time IS NULL THEN 1 ELSE 0 END), scheduled_time ASC;
+
+-- Update task title and notes (for editing)
+updateTaskTitleAndNotes:
+UPDATE Task SET title = ?, notes = ?, updated_at = ? WHERE id = ?;
+
+-- Update task owner type
+updateTaskOwner:
+UPDATE Task SET owner_type = ?, updated_at = ? WHERE id = ?;
+
+-- Delete subtasks when parent is deleted
+deleteSubtasks:
+DELETE FROM Task WHERE parent_task_id = ?;
+
+-- ============================================================================
+-- ADDITIONAL QUERIES FOR WEEK SCREEN (Feature 009)
+-- ============================================================================
+
+-- Get completed tasks for a week (for completed section)
+getCompletedTasksByWeekId:
+SELECT * FROM Task
+WHERE week_id = ?
+  AND status = 'COMPLETED'
+  AND parent_task_id IS NULL
+ORDER BY updated_at DESC;
+
+-- Get task counts per date for a week (for calendar dot indicators)
+-- Returns scheduled_date and count for each date with tasks
+getTaskCountsByDateForWeek:
+SELECT scheduled_date, COUNT(*) AS task_count
+FROM Task
+WHERE week_id = ?
+  AND scheduled_date IS NOT NULL
+  AND parent_task_id IS NULL
+GROUP BY scheduled_date;
+
+-- Get tasks scheduled for today or later (not overdue, not completed)
+-- Used for Today, Tomorrow, Later This Week sections
+getUpcomingTasksByWeekId:
+SELECT * FROM Task
+WHERE week_id = ?
+  AND scheduled_date >= ?
+  AND status != 'COMPLETED'
+  AND parent_task_id IS NULL
+ORDER BY scheduled_date ASC, (CASE WHEN scheduled_time IS NULL THEN 1 ELSE 0 END), scheduled_time ASC;

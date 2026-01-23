@@ -24,10 +24,13 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.epoque.tandem.BuildConfig
 import org.epoque.tandem.data.local.TandemDatabase
+import org.epoque.tandem.data.seed.MockDataSeeder
 import org.epoque.tandem.domain.model.OwnerType
 import org.epoque.tandem.domain.model.Partner
 import org.epoque.tandem.domain.model.PartnershipStatus
+import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.domain.repository.PartnerException
 import org.epoque.tandem.domain.repository.PartnerRepository
@@ -86,8 +89,21 @@ class PartnerRepositoryImpl(
         // Check local cache
         val localPartnership = queries.getActivePartnership(userId, userId).executeAsOneOrNull()
         localPartnership?.let { partnership ->
-            // We don't have partner details in local cache, only partnership
-            // Return null to indicate we need network
+            // DEBUG only: Return synthetic partner for mock data testing
+            if (BuildConfig.DEBUG) {
+                val partnerId = if (partnership.user1_id == userId) partnership.user2_id else partnership.user1_id
+                // Check if this is our mock partner
+                if (partnerId == MockDataSeeder.FAKE_PARTNER_ID) {
+                    return@withContext Partner(
+                        id = partnerId,
+                        name = "Alex Partner",
+                        email = "alex.partner@mock.tandem",
+                        partnershipId = partnership.id,
+                        connectedAt = partnership.created_at
+                    )
+                }
+            }
+            // Production: Return null to indicate we need network
             null
         }
     }
@@ -255,6 +271,12 @@ class PartnerRepositoryImpl(
             linked_goal_id = remote.linkedGoalId,
             review_note = remote.reviewNote,
             rolled_from_week_id = remote.rolledFromWeekId,
+            priority = TaskPriority.P4,
+            scheduled_date = null,
+            scheduled_time = null,
+            deadline = null,
+            parent_task_id = null,
+            labels = null,
             created_at = Instant.parse(remote.createdAt),
             updated_at = Instant.parse(remote.updatedAt)
         )
