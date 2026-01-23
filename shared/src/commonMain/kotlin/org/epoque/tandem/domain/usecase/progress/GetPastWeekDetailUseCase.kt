@@ -90,6 +90,7 @@ class GetPastWeekDetailUseCase(
             TaskOutcome(
                 taskId = userTask.id,
                 title = userTask.title,
+                priority = userTask.priority,
                 userStatus = userTask.status,
                 partnerStatus = partnerTask?.status
             )

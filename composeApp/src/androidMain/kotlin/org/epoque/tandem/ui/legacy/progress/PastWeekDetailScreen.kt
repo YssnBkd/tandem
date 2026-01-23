@@ -17,18 +17,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.epoque.tandem.presentation.progress.PastWeekDetailEvent
 import org.epoque.tandem.presentation.progress.PastWeekDetailSideEffect
 import org.epoque.tandem.presentation.progress.PastWeekDetailUiState
 import org.epoque.tandem.presentation.progress.PastWeekDetailViewModel
+import org.epoque.tandem.ui.theme.TandemSpacing
+import org.epoque.tandem.ui.theme.TandemTextStyles
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -36,6 +38,7 @@ import org.koin.compose.viewmodel.koinViewModel
  *
  * Displays detailed information for a specific past week including
  * review summaries and task outcomes.
+ * Uses design tokens for consistent styling.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,14 +114,14 @@ private fun PastWeekDetailContent(
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(TandemSpacing.md)
                 ) {
                     Text(
                         text = errorMessage,
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = TandemTextStyles.Body.primary,
                         color = MaterialTheme.colorScheme.error
                     )
-                    androidx.compose.material3.TextButton(
+                    TextButton(
                         onClick = { onEvent(PastWeekDetailEvent.Retry) }
                     ) {
                         Text("Retry")
@@ -132,15 +135,17 @@ private fun PastWeekDetailContent(
                 modifier = modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                    .padding(vertical = TandemSpacing.Screen.topPadding),
+                verticalArrangement = Arrangement.spacedBy(TandemSpacing.lg)
             ) {
                 // Review summaries (side-by-side)
                 uiState.userReview?.let { userReview ->
                     ReviewSummaryCards(
                         userReview = userReview,
                         partnerReview = uiState.partnerReview,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = TandemSpacing.Screen.horizontalPadding)
                     )
                 }
 

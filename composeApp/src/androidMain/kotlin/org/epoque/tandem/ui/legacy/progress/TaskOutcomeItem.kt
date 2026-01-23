@@ -2,78 +2,99 @@ package org.epoque.tandem.ui.legacy.progress
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import org.epoque.tandem.presentation.progress.TaskOutcomeUiModel
-import org.epoque.tandem.presentation.progress.TaskStatusColor
+import org.epoque.tandem.ui.components.week.PriorityCheckbox
+import org.epoque.tandem.ui.theme.TandemSpacing
+import org.epoque.tandem.ui.theme.TandemTypography
 
 /**
- * Single task outcome row showing title and status icons.
+ * Single task outcome row showing title and status checkboxes.
  *
- * Displays user status icon, task title, and optional partner status icon.
+ * Displays user priority checkbox, task title, and optional partner status checkbox.
+ * Uses design tokens for consistent styling.
  */
 @Composable
 fun TaskOutcomeItem(
     task: TaskOutcomeUiModel,
     modifier: Modifier = Modifier
 ) {
+    val userStatusText = when {
+        task.isCompleted -> "completed"
+        task.isSkipped -> "skipped"
+        else -> "pending"
+    }
+    val partnerStatusText = when {
+        task.partnerCompleted == true -> "completed"
+        task.partnerSkipped == true -> "skipped"
+        task.partnerCompleted != null -> "pending"
+        else -> null
+    }
+
     val accessibilityLabel = buildString {
         append("Task: ${task.title}")
-        append(", your status: ${task.userStatusIcon}")
-        task.partnerStatusIcon?.let { append(", partner status: $it") }
+        append(", your status: $userStatusText")
+        partnerStatusText?.let { append(", partner status: $it") }
     }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 48.dp)
-            .padding(vertical = 8.dp)
+            .padding(
+                horizontal = TandemSpacing.List.itemHorizontalPadding,
+                vertical = TandemSpacing.List.itemVerticalPadding
+            )
             .semantics { contentDescription = accessibilityLabel },
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(TandemSpacing.Inline.checkboxGap),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // User status icon
-        Text(
-            text = task.userStatusIcon,
-            style = MaterialTheme.typography.titleMedium,
-            color = task.userStatusColor.toComposeColor()
+        // User status checkbox
+        PriorityCheckbox(
+            checked = task.isCompleted,
+            priority = task.priority,
+            onCheckedChange = { },
+            enabled = false,
+            modifier = Modifier.padding(top = TandemSpacing.xxxs)
         )
 
         // Task title
         Text(
             text = task.title,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
+            style = TandemTypography.titleMedium.copy(
+                textDecoration = if (task.isCompleted) TextDecoration.LineThrough else TextDecoration.None
+            ),
+            color = if (task.isCompleted) {
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
             modifier = Modifier.weight(1f),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
 
-        // Partner status icon (if available)
-        task.partnerStatusIcon?.let { icon ->
-            Text(
-                text = icon,
-                style = MaterialTheme.typography.titleMedium,
-                color = task.partnerStatusColor?.toComposeColor() ?: Color.Unspecified
+        // Partner status checkbox (if available)
+        if (task.partnerCompleted != null || task.partnerSkipped != null) {
+            Spacer(modifier = Modifier.width(TandemSpacing.xs))
+            PriorityCheckbox(
+                checked = task.partnerCompleted == true,
+                priority = task.priority,
+                onCheckedChange = { },
+                enabled = false,
+                modifier = Modifier.padding(top = TandemSpacing.xxxs)
             )
         }
     }
-}
-
-@Composable
-private fun TaskStatusColor.toComposeColor(): Color = when (this) {
-    TaskStatusColor.COMPLETED -> MaterialTheme.colorScheme.primary
-    TaskStatusColor.SKIPPED -> MaterialTheme.colorScheme.onSurfaceVariant
-    TaskStatusColor.PENDING -> MaterialTheme.colorScheme.outline
 }

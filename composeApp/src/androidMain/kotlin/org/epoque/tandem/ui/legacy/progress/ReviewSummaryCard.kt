@@ -15,13 +15,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import org.epoque.tandem.presentation.progress.ReviewSummaryUiModel
+import org.epoque.tandem.ui.theme.TandemSpacing
+import org.epoque.tandem.ui.theme.TandemTextStyles
+import org.epoque.tandem.ui.theme.TandemTypography
 
 /**
  * Card displaying review summary for a single user.
  *
  * Shows name, mood emoji, completion bar, and optional reflection note.
+ * Uses design tokens for consistent styling.
  */
 @Composable
 fun ReviewSummaryCard(
@@ -43,8 +46,8 @@ fun ReviewSummaryCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(TandemSpacing.Card.padding),
+            verticalArrangement = Arrangement.spacedBy(TandemSpacing.xs)
         ) {
             // Header: Name and mood emoji
             Row(
@@ -54,20 +57,20 @@ fun ReviewSummaryCard(
             ) {
                 Text(
                     text = review.name,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = TandemTextStyles.Title.card,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 review.moodEmoji?.let { emoji ->
                     Text(
                         text = emoji,
-                        style = MaterialTheme.typography.titleMedium
+                        style = TandemTypography.titleMedium
                     )
                 }
             }
 
             // Completion progress bar
             Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(TandemSpacing.xxs)
             ) {
                 LinearProgressIndicator(
                     progress = { review.completionPercentage / 100f },
@@ -77,7 +80,7 @@ fun ReviewSummaryCard(
                 )
                 Text(
                     text = review.completionText,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = TandemTextStyles.Label.small,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -86,7 +89,7 @@ fun ReviewSummaryCard(
             review.note?.takeIf { it.isNotBlank() }?.let { note ->
                 Text(
                     text = note,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = TandemTextStyles.Body.secondary,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 3
                 )
@@ -96,7 +99,7 @@ fun ReviewSummaryCard(
             if (!review.isReviewed) {
                 Text(
                     text = "Not yet reviewed",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = TandemTextStyles.Label.small,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
             }

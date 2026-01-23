@@ -5,14 +5,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import org.epoque.tandem.presentation.progress.ReviewSummaryUiModel
+import org.epoque.tandem.ui.theme.TandemSpacing
 
 /**
  * Side-by-side display of user and partner review summaries.
  *
  * Shows user card on left, partner card on right (if available).
  * Cards take equal width when both present.
+ * Uses design tokens for consistent styling.
  */
 @Composable
 fun ReviewSummaryCards(
@@ -22,7 +23,7 @@ fun ReviewSummaryCards(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(TandemSpacing.sm)
     ) {
         ReviewSummaryCard(
             review = userReview,
