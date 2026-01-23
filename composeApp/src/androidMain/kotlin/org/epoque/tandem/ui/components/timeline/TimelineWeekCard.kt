@@ -46,6 +46,14 @@ import org.epoque.tandem.ui.theme.TandemPrimary
 import org.epoque.tandem.ui.theme.TandemPrimaryContainer
 
 /**
+ * Simple data class for goal display info.
+ */
+data class GoalDisplayInfo(
+    val icon: String,
+    val name: String
+)
+
+/**
  * Expandable week card for the timeline.
  * Shows week label, date range, completion stats, and expandable task list.
  */
@@ -59,7 +67,9 @@ fun TimelineWeekCard(
     isExpanded: Boolean,
     onToggleExpand: () -> Unit,
     onViewFullWeek: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    goalsByTaskId: Map<String, GoalDisplayInfo> = emptyMap(),
+    partnerNamesByTaskId: Map<String, String> = emptyMap()
 ) {
     val completionRatio = if (totalTasks > 0) completedTasks.toFloat() / totalTasks else 0f
     val completionPercentage = (completionRatio * 100).toInt()
@@ -67,7 +77,7 @@ fun TimelineWeekCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .then(
                 if (isCurrentWeek) {
                     Modifier.border(
@@ -85,19 +95,25 @@ fun TimelineWeekCard(
             ),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isCurrentWeek) {
-                TandemPrimaryContainer.copy(alpha = 0.5f)
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
+            containerColor = Color.Transparent
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
+        // Apply gradient or solid background
+        val backgroundModifier = if (isCurrentWeek) {
+            Modifier.background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(TandemPrimaryContainer, MaterialTheme.colorScheme.surface)
+                )
+            )
+        } else {
+            Modifier.background(MaterialTheme.colorScheme.surface)
+        }
         Column(
-            modifier = Modifier
+            modifier = backgroundModifier
                 .fillMaxWidth()
                 .clickable { onToggleExpand() }
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             // Header row: Week label, stats, chevron
             Row(
@@ -113,7 +129,7 @@ fun TimelineWeekCard(
                     ) {
                         Text(
                             text = formatWeekLabel(week.startDate),
-                            style = MaterialTheme.typography.titleSmall,
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -128,8 +144,8 @@ fun TimelineWeekCard(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(6.dp)
-                                        .clip(RoundedCornerShape(3.dp))
+                                        .size(8.dp)
+                                        .clip(RoundedCornerShape(4.dp))
                                         .background(TandemPrimary)
                                 )
                                 Text(
@@ -148,7 +164,7 @@ fun TimelineWeekCard(
                     // Date range
                     Text(
                         text = formatDateRange(week.startDate, week.endDate),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -203,7 +219,14 @@ fun TimelineWeekCard(
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
-                Column(modifier = Modifier.padding(top = 12.dp)) {
+                Column(modifier = Modifier.padding(top = 8.dp)) {
+                    // Divider before task list
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     if (tasks.isEmpty() && totalTasks > 0) {
                         Text(
                             text = "Loading tasks...",
@@ -219,9 +242,14 @@ fun TimelineWeekCard(
                     } else {
                         // Show up to 5 tasks
                         tasks.take(5).forEach { task ->
+                            val goalInfo = goalsByTaskId[task.id]
+                            val partnerName = partnerNamesByTaskId[task.id]
                             TimelineTaskRow(
                                 task = task,
-                                modifier = Modifier.padding(vertical = 4.dp)
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                goalName = goalInfo?.name,
+                                goalIcon = goalInfo?.icon,
+                                partnerName = partnerName
                             )
                         }
 

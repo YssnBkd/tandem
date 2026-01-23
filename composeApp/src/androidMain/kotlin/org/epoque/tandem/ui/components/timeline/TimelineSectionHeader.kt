@@ -57,18 +57,18 @@ fun TimelineSectionHeader(
                 )
             }
 
-            // Month (bold)
+            // Month (bold) - iOS Subheadline 15pt
             Text(
                 text = month,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            // Year (muted)
+            // Year (muted) - iOS Subheadline 15pt
             Text(
                 text = year.toString(),
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
