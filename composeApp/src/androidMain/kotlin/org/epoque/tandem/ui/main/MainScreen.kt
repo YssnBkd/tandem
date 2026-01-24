@@ -172,6 +172,7 @@ fun MainScreen(
             NavigationTab.Feed -> {
                 currentFab = null
                 FeedScreen(
+                    contentPadding = paddingValues,
                     onNavigateToPlanning = onNavigateToPlanning,
                     onNavigateToReview = { weekId -> /* TODO: Navigate to review with weekId */ },
                     onNavigateToTaskDetail = { taskId -> /* TODO: Navigate to task detail */ },

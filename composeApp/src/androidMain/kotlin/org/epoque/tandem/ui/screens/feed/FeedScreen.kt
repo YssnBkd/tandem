@@ -10,15 +10,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -38,7 +34,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -68,6 +63,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedScreen(
+    contentPadding: PaddingValues = PaddingValues(),
     viewModel: FeedViewModel = koinViewModel(),
     onNavigateToPlanning: () -> Unit = {},
     onNavigateToReview: (String) -> Unit = {},
@@ -160,13 +156,14 @@ fun FeedScreen(
                             uiState = uiState,
                             onEvent = viewModel::onEvent,
                             listState = listState,
+                            bottomNavPadding = contentPadding.calculateBottomPadding(),
                             modifier = Modifier.fillMaxSize()
                         )
                     }
                 }
             }
 
-            // Message input bar at bottom
+            // Message input bar at bottom (above the parent's bottom nav bar)
             AnimatedVisibility(
                 visible = uiState.hasPartner,
                 enter = slideInVertically { it } + fadeIn(),
@@ -182,7 +179,7 @@ fun FeedScreen(
                     onSendClicked = { viewModel.onEvent(FeedEvent.SendMessageTapped) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .padding(bottom = contentPadding.calculateBottomPadding())
                         .imePadding()
                 )
             }
@@ -195,10 +192,16 @@ private fun FeedContent(
     uiState: FeedUiState,
     onEvent: (FeedEvent) -> Unit,
     listState: androidx.compose.foundation.lazy.LazyListState,
+    bottomNavPadding: androidx.compose.ui.unit.Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
-    // Calculate bottom padding to clear the message input bar
-    val bottomPadding = if (uiState.hasPartner) 80.dp else TandemSpacing.md
+    // Calculate bottom padding to clear the message input bar + bottom nav bar
+    val messageInputHeight = 80.dp
+    val bottomPadding = if (uiState.hasPartner) {
+        messageInputHeight + bottomNavPadding
+    } else {
+        TandemSpacing.md + bottomNavPadding
+    }
 
     LazyColumn(
         state = listState,
