@@ -53,7 +53,7 @@ data class FeedUiState(
     /**
      * Whether send button should be enabled.
      */
-    val canSendMessage: Boolean get() = messageText.isNotBlank() && hasPartner && !isSendingMessage
+    val canSendMessage: Boolean get() = messageText.isNotBlank() && !isSendingMessage
 
     /**
      * Total items count across all groups.

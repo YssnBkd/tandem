@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -106,7 +105,6 @@ fun FeedScreen(
     }
 
     // Main layout using contentPadding from parent Scaffold
-    // This ensures proper spacing above the bottom nav bar
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -124,7 +122,7 @@ fun FeedScreen(
             }
         )
 
-        // Main content area with message input bar overlay
+        // Main content area - takes remaining space
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -157,31 +155,30 @@ fun FeedScreen(
                             uiState = uiState,
                             onEvent = viewModel::onEvent,
                             listState = listState,
-                            // Add padding for message bar if partner exists
-                            messageBarPadding = if (uiState.hasPartner) 64.dp else 0.dp,
+                            // Add padding for message bar
+                            messageBarPadding = 64.dp,
                             modifier = Modifier.fillMaxSize()
                         )
                     }
                 }
             }
+        }
 
-            // iOS-style message input bar - sticky at bottom, directly above tab bar
-            androidx.compose.animation.AnimatedVisibility(
-                visible = uiState.hasPartner,
+        // iOS-style message input bar - part of Column layout, not overlay
+        Column {
+            AnimatedVisibility(
+                visible = true,
                 enter = slideInVertically { it } + fadeIn(),
-                exit = slideOutVertically { it } + fadeOut(),
-                modifier = Modifier.align(Alignment.BottomCenter)
+                exit = slideOutVertically { it } + fadeOut()
             ) {
                 MessageInputBar(
                     text = uiState.messageText,
                     placeholder = uiState.messageInputPlaceholder,
-                    isEnabled = uiState.canSendMessage,
+                    isEnabled = true,
                     isSending = uiState.isSendingMessage,
                     onTextChanged = { viewModel.onEvent(FeedEvent.MessageTextChanged(it)) },
                     onSendClicked = { viewModel.onEvent(FeedEvent.SendMessageTapped) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .imePadding()
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
