@@ -1,0 +1,157 @@
+import kotlinx.datetime.Instant;
+import kotlinx.datetime.LocalDate;
+import org.epoque.tandem.domain.model.FeedItemType;
+
+-- Feed items table stores all activity feed entries
+CREATE TABLE FeedItem (
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id TEXT NOT NULL,                      -- The user who sees this feed item
+    type TEXT AS FeedItemType NOT NULL,         -- Type of feed item
+    timestamp INTEGER AS Instant NOT NULL,      -- When the event occurred (for sorting)
+    is_read INTEGER NOT NULL DEFAULT 0,         -- Whether user has seen this item (0=false, 1=true)
+
+    -- Actor info (who performed the action)
+    actor_id TEXT,
+    actor_name TEXT,
+    actor_type TEXT,                            -- SELF, PARTNER, SYSTEM, AI
+
+    -- Task-related fields (for TASK_* types)
+    task_id TEXT,
+    task_title TEXT,
+    task_priority TEXT,
+    notified_partner INTEGER,                   -- For TASK_COMPLETED (0=false, 1=true)
+
+    -- Assignment fields (for TASK_ASSIGNED)
+    assignment_note TEXT,
+
+    -- Message fields (for MESSAGE type)
+    message_text TEXT,
+
+    -- Week-related fields (for WEEK_PLANNED, WEEK_REVIEWED, AI_REVIEW_PROMPT)
+    week_id TEXT,
+    week_start_date TEXT AS LocalDate,
+    task_count INTEGER,                         -- For WEEK_PLANNED
+    completed_task_count INTEGER,               -- For AI_REVIEW_PROMPT
+    total_task_count INTEGER,                   -- For AI_REVIEW_PROMPT
+
+    -- AI prompt fields
+    rollover_task_count INTEGER,                -- For AI_PLAN_PROMPT
+    dismissed INTEGER DEFAULT 0,                -- For AI prompts (0=false, 1=true)
+
+    -- Partner joined fields
+    partner_id TEXT,
+    partner_name TEXT,
+
+    -- Metadata
+    created_at INTEGER AS Instant NOT NULL
+);
+
+-- Indexes for efficient querying
+CREATE INDEX feed_item_user_id ON FeedItem(user_id);
+CREATE INDEX feed_item_timestamp ON FeedItem(timestamp DESC);
+CREATE INDEX feed_item_type ON FeedItem(type);
+CREATE INDEX feed_item_is_read ON FeedItem(is_read);
+CREATE INDEX feed_item_user_timestamp ON FeedItem(user_id, timestamp DESC);
+
+-- Get all feed items for a user, ordered by timestamp (newest first)
+getAllFeedItemsForUser:
+SELECT * FROM FeedItem
+WHERE user_id = ?
+ORDER BY timestamp DESC;
+
+-- Get feed items by type(s) for a user
+getFeedItemsByType:
+SELECT * FROM FeedItem
+WHERE user_id = ? AND type IN ?
+ORDER BY timestamp DESC;
+
+-- Get a single feed item by ID
+getFeedItemById:
+SELECT * FROM FeedItem WHERE id = ?;
+
+-- Get unread count for a user
+getUnreadCount:
+SELECT COUNT(*) FROM FeedItem
+WHERE user_id = ? AND is_read = 0;
+
+-- Get feed items for a specific date
+getFeedItemsForDate:
+SELECT * FROM FeedItem
+WHERE user_id = ?
+  AND date(timestamp / 1000, 'unixepoch') = ?
+ORDER BY timestamp DESC;
+
+-- Get latest AI plan prompt for user (not dismissed)
+getActiveAiPlanPrompt:
+SELECT * FROM FeedItem
+WHERE user_id = ?
+  AND type = 'AI_PLAN_PROMPT'
+  AND dismissed = 0
+ORDER BY timestamp DESC
+LIMIT 1;
+
+-- Get latest AI review prompt for user (not dismissed) for a specific week
+getActiveAiReviewPrompt:
+SELECT * FROM FeedItem
+WHERE user_id = ?
+  AND type = 'AI_REVIEW_PROMPT'
+  AND week_id = ?
+  AND dismissed = 0
+ORDER BY timestamp DESC
+LIMIT 1;
+
+-- Insert or replace a feed item
+upsertFeedItem:
+INSERT OR REPLACE INTO FeedItem (
+    id, user_id, type, timestamp, is_read,
+    actor_id, actor_name, actor_type,
+    task_id, task_title, task_priority, notified_partner,
+    assignment_note, message_text,
+    week_id, week_start_date, task_count, completed_task_count, total_task_count,
+    rollover_task_count, dismissed,
+    partner_id, partner_name,
+    created_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Mark a feed item as read
+markAsRead:
+UPDATE FeedItem SET is_read = 1 WHERE id = ?;
+
+-- Mark all items as read up to a timestamp
+markAllAsReadUpTo:
+UPDATE FeedItem
+SET is_read = 1
+WHERE user_id = ? AND timestamp <= ? AND is_read = 0;
+
+-- Dismiss an AI prompt
+dismissAiPrompt:
+UPDATE FeedItem
+SET dismissed = 1
+WHERE id = ? AND type IN ('AI_PLAN_PROMPT', 'AI_REVIEW_PROMPT');
+
+-- Delete a feed item
+deleteFeedItem:
+DELETE FROM FeedItem WHERE id = ?;
+
+-- Delete all feed items for a user (for cleanup)
+deleteAllFeedItemsForUser:
+DELETE FROM FeedItem WHERE user_id = ?;
+
+-- Get the count of items marked as read
+getReadItemsCount:
+SELECT COUNT(*) FROM FeedItem
+WHERE user_id = ? AND is_read = 1;
+
+-- Last read timestamp table (separate for simplicity)
+CREATE TABLE FeedLastRead (
+    user_id TEXT NOT NULL PRIMARY KEY,
+    timestamp INTEGER AS Instant NOT NULL
+);
+
+-- Get last read timestamp
+getLastReadTimestamp:
+SELECT timestamp FROM FeedLastRead WHERE user_id = ?;
+
+-- Update last read timestamp
+upsertLastReadTimestamp:
+INSERT OR REPLACE INTO FeedLastRead (user_id, timestamp) VALUES (?, ?);

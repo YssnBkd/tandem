@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import org.epoque.tandem.domain.model.User
 import org.epoque.tandem.ui.navigation.NavigationTab
 import org.epoque.tandem.ui.legacy.progress.ProgressScreen
+import org.epoque.tandem.ui.screens.feed.FeedScreen
 import org.epoque.tandem.ui.screens.timeline.TimelineScreen
 import org.epoque.tandem.ui.screens.week.WeekScreen
 
@@ -67,8 +68,10 @@ fun MainScreen(
     // FAB composable provided by the current tab (only Week tab has FAB)
     var currentFab: (@Composable () -> Unit)? by remember { mutableStateOf(null) }
 
-    // Week and Goals tabs have their own headers, so we don't show TopAppBar for them
-    val showTopBar = selectedTab != NavigationTab.Week && selectedTab != NavigationTab.Goals
+    // Week, Feed, and Goals tabs have their own headers, so we don't show TopAppBar for them
+    val showTopBar = selectedTab != NavigationTab.Week &&
+                     selectedTab != NavigationTab.Feed &&
+                     selectedTab != NavigationTab.Goals
 
     Scaffold(
         modifier = modifier,
@@ -166,6 +169,15 @@ fun MainScreen(
                 onNavigateToPlanning = onNavigateToPlanning,
                 onNavigateToReview = onNavigateToReview
             )
+            NavigationTab.Feed -> {
+                currentFab = null
+                FeedScreen(
+                    onNavigateToPlanning = onNavigateToPlanning,
+                    onNavigateToReview = { weekId -> /* TODO: Navigate to review with weekId */ },
+                    onNavigateToTaskDetail = { taskId -> /* TODO: Navigate to task detail */ },
+                    onNavigateToWeek = { selectedTab = NavigationTab.Week }
+                )
+            }
             NavigationTab.Progress -> ProgressScreen(
                 contentPadding = paddingValues,
                 snackbarHostState = snackbarHostState,

@@ -87,6 +87,7 @@ actual class DriverFactory(private val context: Context) {
         // Ensure all feature tables exist
         createPartnerTablesIfNeeded(db)
         createGoalTablesIfNeeded(db)
+        createFeedTablesIfNeeded(db)
     }
 
     /**
@@ -131,6 +132,7 @@ actual class DriverFactory(private val context: Context) {
         if (oldVersion < newVersion) {
             createPartnerTablesIfNeeded(db)
             createGoalTablesIfNeeded(db)
+            createFeedTablesIfNeeded(db)
         }
     }
 
@@ -262,5 +264,53 @@ actual class DriverFactory(private val context: Context) {
             )
         """.trimIndent())
         db.execSQL("CREATE INDEX IF NOT EXISTS partner_goal_owner_id ON PartnerGoal(owner_id)")
+    }
+
+    /**
+     * Creates Feed-related tables if they don't exist (Feature 010).
+     */
+    private fun createFeedTablesIfNeeded(db: SupportSQLiteDatabase) {
+        // FeedItem table
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS FeedItem (
+                id TEXT NOT NULL PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                type TEXT NOT NULL,
+                timestamp INTEGER NOT NULL,
+                is_read INTEGER NOT NULL DEFAULT 0,
+                actor_id TEXT,
+                actor_name TEXT,
+                actor_type TEXT,
+                task_id TEXT,
+                task_title TEXT,
+                task_priority TEXT,
+                notified_partner INTEGER,
+                assignment_note TEXT,
+                message_text TEXT,
+                week_id TEXT,
+                week_start_date TEXT,
+                task_count INTEGER,
+                completed_task_count INTEGER,
+                total_task_count INTEGER,
+                rollover_task_count INTEGER,
+                dismissed INTEGER DEFAULT 0,
+                partner_id TEXT,
+                partner_name TEXT,
+                created_at INTEGER NOT NULL
+            )
+        """.trimIndent())
+        db.execSQL("CREATE INDEX IF NOT EXISTS feed_item_user_id ON FeedItem(user_id)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS feed_item_timestamp ON FeedItem(timestamp DESC)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS feed_item_type ON FeedItem(type)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS feed_item_is_read ON FeedItem(is_read)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS feed_item_user_timestamp ON FeedItem(user_id, timestamp DESC)")
+
+        // FeedLastRead table
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS FeedLastRead (
+                user_id TEXT NOT NULL PRIMARY KEY,
+                timestamp INTEGER NOT NULL
+            )
+        """.trimIndent())
     }
 }

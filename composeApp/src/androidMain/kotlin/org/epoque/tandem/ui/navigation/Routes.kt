@@ -36,6 +36,10 @@ sealed interface Routes {
         @Serializable
         data object Week : Main
 
+        /** Feed tab content - communication hub with partner */
+        @Serializable
+        data object Feed : Main
+
         /** Progress tab content */
         @Serializable
         data object Progress : Main
