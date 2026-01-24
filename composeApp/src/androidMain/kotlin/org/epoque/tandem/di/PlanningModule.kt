@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import org.epoque.tandem.domain.usecase.planning.CompletePlanningUseCase
 import org.epoque.tandem.presentation.planning.PlanningViewModel
 import org.epoque.tandem.presentation.planning.preferences.PlanningProgress
 import org.koin.android.ext.koin.androidContext
@@ -40,6 +41,9 @@ val planningModule = module {
     // Planning progress manager
     single { PlanningProgress(get(named("planning"))) }
 
+    // Use cases
+    factory { CompletePlanningUseCase(get(), get(), get(), get()) }
+
     // Planning ViewModel with lifecycle-aware scope
     viewModel {
         PlanningViewModel(
@@ -47,7 +51,8 @@ val planningModule = module {
             weekRepository = get(),
             authRepository = get(),
             goalRepository = get(),
-            planningProgress = get()
+            planningProgress = get(),
+            completePlanningUseCase = get()
         )
     }
 }

@@ -23,6 +23,7 @@ import org.epoque.tandem.domain.repository.AuthState
 import org.epoque.tandem.domain.repository.TaskRepository
 import org.epoque.tandem.domain.repository.WeekRepository
 import org.epoque.tandem.domain.usecase.review.CalculateStreakUseCase
+import org.epoque.tandem.domain.usecase.review.CompleteReviewUseCase
 import org.epoque.tandem.domain.usecase.review.GetReviewStatsUseCase
 import org.epoque.tandem.domain.usecase.review.IsReviewWindowOpenUseCase
 import org.epoque.tandem.presentation.review.preferences.ReviewProgress
@@ -46,6 +47,7 @@ class ReviewViewModel(
     private val calculateStreakUseCase: CalculateStreakUseCase,
     private val isReviewWindowOpenUseCase: IsReviewWindowOpenUseCase,
     private val getReviewStatsUseCase: GetReviewStatsUseCase,
+    private val completeReviewUseCase: CompleteReviewUseCase,
     private val reviewProgress: ReviewProgress
 ) : ViewModel() {
 
@@ -407,11 +409,13 @@ class ReviewViewModel(
     private suspend fun completeReview() {
         val state = _uiState.value
         val week = state.currentWeek ?: return
+        val userId = currentUserId ?: return
 
         try {
-            // Final save of week review (sets reviewedAt)
-            weekRepository.updateWeekReview(
+            // Complete review and create feed item
+            completeReviewUseCase(
                 weekId = week.id,
+                userId = userId,
                 overallRating = state.overallRating,
                 reviewNote = state.overallNote.takeIf { it.isNotBlank() }
             )
@@ -420,7 +424,6 @@ class ReviewViewModel(
             reviewProgress.clearProgress()
 
             // Recalculate streak
-            val userId = currentUserId ?: return
             val newStreak = calculateStreakUseCase(userId)
 
             _uiState.update {

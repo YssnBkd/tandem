@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import org.epoque.tandem.domain.usecase.task.CompleteTaskUseCase
 import org.epoque.tandem.presentation.week.WeekViewModel
 import org.epoque.tandem.presentation.week.preferences.SegmentPreferences
 import org.koin.android.ext.koin.androidContext
@@ -39,6 +40,9 @@ val weekModule = module {
     // Segment preferences manager
     single { SegmentPreferences(get()) }
 
+    // Use cases
+    factory { CompleteTaskUseCase(get(), get(), get(), get()) }
+
     // Week ViewModel with lifecycle-aware scope
     viewModel { WeekViewModel(
         taskRepository = get(),
@@ -47,6 +51,7 @@ val weekModule = module {
         authRepository = get(),
         isReviewWindowOpenUseCase = get(),
         calculateStreakUseCase = get(),
-        goalRepository = get()
+        goalRepository = get(),
+        completeTaskUseCase = get()
     ) }
 }

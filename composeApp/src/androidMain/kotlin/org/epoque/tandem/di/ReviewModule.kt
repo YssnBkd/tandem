@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import org.epoque.tandem.domain.usecase.review.CalculateStreakUseCase
+import org.epoque.tandem.domain.usecase.review.CompleteReviewUseCase
 import org.epoque.tandem.domain.usecase.review.GetReviewStatsUseCase
 import org.epoque.tandem.domain.usecase.review.IsReviewWindowOpenUseCase
 import org.epoque.tandem.presentation.review.ReviewViewModel
@@ -40,6 +41,7 @@ val reviewModule = module {
     factory { CalculateStreakUseCase(get()) }
     factory { IsReviewWindowOpenUseCase() }
     factory { GetReviewStatsUseCase() }
+    factory { CompleteReviewUseCase(get(), get(), get()) }
 
     // DataStore singleton for review preferences (named to avoid conflict with other preferences)
     single<DataStore<Preferences>>(named("review")) {
@@ -58,6 +60,7 @@ val reviewModule = module {
             calculateStreakUseCase = get(),
             isReviewWindowOpenUseCase = get(),
             getReviewStatsUseCase = get(),
+            completeReviewUseCase = get(),
             reviewProgress = get()
         )
     }

@@ -21,6 +21,7 @@ import org.epoque.tandem.domain.model.TaskPriority
 import org.epoque.tandem.domain.model.TaskStatus
 import org.epoque.tandem.domain.repository.AuthRepository
 import org.epoque.tandem.domain.repository.AuthState
+import org.epoque.tandem.domain.repository.FeedRepository
 import org.epoque.tandem.domain.repository.InviteException
 import org.epoque.tandem.domain.repository.InviteRepository
 import org.epoque.tandem.domain.repository.PartnerException
@@ -43,6 +44,7 @@ class PartnerViewModel(
     private val authRepository: AuthRepository,
     private val partnerRepository: PartnerRepository,
     private val inviteRepository: InviteRepository,
+    private val feedRepository: FeedRepository,
     private val taskRepository: TaskRepository,
     private val weekRepository: WeekRepository
 ) : ViewModel() {
@@ -223,11 +225,24 @@ class PartnerViewModel(
             _uiState.update { it.copy(isAcceptingInvite = true) }
             try {
                 val userId = getCurrentUserId()
+                val currentUser = authRepository.currentUser
                 val partnership = inviteRepository.acceptInvite(info.code, userId)
 
                 // Get partner details
                 val partner = partnerRepository.getPartner(userId)
                 currentPartner = partner
+
+                // Create PartnerJoined feed item for the inviter's feed
+                val inviterId = if (partnership.user1Id == userId) {
+                    partnership.user2Id
+                } else {
+                    partnership.user1Id
+                }
+                feedRepository.createPartnerJoinedItem(
+                    partnerId = userId,
+                    partnerName = currentUser?.displayName ?: "Partner",
+                    forUserId = inviterId
+                )
 
                 _uiState.update {
                     it.copy(

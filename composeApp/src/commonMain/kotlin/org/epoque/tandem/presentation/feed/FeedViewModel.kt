@@ -28,6 +28,8 @@ import org.epoque.tandem.domain.usecase.feed.AcceptTaskAssignmentUseCase
 import org.epoque.tandem.domain.usecase.feed.DeclineTaskAssignmentUseCase
 import org.epoque.tandem.domain.usecase.feed.DismissAiPromptUseCase
 import org.epoque.tandem.domain.usecase.feed.FeedFilter as DomainFeedFilter
+import org.epoque.tandem.domain.usecase.feed.GenerateAiPlanPromptUseCase
+import org.epoque.tandem.domain.usecase.feed.GenerateAiReviewPromptUseCase
 import org.epoque.tandem.domain.usecase.feed.GetFeedItemsUseCase
 import org.epoque.tandem.domain.usecase.feed.MarkFeedItemReadUseCase
 import org.epoque.tandem.domain.usecase.feed.SendMessageUseCase
@@ -54,7 +56,9 @@ class FeedViewModel(
     private val acceptTaskAssignmentUseCase: AcceptTaskAssignmentUseCase,
     private val declineTaskAssignmentUseCase: DeclineTaskAssignmentUseCase,
     private val dismissAiPromptUseCase: DismissAiPromptUseCase,
-    private val sendMessageUseCase: SendMessageUseCase
+    private val sendMessageUseCase: SendMessageUseCase,
+    private val generateAiPlanPromptUseCase: GenerateAiPlanPromptUseCase,
+    private val generateAiReviewPromptUseCase: GenerateAiReviewPromptUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FeedUiState())
@@ -71,6 +75,7 @@ class FeedViewModel(
         observeFeed()
         observePartner()
         observeUnreadCount()
+        generateAiPrompts()
     }
 
     /**
@@ -217,6 +222,31 @@ class FeedViewModel(
 
             feedRepository.observeUnreadCount(userId).collect { count ->
                 _uiState.update { it.copy(unreadCount = count) }
+            }
+        }
+    }
+
+    /**
+     * Generate AI prompts for planning and review if conditions are met.
+     * These prompts appear in the feed to nudge users to take action.
+     */
+    private fun generateAiPrompts() {
+        viewModelScope.launch {
+            try {
+                val userId = authRepository.authState
+                    .filterIsInstance<AuthState.Authenticated>()
+                    .first()
+                    .user.id
+
+                // Generate planning prompt if week not planned
+                generateAiPlanPromptUseCase(userId)
+
+                // Generate review prompt if review window is open
+                generateAiReviewPromptUseCase(userId)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Silently fail - AI prompts are not critical
             }
         }
     }

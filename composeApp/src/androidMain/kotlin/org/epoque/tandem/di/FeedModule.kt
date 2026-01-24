@@ -5,9 +5,12 @@ import org.epoque.tandem.domain.repository.FeedRepository
 import org.epoque.tandem.domain.usecase.feed.AcceptTaskAssignmentUseCase
 import org.epoque.tandem.domain.usecase.feed.DeclineTaskAssignmentUseCase
 import org.epoque.tandem.domain.usecase.feed.DismissAiPromptUseCase
+import org.epoque.tandem.domain.usecase.feed.GenerateAiPlanPromptUseCase
+import org.epoque.tandem.domain.usecase.feed.GenerateAiReviewPromptUseCase
 import org.epoque.tandem.domain.usecase.feed.GetFeedItemsUseCase
 import org.epoque.tandem.domain.usecase.feed.MarkFeedItemReadUseCase
 import org.epoque.tandem.domain.usecase.feed.SendMessageUseCase
+import org.epoque.tandem.domain.usecase.review.IsReviewWindowOpenUseCase
 import org.epoque.tandem.presentation.feed.FeedViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -31,6 +34,8 @@ val feedModule = module {
     factory { DeclineTaskAssignmentUseCase(get(), get()) }
     factory { DismissAiPromptUseCase(get()) }
     factory { SendMessageUseCase(get(), get()) }
+    factory { GenerateAiPlanPromptUseCase(get(), get(), get()) }
+    factory { GenerateAiReviewPromptUseCase(get(), get(), get(), get()) }
 
     // ViewModel
     viewModel {
@@ -43,7 +48,9 @@ val feedModule = module {
             acceptTaskAssignmentUseCase = get(),
             declineTaskAssignmentUseCase = get(),
             dismissAiPromptUseCase = get(),
-            sendMessageUseCase = get()
+            sendMessageUseCase = get(),
+            generateAiPlanPromptUseCase = get(),
+            generateAiReviewPromptUseCase = get()
         )
     }
 }
