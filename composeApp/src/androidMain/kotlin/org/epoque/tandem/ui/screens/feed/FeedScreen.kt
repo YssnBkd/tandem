@@ -21,27 +21,21 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.epoque.tandem.presentation.feed.FeedEvent
 import org.epoque.tandem.presentation.feed.FeedSideEffect
 import org.epoque.tandem.presentation.feed.FeedUiState
 import org.epoque.tandem.presentation.feed.FeedViewModel
-import org.epoque.tandem.presentation.feed.model.FeedFilter
 import org.epoque.tandem.presentation.feed.model.FeedUiItem
 import org.epoque.tandem.ui.components.feed.AiPromptCard
 import org.epoque.tandem.ui.components.feed.CaughtUpSeparator
@@ -60,10 +54,17 @@ import org.epoque.tandem.ui.theme.TandemBackgroundLight
 import org.epoque.tandem.ui.theme.TandemSpacing
 import org.koin.compose.viewmodel.koinViewModel
 
+/**
+ * Feed screen showing activity stream with partner.
+ *
+ * Note: This screen does NOT use its own Scaffold. It receives padding
+ * from MainScreen's Scaffold to ensure proper NavigationBar spacing.
+ * This follows the same pattern as WeekScreen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedScreen(
-    contentPadding: PaddingValues = PaddingValues(),
+    contentPadding: PaddingValues,
     viewModel: FeedViewModel = koinViewModel(),
     onNavigateToPlanning: () -> Unit = {},
     onNavigateToReview: (String) -> Unit = {},
@@ -71,7 +72,6 @@ fun FeedScreen(
     onNavigateToWeek: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
@@ -84,9 +84,7 @@ fun FeedScreen(
                 is FeedSideEffect.NavigateToTaskDetail -> onNavigateToTaskDetail(effect.taskId)
                 is FeedSideEffect.NavigateToWeek -> onNavigateToWeek()
                 is FeedSideEffect.ShowSnackbar -> {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(effect.message)
-                    }
+                    // Snackbar is handled by MainScreen's snackbarHostState
                 }
                 is FeedSideEffect.TriggerHapticFeedback -> {
                     // Platform-specific haptic feedback
@@ -107,27 +105,30 @@ fun FeedScreen(
             .collect { /* Could track for read marking */ }
     }
 
-    Scaffold(
-        topBar = {
-            Column {
-                FeedTopBar(
-                    onMoreOptionsTapped = { viewModel.onEvent(FeedEvent.MoreOptionsTapped) }
-                )
-                FeedFilterBar(
-                    activeFilter = uiState.activeFilter,
-                    onFilterSelected = { filter ->
-                        viewModel.onEvent(FeedEvent.FilterSelected(filter))
-                    }
-                )
+    // Main layout using contentPadding from parent Scaffold
+    // This ensures proper spacing above the bottom nav bar
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(TandemBackgroundLight)
+            .padding(contentPadding)
+    ) {
+        // Fixed header: TopBar + FilterBar
+        FeedTopBar(
+            onMoreOptionsTapped = { viewModel.onEvent(FeedEvent.MoreOptionsTapped) }
+        )
+        FeedFilterBar(
+            activeFilter = uiState.activeFilter,
+            onFilterSelected = { filter ->
+                viewModel.onEvent(FeedEvent.FilterSelected(filter))
             }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = TandemBackgroundLight
-    ) { paddingValues ->
+        )
+
+        // Main content area with message input bar overlay
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+                .fillMaxWidth()
+                .weight(1f)
         ) {
             when {
                 uiState.isLoading -> {
@@ -156,15 +157,16 @@ fun FeedScreen(
                             uiState = uiState,
                             onEvent = viewModel::onEvent,
                             listState = listState,
-                            bottomNavPadding = contentPadding.calculateBottomPadding(),
+                            // Add padding for message bar if partner exists
+                            messageBarPadding = if (uiState.hasPartner) 64.dp else 0.dp,
                             modifier = Modifier.fillMaxSize()
                         )
                     }
                 }
             }
 
-            // Message input bar at bottom (above the parent's bottom nav bar)
-            AnimatedVisibility(
+            // iOS-style message input bar - sticky at bottom, directly above tab bar
+            androidx.compose.animation.AnimatedVisibility(
                 visible = uiState.hasPartner,
                 enter = slideInVertically { it } + fadeIn(),
                 exit = slideOutVertically { it } + fadeOut(),
@@ -179,7 +181,6 @@ fun FeedScreen(
                     onSendClicked = { viewModel.onEvent(FeedEvent.SendMessageTapped) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = contentPadding.calculateBottomPadding())
                         .imePadding()
                 )
             }
@@ -192,20 +193,12 @@ private fun FeedContent(
     uiState: FeedUiState,
     onEvent: (FeedEvent) -> Unit,
     listState: androidx.compose.foundation.lazy.LazyListState,
-    bottomNavPadding: androidx.compose.ui.unit.Dp = 0.dp,
+    messageBarPadding: androidx.compose.ui.unit.Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
-    // Calculate bottom padding to clear the message input bar + bottom nav bar
-    val messageInputHeight = 80.dp
-    val bottomPadding = if (uiState.hasPartner) {
-        messageInputHeight + bottomNavPadding
-    } else {
-        TandemSpacing.md + bottomNavPadding
-    }
-
     LazyColumn(
         state = listState,
-        contentPadding = PaddingValues(bottom = bottomPadding),
+        contentPadding = PaddingValues(bottom = messageBarPadding + TandemSpacing.md),
         modifier = modifier
     ) {
         var globalItemIndex = 0
