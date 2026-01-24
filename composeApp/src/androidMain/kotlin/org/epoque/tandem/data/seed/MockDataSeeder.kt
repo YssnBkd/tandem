@@ -10,6 +10,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.epoque.tandem.data.local.TandemDatabase
+import org.epoque.tandem.domain.model.FeedItemType
 import org.epoque.tandem.domain.model.GoalStatus
 import org.epoque.tandem.domain.model.GoalType
 import org.epoque.tandem.domain.model.OwnerType
@@ -54,10 +55,28 @@ class MockDataSeeder(
      */
     suspend fun seedIfNeeded(userId: String) {
         if (seedPreferences.isSeededSync()) {
+            // Already seeded, but check if feed items need to be added
+            // (for users who had older seed data before feed was implemented)
+            seedFeedItemsIfEmpty(userId)
             return
         }
         seedData(userId)
         seedPreferences.markSeeded(userId)
+    }
+
+    /**
+     * Seeds feed items if the feed table is empty.
+     * This allows existing users to get feed data without full re-seed.
+     */
+    private fun seedFeedItemsIfEmpty(userId: String) {
+        val existingCount = database.feedItemQueries.getUnreadCount(userId).executeAsOne()
+        val totalCount = database.feedItemQueries.getAllFeedItemsForUser(userId).executeAsList().size
+        if (totalCount == 0) {
+            database.transaction {
+                val weekIds = generateWeekIds()
+                seedFeedItems(userId, weekIds)
+            }
+        }
     }
 
     /**
@@ -90,6 +109,9 @@ class MockDataSeeder(
             partnerGoals.forEach { (goalId, goalType, startWeekIdx) ->
                 seedGoalProgress(goalId, goalType, weekIds, startWeekIdx)
             }
+
+            // Seed feed items to showcase all feed item types
+            seedFeedItems(userId, weekIds)
         }
     }
 
@@ -413,6 +435,404 @@ class MockDataSeeder(
                 created_at = weekDate.plus(6, DateTimeUnit.DAY).toInstantAtEndOfWeek()
             )
         }
+    }
+
+    /**
+     * Seeds feed items to showcase all feed item types.
+     * Creates a realistic mix of activities from both user and partner.
+     */
+    private fun seedFeedItems(userId: String, weekIds: List<String>) {
+        val currentWeekId = weekIds.first()
+        val currentWeekDate = WeekCalculator.parseWeekId(currentWeekId)
+
+        // Helper to create timestamps at various times today and recent days
+        fun daysAgo(days: Int, hour: Int = 10, minute: Int = 0): Instant {
+            val date = currentWeekDate.plus(days.toLong() * -1, DateTimeUnit.DAY)
+            return kotlinx.datetime.LocalDateTime(
+                date.year, date.monthNumber, date.dayOfMonth, hour, minute
+            ).toInstant(tz)
+        }
+
+        var feedItemIndex = 0
+        fun nextFeedId() = "feed-$userId-${feedItemIndex++}"
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // TODAY'S ITEMS (unread)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        // AI Plan Prompt (for users who haven't planned yet)
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.AI_PLAN_PROMPT,
+            timestamp = daysAgo(0, 8, 30),
+            is_read = 0L,
+            actor_id = null,
+            actor_name = "Tandem AI",
+            actor_type = "AI",
+            task_id = null,
+            task_title = null,
+            task_priority = null,
+            notified_partner = null,
+            assignment_note = null,
+            message_text = null,
+            week_id = currentWeekId,
+            week_start_date = currentWeekDate,
+            task_count = null,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = 3L,
+            dismissed = 0L,
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(0, 8, 30)
+        )
+
+        // Task completed by user (self) - today
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.TASK_COMPLETED,
+            timestamp = daysAgo(0, 9, 15),
+            is_read = 0L,
+            actor_id = userId,
+            actor_name = "You",
+            actor_type = "SELF",
+            task_id = "task-$userId-$currentWeekId-0",
+            task_title = "Morning workout",
+            task_priority = TaskPriority.P2.name,
+            notified_partner = 1L,
+            assignment_note = null,
+            message_text = null,
+            week_id = null,
+            week_start_date = null,
+            task_count = null,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = null,
+            dismissed = null,
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(0, 9, 15)
+        )
+
+        // Task assigned BY partner (needs accept/decline)
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.TASK_ASSIGNED,
+            timestamp = daysAgo(0, 10, 0),
+            is_read = 0L,
+            actor_id = FAKE_PARTNER_ID,
+            actor_name = FAKE_PARTNER_NAME,
+            actor_type = "PARTNER",
+            task_id = "task-assigned-$userId-1",
+            task_title = "Pick up dry cleaning",
+            task_priority = TaskPriority.P3.name,
+            notified_partner = null,
+            assignment_note = "Can you grab this on your way home? I have a meeting until 6pm",
+            message_text = null,
+            week_id = null,
+            week_start_date = null,
+            task_count = null,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = null,
+            dismissed = null,
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(0, 10, 0)
+        )
+
+        // Message from partner
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.MESSAGE,
+            timestamp = daysAgo(0, 11, 30),
+            is_read = 0L,
+            actor_id = FAKE_PARTNER_ID,
+            actor_name = FAKE_PARTNER_NAME,
+            actor_type = "PARTNER",
+            task_id = null,
+            task_title = null,
+            task_priority = null,
+            notified_partner = null,
+            assignment_note = null,
+            message_text = "Great job on the workout! Keep it up! 💪",
+            week_id = null,
+            week_start_date = null,
+            task_count = null,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = null,
+            dismissed = null,
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(0, 11, 30)
+        )
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // YESTERDAY'S ITEMS (mix of read/unread)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        // Task completed by partner
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.TASK_COMPLETED,
+            timestamp = daysAgo(1, 14, 0),
+            is_read = 1L,
+            actor_id = FAKE_PARTNER_ID,
+            actor_name = FAKE_PARTNER_NAME,
+            actor_type = "PARTNER",
+            task_id = "task-partner-completed-1",
+            task_title = "Grocery shopping",
+            task_priority = TaskPriority.P2.name,
+            notified_partner = 0L,
+            assignment_note = null,
+            message_text = null,
+            week_id = null,
+            week_start_date = null,
+            task_count = null,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = null,
+            dismissed = null,
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(1, 14, 0)
+        )
+
+        // Partner accepted a task you assigned
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.TASK_ACCEPTED,
+            timestamp = daysAgo(1, 15, 30),
+            is_read = 1L,
+            actor_id = FAKE_PARTNER_ID,
+            actor_name = FAKE_PARTNER_NAME,
+            actor_type = "PARTNER",
+            task_id = "task-accepted-by-partner-1",
+            task_title = "Book restaurant for Friday",
+            task_priority = TaskPriority.P1.name,
+            notified_partner = null,
+            assignment_note = null,
+            message_text = null,
+            week_id = null,
+            week_start_date = null,
+            task_count = null,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = null,
+            dismissed = null,
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(1, 15, 30)
+        )
+
+        // Week planned by user
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.WEEK_PLANNED,
+            timestamp = daysAgo(1, 20, 0),
+            is_read = 1L,
+            actor_id = userId,
+            actor_name = "You",
+            actor_type = "SELF",
+            task_id = null,
+            task_title = null,
+            task_priority = null,
+            notified_partner = null,
+            assignment_note = null,
+            message_text = null,
+            week_id = currentWeekId,
+            week_start_date = currentWeekDate,
+            task_count = 7L,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = null,
+            dismissed = null,
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(1, 20, 0)
+        )
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // OLDER ITEMS (2+ days ago, all read)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        // Partner declined a task
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.TASK_DECLINED,
+            timestamp = daysAgo(2, 9, 0),
+            is_read = 1L,
+            actor_id = FAKE_PARTNER_ID,
+            actor_name = FAKE_PARTNER_NAME,
+            actor_type = "PARTNER",
+            task_id = "task-declined-by-partner-1",
+            task_title = "Call the plumber",
+            task_priority = TaskPriority.P2.name,
+            notified_partner = null,
+            assignment_note = null,
+            message_text = null,
+            week_id = null,
+            week_start_date = null,
+            task_count = null,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = null,
+            dismissed = null,
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(2, 9, 0)
+        )
+
+        // Week planned by partner
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.WEEK_PLANNED,
+            timestamp = daysAgo(2, 19, 0),
+            is_read = 1L,
+            actor_id = FAKE_PARTNER_ID,
+            actor_name = FAKE_PARTNER_NAME,
+            actor_type = "PARTNER",
+            task_id = null,
+            task_title = null,
+            task_priority = null,
+            notified_partner = null,
+            assignment_note = null,
+            message_text = null,
+            week_id = currentWeekId,
+            week_start_date = currentWeekDate,
+            task_count = 5L,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = null,
+            dismissed = null,
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(2, 19, 0)
+        )
+
+        // Message from user (to show sent messages)
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.MESSAGE,
+            timestamp = daysAgo(3, 12, 0),
+            is_read = 1L,
+            actor_id = userId,
+            actor_name = "You",
+            actor_type = "SELF",
+            task_id = null,
+            task_title = null,
+            task_priority = null,
+            notified_partner = null,
+            assignment_note = null,
+            message_text = "Don't forget we have dinner with parents on Saturday!",
+            week_id = null,
+            week_start_date = null,
+            task_count = null,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = null,
+            dismissed = null,
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(3, 12, 0)
+        )
+
+        // AI Review prompt for last week
+        val lastWeekId = weekIds.getOrNull(1) ?: currentWeekId
+        val lastWeekDate = WeekCalculator.parseWeekId(lastWeekId)
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.AI_REVIEW_PROMPT,
+            timestamp = daysAgo(3, 18, 0),
+            is_read = 1L,
+            actor_id = null,
+            actor_name = "Tandem AI",
+            actor_type = "AI",
+            task_id = null,
+            task_title = null,
+            task_priority = null,
+            notified_partner = null,
+            assignment_note = null,
+            message_text = null,
+            week_id = lastWeekId,
+            week_start_date = lastWeekDate,
+            task_count = null,
+            completed_task_count = 5L,
+            total_task_count = 7L,
+            rollover_task_count = null,
+            dismissed = 1L, // Already dismissed
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(3, 18, 0)
+        )
+
+        // Week reviewed by user
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.WEEK_REVIEWED,
+            timestamp = daysAgo(4, 20, 0),
+            is_read = 1L,
+            actor_id = userId,
+            actor_name = "You",
+            actor_type = "SELF",
+            task_id = null,
+            task_title = null,
+            task_priority = null,
+            notified_partner = null,
+            assignment_note = null,
+            message_text = null,
+            week_id = lastWeekId,
+            week_start_date = lastWeekDate,
+            task_count = null,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = null,
+            dismissed = null,
+            partner_id = null,
+            partner_name = null,
+            created_at = daysAgo(4, 20, 0)
+        )
+
+        // Partner joined (oldest item)
+        database.feedItemQueries.upsertFeedItem(
+            id = nextFeedId(),
+            user_id = userId,
+            type = FeedItemType.PARTNER_JOINED,
+            timestamp = daysAgo(150, 14, 0), // 150 days ago when partnership was created
+            is_read = 1L,
+            actor_id = FAKE_PARTNER_ID,
+            actor_name = FAKE_PARTNER_NAME,
+            actor_type = "PARTNER",
+            task_id = null,
+            task_title = null,
+            task_priority = null,
+            notified_partner = null,
+            assignment_note = null,
+            message_text = null,
+            week_id = null,
+            week_start_date = null,
+            task_count = null,
+            completed_task_count = null,
+            total_task_count = null,
+            rollover_task_count = null,
+            dismissed = null,
+            partner_id = FAKE_PARTNER_ID,
+            partner_name = FAKE_PARTNER_NAME,
+            created_at = daysAgo(150, 14, 0)
+        )
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

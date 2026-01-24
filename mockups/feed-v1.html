@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tandem - Feed</title>
+    <style>
+        /* ========================================
+           DESIGN SYSTEM TOKENS
+           (Consistent with timeline-v1.html)
+           ======================================== */
+        :root {
+            /* Primary - Warm Terracotta */
+            --tandem-primary: #D97757;
+            --tandem-on-primary: #FFFFFF;
+            --tandem-primary-container: #FDF2EF;
+            --tandem-on-primary-container: #4A4238;
+
+            /* Secondary */
+            --tandem-secondary: #9C9488;
+            --tandem-secondary-container: #F0EBE6;
+            --tandem-on-secondary-container: #4A4238;
+
+            /* Tertiary - Coral (Partner color) */
+            --tandem-tertiary: #E07A5F;
+            --tandem-tertiary-container: #FFE5DE;
+
+            /* Background & Surface */
+            --background: #FFFBF7;
+            --on-background: #4A4238;
+            --surface: #FFFFFF;
+            --on-surface: #4A4238;
+            --surface-variant: #F0EBE6;
+            --on-surface-variant: #9C9488;
+            --outline: #E0DCD6;
+            --outline-light: #E0DCD6;
+
+            /* Priority Colors */
+            --priority-p1: #D1453B;
+            --priority-p1-light: rgba(209, 69, 59, 0.1);
+            --priority-p2: #EB8909;
+            --priority-p2-light: rgba(235, 137, 9, 0.1);
+            --priority-p3: #246FE0;
+            --priority-p3-light: rgba(36, 111, 224, 0.1);
+            --priority-p4: #79747E;
+
+            /* Status Colors */
+            --overdue-red: #D1453B;
+            --schedule-green: #058527;
+            --today-blue: #246FE0;
+            --coral-dark: #DC4C3E;
+
+            /* AI/System Colors */
+            --ai-purple: #7C3AED;
+            --ai-purple-light: rgba(124, 58, 237, 0.1);
+            --ai-purple-container: #F3E8FF;
+
+            /* Unread indicator */
+            --unread-blue: #246FE0;
+
+            /* Typography */
+            --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Roboto', sans-serif;
+
+            /* Spacing */
+            --spacing-2: 2px;
+            --spacing-4: 4px;
+            --spacing-6: 6px;
+            --spacing-8: 8px;
+            --spacing-12: 12px;
+            --spacing-16: 16px;
+            --spacing-24: 24px;
+            --spacing-32: 32px;
+
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 50px;
+        }
+
+        /* ========================================
+           RESET & BASE
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background);
+            color: var(--on-background);
+            line-height: 1.5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ========================================
+           APP CONTAINER (Mobile Frame)
+           ======================================== */
+        .app-container {
+            max-width: 390px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--background);
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
+        }
+
+        /* ========================================
+           TOP NAV BAR
+           ======================================== */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--background);
+            padding: var(--spacing-16);
+            padding-top: var(--spacing-24);
+            border-bottom: 1px solid var(--outline);
+        }
+
+        .top-nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--on-background);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--spacing-8);
+        }
+
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: var(--surface);
+            color: var(--on-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--surface-variant);
+        }
+
+        .nav-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ========================================
+           FILTER BAR (Segment Control)
+           ======================================== */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-8);
+            padding: var(--spacing-8) var(--spacing-16);
+            background: var(--background);
+            border-bottom: 1px solid var(--outline);
+        }
+
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-4);
+            padding: var(--spacing-6) var(--spacing-12);
+            border-radius: var(--radius-full);
+            background: var(--surface);
+            border: 1px solid var(--outline);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--on-surface-variant);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active {
+            background: var(--tandem-primary-container);
+            border-color: var(--tandem-primary);
+            color: var(--tandem-primary);
+        }
+
+        .filter-chip svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ========================================
+           FEED CONTENT
+           ======================================== */
+        .feed-content {
+            padding-bottom: 80px;
+        }
+
+        /* ========================================
+           STICKY SECTION HEADER (Day)
+           ======================================== */
+        .section-header {
+            position: sticky;
+            top: 89px;
+            z-index: 50;
+            background: var(--background);
+            padding: var(--spacing-12) var(--spacing-16);
+            border-bottom: 1px solid var(--outline);
+        }
+
+        .section-header-content {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-8);
+        }
+
+        .section-day {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--on-background);
+        }
+
+        .section-date {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--on-surface-variant);
+        }
+
+        /* "You're all caught up" separator */
+        .caught-up-separator {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-12);
+            padding: var(--spacing-16) var(--spacing-16);
+            margin: var(--spacing-8) var(--spacing-16);
+        }
+
+        .caught-up-line {
+            flex: 1;
+            height: 1px;
+            background: var(--outline);
+        }
+
+        .caught-up-content {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-6);
+            color: var(--on-surface-variant);
+        }
+
+        .caught-up-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--schedule-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .caught-up-icon svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .caught-up-text {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--on-surface-variant);
+            white-space: nowrap;
+        }
+
+        /* ========================================
+           FEED CARD (Matching week-card from timeline)
+           ======================================== */
+        .feed-card {
+            margin: var(--spacing-8) var(--spacing-16);
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--outline);
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .feed-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .feed-card.unread {
+            position: relative;
+        }
+
+        /* iOS-style unread dot - top right corner */
+        .feed-card.unread::before {
+            content: '';
+            position: absolute;
+            top: var(--spacing-8);
+            right: var(--spacing-8);
+            width: 10px;
+            height: 10px;
+            background: var(--unread-blue);
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        .feed-card.assignment {
+            border: 2px solid var(--tandem-tertiary);
+            background: linear-gradient(to bottom, var(--tandem-tertiary-container), var(--surface));
+        }
+
+        .feed-card.ai-prompt {
+            border: 2px solid var(--ai-purple);
+            background: linear-gradient(to bottom, var(--ai-purple-container), var(--surface));
+        }
+
+        /* Card Header (like week-card-header) */
+        .feed-card-header {
+            display: flex;
+            align-items: flex-start;
+            padding: var(--spacing-12) var(--spacing-16);
+            gap: var(--spacing-12);
+        }
+
+        /* Card Body (like week-card-body) */
+        .feed-card-body {
+            border-top: 1px solid var(--outline);
+            padding: var(--spacing-8) var(--spacing-16);
+        }
+
+        /* Card Footer (like week-card-footer) */
+        .feed-card-footer {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-8);
+            padding: var(--spacing-8) var(--spacing-16);
+            border-top: 1px solid var(--outline);
+        }
+
+        /* ========================================
+           AVATAR
+           ======================================== */
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .avatar.partner { background: var(--tandem-tertiary); }
+        .avatar.self { background: var(--tandem-primary); }
+        .avatar.ai { background: var(--ai-purple); }
+        .avatar.system { background: var(--tandem-secondary); }
+
+        .avatar svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ========================================
+           CARD INFO
+           ======================================== */
+        .feed-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .feed-card-label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-8);
+        }
+
+        .actor-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+
+        .actor-action {
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--on-surface-variant);
+        }
+
+        .feed-card-time {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+            margin-top: var(--spacing-2);
+        }
+
+        /* ========================================
+           MESSAGE CONTENT
+           ======================================== */
+        .message-text {
+            font-size: 14px;
+            color: var(--on-surface);
+            line-height: 1.5;
+        }
+
+        /* ========================================
+           TASK LIST (Matching timeline task-list)
+           ======================================== */
+        .task-list {
+            padding: var(--spacing-8) 0;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            padding: var(--spacing-8) var(--spacing-16);
+            gap: var(--spacing-12);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .task-item:hover {
+            background: var(--surface-variant);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--priority-p4);
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+
+        .task-checkbox.p1 {
+            border-color: var(--priority-p1);
+            background: var(--priority-p1-light);
+        }
+
+        .task-checkbox.p2 {
+            border-color: var(--priority-p2);
+            background: var(--priority-p2-light);
+        }
+
+        .task-checkbox.p3 {
+            border-color: var(--priority-p3);
+            background: var(--priority-p3-light);
+        }
+
+        .task-checkbox.completed {
+            border-color: var(--outline-light);
+            background: var(--outline-light);
+        }
+
+        .task-checkbox.completed svg {
+            width: 12px;
+            height: 12px;
+            color: white;
+        }
+
+        .task-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-title {
+            font-size: 14px;
+            color: var(--on-surface);
+            line-height: 1.4;
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            color: var(--on-surface-variant);
+            opacity: 0.6;
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-8);
+            margin-top: var(--spacing-4);
+            font-size: 11px;
+            color: var(--on-surface-variant);
+        }
+
+        .task-meta svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .task-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-4);
+        }
+
+        .notification-sent {
+            color: var(--tandem-tertiary);
+        }
+
+        /* ========================================
+           ACTION BUTTONS (Matching view-detail-btn)
+           ======================================== */
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-6);
+            padding: var(--spacing-8) var(--spacing-16);
+            border-radius: var(--radius-full);
+            border: none;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .action-btn.primary {
+            background: var(--tandem-primary-container);
+            color: var(--tandem-primary);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--tandem-tertiary-container);
+        }
+
+        .action-btn.secondary {
+            background: var(--surface-variant);
+            color: var(--on-surface-variant);
+        }
+
+        .action-btn.secondary:hover {
+            background: var(--outline);
+        }
+
+        .action-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* AI prompt specific CTA */
+        .action-btn.ai {
+            background: var(--ai-purple);
+            color: white;
+        }
+
+        .action-btn.ai:hover {
+            opacity: 0.9;
+        }
+
+        /* ========================================
+           ASSIGNMENT NOTE
+           ======================================== */
+        .assignment-note {
+            font-size: 13px;
+            color: var(--on-surface-variant);
+            font-style: italic;
+            padding: 0 var(--spacing-16);
+            padding-bottom: var(--spacing-8);
+        }
+
+        /* ========================================
+           WEEK EVENT PREVIEW
+           ======================================== */
+        .week-event-preview {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-12);
+        }
+
+        .week-event-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            background: var(--tandem-primary-container);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--tandem-primary);
+        }
+
+        .week-event-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .week-event-info {
+            flex: 1;
+        }
+
+        .week-event-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--on-surface);
+        }
+
+        .week-event-meta {
+            font-size: 12px;
+            color: var(--on-surface-variant);
+        }
+
+        /* ========================================
+           INVITE CARD
+           ======================================== */
+        .invite-card {
+            margin: var(--spacing-16);
+            padding: var(--spacing-24);
+            background: linear-gradient(135deg, var(--tandem-primary-container) 0%, var(--surface) 100%);
+            border-radius: var(--radius-lg);
+            border: 1px dashed var(--tandem-primary);
+            text-align: center;
+        }
+
+        .invite-card-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto var(--spacing-16);
+            background: var(--tandem-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .invite-card-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .invite-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--on-surface);
+            margin-bottom: var(--spacing-4);
+        }
+
+        .invite-card-description {
+            font-size: 14px;
+            color: var(--on-surface-variant);
+            margin-bottom: var(--spacing-16);
+        }
+
+        .invite-card-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-6);
+            padding: var(--spacing-12) var(--spacing-24);
+            background: var(--tandem-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .invite-card-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* ========================================
+           MESSAGE INPUT BAR
+           ======================================== */
+        .input-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 390px;
+            background: var(--surface);
+            border-top: 1px solid var(--outline);
+            padding: var(--spacing-12) var(--spacing-16);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-12);
+            z-index: 200;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: var(--spacing-12) var(--spacing-16);
+            background: var(--surface-variant);
+            border: none;
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--on-surface);
+            outline: none;
+            transition: background 0.2s;
+        }
+
+        .input-field:focus {
+            background: var(--outline);
+        }
+
+        .input-field::placeholder {
+            color: var(--on-surface-variant);
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--tandem-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .send-btn:hover {
+            opacity: 0.9;
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .send-btn:disabled {
+            background: var(--outline);
+            color: var(--on-surface-variant);
+            cursor: not-allowed;
+        }
+
+        .send-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ========================================
+           ANIMATIONS
+           ======================================== */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feed-card {
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        .feed-card:nth-child(1) { animation-delay: 0ms; }
+        .feed-card:nth-child(2) { animation-delay: 50ms; }
+        .feed-card:nth-child(3) { animation-delay: 100ms; }
+        .feed-card:nth-child(4) { animation-delay: 150ms; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="top-nav-content">
+                <h1 class="nav-title">Feed</h1>
+                <div class="nav-actions">
+                    <button class="nav-btn" title="More options">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="1"/>
+                            <circle cx="12" cy="5" r="1"/>
+                            <circle cx="12" cy="19" r="1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <button class="filter-chip active" id="filterAll">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                All
+            </button>
+            <button class="filter-chip" id="filterTasks">Tasks</button>
+            <button class="filter-chip" id="filterMessages">Messages</button>
+        </div>
+
+        <!-- Feed Content -->
+        <div class="feed-content">
+
+            <!-- Today Section -->
+            <div class="section-header">
+                <div class="section-header-content">
+                    <span class="section-day">Today</span>
+                    <span class="section-date">Thursday, Jan 23</span>
+                </div>
+            </div>
+
+            <!-- AI Plan Prompt -->
+            <div class="feed-card ai-prompt unread">
+                <div class="feed-card-header">
+                    <div class="avatar ai">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <div class="feed-card-info">
+                        <div class="feed-card-label">
+                            <span class="actor-name">Tandem</span>
+                        </div>
+                        <div class="feed-card-time">8:00 AM</div>
+                    </div>
+                </div>
+                <div class="feed-card-body">
+                    <div class="task-title" style="font-weight: 600; margin-bottom: 4px;">Ready to plan your week?</div>
+                    <div class="task-meta" style="margin-top: 0;">You have 3 tasks rolled over from last week.</div>
+                </div>
+                <div class="feed-card-footer">
+                    <button class="action-btn ai">
+                        Start Planning
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </button>
+                    <button class="action-btn secondary" title="Dismiss">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task Assignment -->
+            <div class="feed-card assignment unread">
+                <div class="feed-card-header">
+                    <div class="avatar partner">S</div>
+                    <div class="feed-card-info">
+                        <div class="feed-card-label">
+                            <span class="actor-name">Sarah</span>
+                            <span class="actor-action">assigned you a task</span>
+                        </div>
+                        <div class="feed-card-time">9:30 AM</div>
+                    </div>
+                </div>
+                <div class="feed-card-body">
+                    <div class="task-list" style="padding: 0;">
+                        <div class="task-item" style="padding: 0;">
+                            <div class="task-checkbox p2"></div>
+                            <div class="task-content">
+                                <div class="task-title">Pick up birthday cake from bakery</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="assignment-note">"Don't forget it's the chocolate one! They close at 6pm"</div>
+                <div class="feed-card-footer">
+                    <button class="action-btn primary">
+                        Accept
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </button>
+                    <button class="action-btn secondary">Decline</button>
+                </div>
+            </div>
+
+            <!-- Message from partner -->
+            <div class="feed-card unread">
+                <div class="feed-card-header">
+                    <div class="avatar partner">S</div>
+                    <div class="feed-card-info">
+                        <div class="feed-card-label">
+                            <span class="actor-name">Sarah</span>
+                        </div>
+                        <div class="feed-card-time">2:30 PM</div>
+                    </div>
+                </div>
+                <div class="feed-card-body">
+                    <p class="message-text">Running about 10 minutes late! Can you start dinner prep?</p>
+                </div>
+            </div>
+
+            <!-- "You're all caught up" separator -->
+            <div class="caught-up-separator">
+                <div class="caught-up-line"></div>
+                <div class="caught-up-content">
+                    <div class="caught-up-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    <span class="caught-up-text">You're all caught up</span>
+                </div>
+                <div class="caught-up-line"></div>
+            </div>
+
+            <!-- Task Completion by Partner -->
+            <div class="feed-card">
+                <div class="feed-card-header">
+                    <div class="avatar partner">S</div>
+                    <div class="feed-card-info">
+                        <div class="feed-card-label">
+                            <span class="actor-name">Sarah</span>
+                            <span class="actor-action">completed a task</span>
+                        </div>
+                        <div class="feed-card-time">11:42 AM</div>
+                    </div>
+                </div>
+                <div class="feed-card-body">
+                    <div class="task-list" style="padding: 0;">
+                        <div class="task-item completed" style="padding: 0;">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Grocery shopping</div>
+                                <div class="task-meta">
+                                    <span class="task-meta-item notification-sent">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                                        </svg>
+                                        Notified you
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Own Task Completion -->
+            <div class="feed-card">
+                <div class="feed-card-header">
+                    <div class="avatar self">Y</div>
+                    <div class="feed-card-info">
+                        <div class="feed-card-label">
+                            <span class="actor-name">You</span>
+                            <span class="actor-action">completed a task</span>
+                        </div>
+                        <div class="feed-card-time">10:15 AM</div>
+                    </div>
+                </div>
+                <div class="feed-card-body">
+                    <div class="task-list" style="padding: 0;">
+                        <div class="task-item completed" style="padding: 0;">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Book flight tickets</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yesterday Section -->
+            <div class="section-header">
+                <div class="section-header-content">
+                    <span class="section-day">Yesterday</span>
+                    <span class="section-date">Wednesday, Jan 22</span>
+                </div>
+            </div>
+
+            <!-- Partner finished planning -->
+            <div class="feed-card">
+                <div class="feed-card-header">
+                    <div class="avatar partner">S</div>
+                    <div class="feed-card-info">
+                        <div class="feed-card-label">
+                            <span class="actor-name">Sarah</span>
+                            <span class="actor-action">finished planning</span>
+                        </div>
+                        <div class="feed-card-time">8:00 PM</div>
+                    </div>
+                </div>
+                <div class="feed-card-body">
+                    <div class="week-event-preview">
+                        <div class="week-event-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                        </div>
+                        <div class="week-event-info">
+                            <div class="week-event-title">Week of Jan 20</div>
+                            <div class="week-event-meta">Planned 8 tasks</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Own message sent -->
+            <div class="feed-card">
+                <div class="feed-card-header">
+                    <div class="avatar self">Y</div>
+                    <div class="feed-card-info">
+                        <div class="feed-card-label">
+                            <span class="actor-name">You</span>
+                        </div>
+                        <div class="feed-card-time">3:42 PM</div>
+                    </div>
+                </div>
+                <div class="feed-card-body">
+                    <p class="message-text">Sounds good! I'll handle dinner tonight.</p>
+                </div>
+            </div>
+
+            <!-- Task Accepted -->
+            <div class="feed-card">
+                <div class="feed-card-header">
+                    <div class="avatar partner">S</div>
+                    <div class="feed-card-info">
+                        <div class="feed-card-label">
+                            <span class="actor-name">Sarah</span>
+                            <span class="actor-action">accepted your task</span>
+                        </div>
+                        <div class="feed-card-time">10:00 AM</div>
+                    </div>
+                </div>
+                <div class="feed-card-body">
+                    <div class="task-list" style="padding: 0;">
+                        <div class="task-item" style="padding: 0;">
+                            <div class="task-checkbox p3"></div>
+                            <div class="task-content">
+                                <div class="task-title">Call insurance company</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Earlier this week -->
+            <div class="section-header">
+                <div class="section-header-content">
+                    <span class="section-day">Monday</span>
+                    <span class="section-date">Jan 20</span>
+                </div>
+            </div>
+
+            <!-- Partner joined -->
+            <div class="feed-card">
+                <div class="feed-card-header">
+                    <div class="avatar system">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="8.5" cy="7" r="4"/>
+                            <line x1="20" y1="8" x2="20" y2="14"/>
+                            <line x1="23" y1="11" x2="17" y2="11"/>
+                        </svg>
+                    </div>
+                    <div class="feed-card-info">
+                        <div class="feed-card-label">
+                            <span class="actor-name">Sarah</span>
+                            <span class="actor-action">joined as your partner</span>
+                        </div>
+                        <div class="feed-card-time">2:30 PM</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Own completion -->
+            <div class="feed-card">
+                <div class="feed-card-header">
+                    <div class="avatar self">Y</div>
+                    <div class="feed-card-info">
+                        <div class="feed-card-label">
+                            <span class="actor-name">You</span>
+                            <span class="actor-action">completed a task</span>
+                        </div>
+                        <div class="feed-card-time">9:00 AM</div>
+                    </div>
+                </div>
+                <div class="feed-card-body">
+                    <div class="task-list" style="padding: 0;">
+                        <div class="task-item completed" style="padding: 0;">
+                            <div class="task-checkbox completed">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">Set up weekly goals</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Message Input Bar -->
+        <div class="input-bar">
+            <input type="text" class="input-field" placeholder="Message Sarah..." id="messageInput">
+            <button class="send-btn" id="sendBtn" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Filter chips
+        const filterChips = document.querySelectorAll('.filter-chip');
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                filterChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            });
+        });
+
+        // Message input
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        messageInput.addEventListener('input', () => {
+            sendBtn.disabled = messageInput.value.trim() === '';
+        });
+
+        sendBtn.addEventListener('click', () => {
+            if (messageInput.value.trim()) {
+                alert('Message sent: ' + messageInput.value);
+                messageInput.value = '';
+                sendBtn.disabled = true;
+            }
+        });
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !sendBtn.disabled) {
+                sendBtn.click();
+            }
+        });
+
+        // Task items click
+        document.querySelectorAll('.task-item').forEach(item => {
+            item.addEventListener('click', () => {
+                alert('Opens task detail sheet');
+            });
+        });
+
+        // Action buttons
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const text = btn.textContent.trim();
+                if (text === 'Accept') {
+                    alert('Task accepted');
+                } else if (text === 'Decline') {
+                    alert('Task declined');
+                } else if (text.includes('Planning')) {
+                    alert('Navigate to Planning screen');
+                }
+            });
+        });
+
+        // Dismiss button (X)
+        document.querySelectorAll('.action-btn.secondary svg line').forEach(svg => {
+            svg.closest('.action-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const card = e.target.closest('.feed-card');
+                if (card) {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateX(-100%)';
+                    card.style.transition = 'all 0.3s ease';
+                    setTimeout(() => card.remove(), 300);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

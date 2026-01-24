@@ -56,6 +56,15 @@ object TandemDatabaseFactory {
                 created_atAdapter = instantAdapter,
                 updated_atAdapter = instantAdapter,
                 synced_atAdapter = instantAdapter
+            ),
+            FeedItemAdapter = FeedItem.Adapter(
+                typeAdapter = EnumColumnAdapter(),
+                timestampAdapter = instantAdapter,
+                week_start_dateAdapter = localDateAdapter,
+                created_atAdapter = instantAdapter
+            ),
+            FeedLastReadAdapter = FeedLastRead.Adapter(
+                timestampAdapter = instantAdapter
             )
         )
     }

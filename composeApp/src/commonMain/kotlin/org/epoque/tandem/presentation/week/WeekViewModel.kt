@@ -40,6 +40,7 @@ import org.epoque.tandem.domain.repository.TaskRepository
 import org.epoque.tandem.domain.repository.WeekRepository
 import org.epoque.tandem.domain.usecase.review.CalculateStreakUseCase
 import org.epoque.tandem.domain.usecase.review.IsReviewWindowOpenUseCase
+import org.epoque.tandem.domain.usecase.task.CompleteTaskUseCase
 import org.epoque.tandem.presentation.week.model.AddTaskFormState
 import org.epoque.tandem.presentation.week.model.CalendarDay
 import org.epoque.tandem.presentation.week.model.Segment
@@ -68,7 +69,8 @@ class WeekViewModel(
     private val authRepository: AuthRepository,
     private val isReviewWindowOpenUseCase: IsReviewWindowOpenUseCase,
     private val calculateStreakUseCase: CalculateStreakUseCase,
-    private val goalRepository: GoalRepository
+    private val goalRepository: GoalRepository,
+    private val completeTaskUseCase: CompleteTaskUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WeekUiState())
@@ -448,28 +450,17 @@ class WeekViewModel(
             val task = taskRepository.getTaskById(taskId) ?: return@launch
             val wasCompleted = task.status == TaskStatus.COMPLETED ||
                 (task.isRepeating && task.repeatCompleted >= (task.repeatTarget ?: 0))
+            val userId = currentUserId ?: return@launch
 
-            if (task.isRepeating) {
-                val newCount = task.repeatCompleted + 1
-                taskRepository.incrementRepeatCount(taskId)
-
-                if (newCount >= (task.repeatTarget ?: 0)) {
-                    taskRepository.updateTaskStatus(taskId, TaskStatus.COMPLETED)
-                }
+            if (wasCompleted) {
+                // Uncomplete the task
+                completeTaskUseCase.uncomplete(taskId)
             } else {
-                val newStatus = if (task.status == TaskStatus.COMPLETED) {
-                    TaskStatus.PENDING
-                } else {
-                    TaskStatus.COMPLETED
-                }
-                taskRepository.updateTaskStatus(taskId, newStatus)
-            }
-
-            // Increment goal progress when task is completed (not uncompleted)
-            val isNowCompleted = !wasCompleted
-            val goalId = task.linkedGoalId
-            if (isNowCompleted && goalId != null) {
-                goalRepository.incrementProgress(goalId, 1)
+                // Complete the task - use case handles:
+                // - Updating task status (including repeating tasks)
+                // - Creating feed item
+                // - Incrementing goal progress
+                completeTaskUseCase(taskId, userId)
             }
 
             _sideEffects.send(WeekSideEffect.TriggerHapticFeedback)

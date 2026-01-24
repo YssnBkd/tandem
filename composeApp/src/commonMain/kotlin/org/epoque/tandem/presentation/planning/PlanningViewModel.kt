@@ -24,6 +24,7 @@ import org.epoque.tandem.domain.repository.AuthState
 import org.epoque.tandem.domain.repository.GoalRepository
 import org.epoque.tandem.domain.repository.TaskRepository
 import org.epoque.tandem.domain.repository.WeekRepository
+import org.epoque.tandem.domain.usecase.planning.CompletePlanningUseCase
 import org.epoque.tandem.presentation.planning.preferences.PlanningProgress
 import org.epoque.tandem.presentation.planning.preferences.PlanningProgressState
 import org.epoque.tandem.presentation.week.model.TaskUiModel
@@ -44,7 +45,8 @@ class PlanningViewModel(
     private val weekRepository: WeekRepository,
     private val authRepository: AuthRepository,
     private val goalRepository: GoalRepository,
-    private val planningProgress: PlanningProgress
+    private val planningProgress: PlanningProgress,
+    private val completePlanningUseCase: CompletePlanningUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PlanningUiState())
@@ -439,9 +441,10 @@ class PlanningViewModel(
         viewModelScope.launch {
             try {
                 val weekId = currentWeek?.id ?: return@launch
+                val userId = currentUserId ?: return@launch
 
-                // Mark planning as completed
-                weekRepository.markPlanningCompleted(weekId)
+                // Complete planning and create feed item
+                completePlanningUseCase(weekId, userId)
 
                 // Clear saved progress
                 planningProgress.clearProgress()

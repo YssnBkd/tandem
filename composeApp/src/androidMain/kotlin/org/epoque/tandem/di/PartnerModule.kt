@@ -22,6 +22,7 @@ val partnerModule = module {
             authRepository = get(),
             partnerRepository = get(),
             inviteRepository = get(),
+            feedRepository = get(),
             taskRepository = get(),
             weekRepository = get()
         )

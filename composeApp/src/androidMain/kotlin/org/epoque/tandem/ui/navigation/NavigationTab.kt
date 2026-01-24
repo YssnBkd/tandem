@@ -1,7 +1,9 @@
 package org.epoque.tandem.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Flag
@@ -29,6 +31,14 @@ sealed class NavigationTab(
         unselectedIcon = Icons.Outlined.CalendarMonth
     )
 
+    /** Feed tab - communication hub with partner */
+    data object Feed : NavigationTab(
+        route = Routes.Main.Feed,
+        title = "Feed",
+        selectedIcon = Icons.AutoMirrored.Filled.Chat,
+        unselectedIcon = Icons.AutoMirrored.Outlined.Chat
+    )
+
     data object Progress : NavigationTab(
         route = Routes.Main.Progress,
         title = "Progress",
@@ -52,7 +62,7 @@ sealed class NavigationTab(
     )
 
     companion object {
-        val entries = listOf(Week, Progress, Goals, Timeline)
+        val entries = listOf(Week, Feed, Progress, Goals, Timeline)
 
         /** Saver for use with rememberSaveable */
         val Saver: Saver<NavigationTab, String> = Saver(
